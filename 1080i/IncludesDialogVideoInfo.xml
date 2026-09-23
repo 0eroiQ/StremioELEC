@@ -583,7 +583,7 @@
 								<!-- plugin with fallback -->
 								<!-- tvshow trailer local/youtube -->	
 
-<onclick>RunScript(special://home/addons/plugin.video.stremioelec/trailer_player.py)</onclick>
+<onclick>RunScript(special://skin/extras/stremio_dispatch.py,trailer_player.py)</onclick>
 </control>
 
 							<!--Similar Button	-->	
@@ -1829,7 +1829,7 @@
 								<!-- plugin with fallback -->
 								<!-- tvshow trailer local/youtube -->	
 
-<onclick>RunScript(special://home/addons/plugin.video.stremioelec/trailer_player.py)</onclick>
+<onclick>RunScript(special://skin/extras/stremio_dispatch.py,trailer_player.py)</onclick>
 </control>
 							
 							<!--Trailers Button-->
@@ -2493,7 +2493,7 @@
 			
 				<!--Trailers List-->
 				<control type="fixedlist" id="354">
-                    <onclick>RunScript(special://home/addons/plugin.video.stremioelec/trailer_player.py,selected)</onclick>
+                    <onclick>RunScript(special://skin/extras/stremio_dispatch.py,trailer_player.py,selected)</onclick>
 					<top>-153</top>
                     <posx>781</posx>
                     <height>1280</height>

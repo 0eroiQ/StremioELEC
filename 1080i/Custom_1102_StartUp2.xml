@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <window id="1102"><defaultcontrol always="true">102</defaultcontrol>
-<onload>RunScript(special://home/addons/plugin.video.stremioelec/onboarding.py)</onload>
+<onload>RunScript(special://skin/extras/stremio_dispatch.py,onboarding.py)</onload>
 <onunload>SetProperty(StremioOnboardingCancel,1,Home)</onunload>
 <controls><control type="image"><include>FullscreenDimensions</include><texture colordiffuse="ff000000">colors/color_white.png</texture></control><control type="label"><left>400</left><top>150</top><width>1120</width><height>100</height><font>Bold60</font><align>center</align><textcolor>ff9b7cff</textcolor><label>StremioELEC</label></control>
 <control type="label"><left>420</left><top>310</top><width>1080</width><height>60</height><font>Bold40</font><label>Connect your Stremio account</label></control>
