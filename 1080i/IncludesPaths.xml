@@ -478,6 +478,7 @@
     </variable>
 	
 	<variable name="DefWidgetContent">
+		<value condition="System.HasAddon(plugin.video.stremioelec) + Skin.HasSetting(StremioCatalogPilot)">plugin://plugin.video.stremioelec/?action=catalog&amp;kind=movie&amp;id=top</value>
 		<value condition="Library.HasContent(Movies) | Library.HasContent(TVShows)">plugin://script.bingie.widgets/?action=inprogressnextepisode&amp;mediatype=media&amp;limit=25&amp;reload=$INFO[Window(Home).Property(widgetreload)]</value>
         <value condition="!Library.HasContent(Movies) + !Library.HasContent(TVShows)">plugin://plugin.video.tmdb.bingie.helper?info=trakt_trending&amp;tmdb_type=movie&amp;widget=true&amp;reload=$INFO[Window(Home).Property(TMDbBingieHelper.Widgets.Reload)]</value>
     </variable>
