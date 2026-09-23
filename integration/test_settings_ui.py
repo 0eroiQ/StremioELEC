@@ -41,6 +41,18 @@ class SettingsTests(unittest.TestCase):
             prepare.assert_not_called()
             store.assert_not_called()
 
+    def test_updates_open_only_our_updater(self):
+        with patch.object(self.module, 'choose', return_value=1):
+            self.xbmc.getCondVisibility.return_value = True
+            self.module.run('system')
+            self.xbmc.executebuiltin.assert_called_once_with('RunScript(special://xbmc/addons/service.stremioelec.updates/ui.py)')
+
+    def test_missing_updater_does_not_install_or_restart(self):
+        with patch.object(self.module, 'choose', return_value=1):
+            self.xbmc.getCondVisibility.return_value = False
+            self.module.run('system')
+            self.xbmc.executebuiltin.assert_not_called()
+
     def test_reset_blocked_during_playback(self):
         self.xbmc.Player.return_value.isPlaying.return_value = True
         with patch.object(self.module, 'prepare') as prepare:

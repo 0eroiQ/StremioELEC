@@ -258,11 +258,16 @@ def run(section):
     elif section == 'subtitles':
         kodi_menu('Subtitles', [('locale.subtitlelanguage', 'Preferred language'), ('subtitles.languages', 'Download languages'), ('subtitles.downloadfirst', 'Automatically download first subtitle'), ('subtitles.fontsize', 'Text size'), ('subtitles.fontname', 'Font'), ('subtitles.style', 'Text style'), ('subtitles.colorpick', 'Text color'), ('subtitles.align', 'Position'), ('subtitles.backgroundtype', 'Background style'), ('subtitles.bordercolorpick', 'Border color'), ('subtitles.overridestyles', 'Override subtitle styles')])
     elif section == 'system':
-        index = choose('System', ['System information', 'Restart', 'Power off'])
+        index = choose('System', ['System information', 'Updates', 'Restart', 'Power off'])
         if index == 0:
             DIALOG.ok('StremioELEC', 'Kodi engine: ' + xbmc.getInfoLabel('System.BuildVersion') + '\nIP: ' + xbmc.getInfoLabel('Network.IPAddress'))
-        elif index > 0 and DIALOG.yesno('StremioELEC', 'This affects the whole device. Continue?'):
-            xbmc.executebuiltin('Reboot' if index == 1 else 'Powerdown')
+        elif index == 1:
+            if xbmc.getCondVisibility('System.HasAddon(service.stremioelec.updates)'):
+                xbmc.executebuiltin('RunScript(special://xbmc/addons/service.stremioelec.updates/ui.py)')
+            else:
+                DIALOG.ok('StremioELEC updates', 'Updates are available on the StremioELEC OS image. This development runtime has no system updater.')
+        elif index > 1 and DIALOG.yesno('StremioELEC', 'This affects the whole device. Continue?'):
+            xbmc.executebuiltin('Reboot' if index == 2 else 'Powerdown')
     elif section == 'maintenance':
         index = choose('Maintenance', ['Restore default Home (10 rows)', 'Reset login and Home / return to welcome'])
         if index == 0 and DIALOG.yesno('Restore Home', 'Replace your Home rows with the default ten rows?'):
@@ -271,7 +276,7 @@ def run(section):
         elif index == 1:
             reset_account()
     elif section == 'about':
-        DIALOG.ok('About StremioELEC', 'StremioELEC test build\nPowered by Kodi, Bingie skin and TMDb Bingie Helper.\nOriginal component licences and credits remain included with their source.\nOS update, Music, Live TV and Weather integrations are not yet installed.')
+        DIALOG.ok('About StremioELEC', 'StremioELEC test build\nPowered by Kodi, Bingie skin and TMDb Bingie Helper.\nOriginal component licences and credits remain included with their source.\nOS updates require our OS image. Music, Live TV and Weather integrations are not yet installed.')
 
 
 if __name__ == '__main__':
