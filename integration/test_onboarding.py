@@ -49,7 +49,12 @@ class OnboardingTest(unittest.TestCase):
         actions = [node.text for node in root.findall('.//onclick')]
         self.assertIn('ReplaceWindow(1102)', actions)
         self.assertFalse(any('kodisetting' in action for action in actions))
-        self.assertIn('Skin.SetBool(StremioOnboardingDone)', actions)
+        self.assertEqual(actions, ['ReplaceWindow(1102)'])
+        buttons = root.findall(".//control[@type='button']")
+        self.assertEqual(len(buttons), 1)
+        self.assertEqual(buttons[0].findtext('label'), 'Connect to Stremio')
+        self.assertEqual(buttons[0].findtext('onleft'), '101')
+        self.assertEqual(buttons[0].findtext('onright'), '101')
 
     def test_qr_and_ready_state_are_wired(self):
         root = ET.parse(ROOT / '1080i/Custom_1102_StartUp2.xml').getroot()
