@@ -11,3 +11,9 @@ An opt-in first Home widget is available for the default Cinemeta manifest: enab
 Not implemented: QR login, account addon import, cross-addon metadata/stream aggregation, search/filter/pagination UI, subtitle providers, progress sync, torrent service, DRM, or streams requiring proxy headers. Catalog-only addons do not guarantee metadata resources. Runtime acceptance must cover these failures without confusing them with successful playback.
 
 Required before removing TMDB/widgets: install pilot on a compatible Kodi instance, validate Home focus/details/episodes, play an authorized direct HTTP sample with audio, then implement account-driven routes and migrate all remaining TMDB references. No Kodi installation was available on the development Mac during the initial source check.
+
+## Offline pilot bundle
+
+`build_bundle.py --inputs INPUT_DIRECTORY --output OUTPUT_DIRECTORY` packages the local skin and bridge and resolves mandatory dependencies recursively from actual ZIP manifests. Inputs are `bingie.xml` (Bingie Omega repository index), `kodi.xml.gz` (official Kodi Omega index), and `builtins/*/addon.xml` extracted from the target LibreELEC image. Use a fresh output directory for a new dependency snapshot.
+
+The builder checks archive paths, CRC, addon identity and dependency minimum versions. It produces a version/source/hash inventory, `SHA256SUMS` and a dependency-first `INSTALL.md`. Hashes are local integrity records, not upstream signatures. This does not install anything, rewrite an image, or validate runtime compatibility. No update repository addon is bundled. Dependencies are retained until the Stremio replacement passes runtime acceptance.
