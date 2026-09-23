@@ -10,7 +10,7 @@ import xbmcgui
 import xbmcplugin
 
 from protocol import base_url, catalogs, fetch, resource_url
-from account import AccountError, Store, create_link, read_link, pull_addons
+from account import AccountError, Store, create_link, read_link, pull_addons, pull_library, library_rows
 from sources import collect, direct_url
 
 HANDLE = int(sys.argv[1])
@@ -42,6 +42,11 @@ def connect_account():
                 if progress.iscanceled() or monitor.abortRequested():
                     return
                 STORE.save({'token': token, 'addons': addons})
+                try:
+                    library = pull_library(token)
+                    STORE.save({'token': token, 'addons': addons, 'library': library})
+                except AccountError:
+                    xbmcgui.Dialog().notification('Stremio', 'Library import failed; retry Refresh library.')
                 progress.close()
                 xbmcgui.Dialog().ok('Stremio connected',
                     '{} addons imported. {} unsupported entries skipped.'.format(len(addons), skipped))
@@ -73,7 +78,7 @@ def item(meta):
 
 def run(params):
     action = params.get('action', 'root')
-    if action in ('connect', 'sync', 'disconnect'):
+    if action in ('connect', 'sync', 'sync_library', 'disconnect'):
         if action == 'connect':
             connect_account()
         elif action == 'sync':
@@ -81,8 +86,16 @@ def run(params):
             if not state.get('token'):
                 raise AccountError('Connect your account first.')
             addons, skipped = pull_addons(state['token'])
-            STORE.save({'token': state['token'], 'addons': addons})
+            state['addons'] = addons
+            STORE.save(state)
             xbmcgui.Dialog().ok('Stremio', '{} addons imported. {} skipped.'.format(len(addons), skipped))
+        elif action == 'sync_library':
+            state = STORE.load()
+            if not state.get('token'):
+                raise AccountError('Connect your account first.')
+            state['library'] = pull_library(state['token'])
+            STORE.save(state)
+            xbmcgui.Dialog().ok('Stremio', '{} library entries imported. Account unchanged.'.format(len(state['library'])))
         elif xbmcgui.Dialog().yesno('Disconnect this device',
                 'Remove the local token and imported addon list? Your Stremio account stays unchanged.'):
             STORE.forget()
@@ -105,6 +118,8 @@ def run(params):
         return route(provider=provider, **values)
 
     if action == 'widgets':
+        for target, label in [('library', 'My Library'), ('continue', 'Continue Watching')]:
+            xbmcplugin.addDirectoryItem(HANDLE, route(action=target), xbmcgui.ListItem(label=label), True)
         # Widget picker has no login/logout actions and excludes stream-only addons.
         xbmcplugin.addDirectoryItem(HANDLE, route(action='provider'),
                                    xbmcgui.ListItem(label='Manual catalog'), True)
@@ -118,7 +133,8 @@ def run(params):
         state = STORE.load()
         options = [('connect', 'Connect Stremio account')]
         if state.get('token'):
-            options = [('sync', 'Refresh account addons'), ('disconnect', 'Disconnect this device')]
+            options = [('sync', 'Refresh account addons'), ('sync_library', 'Refresh library'),
+                       ('library', 'My Library'), ('continue', 'Continue Watching'), ('disconnect', 'Disconnect this device')]
         for target, label in options:
             xbmcplugin.addDirectoryItem(HANDLE, route(action=target), xbmcgui.ListItem(label=label), True)
         xbmcplugin.addDirectoryItem(HANDLE, route(action='provider'),
@@ -127,6 +143,19 @@ def run(params):
             label = addon['manifest'].get('name') or 'Stremio addon'
             xbmcplugin.addDirectoryItem(HANDLE, route(action='provider', provider=addon['id']),
                                        xbmcgui.ListItem(label=label), True)
+    elif action in ('library', 'continue'):
+        xbmcplugin.setContent(HANDLE, 'videos')
+        for saved in library_rows(STORE.load().get('library', []), action == 'continue'):
+            meta = dict(saved, id=saved['_id'])
+            entry = item(meta)
+            progress = saved['state']
+            video = progress.get('video_id')
+            if action == 'continue' and (saved['type'] == 'movie' or video):
+                target = route(action='streams', kind=saved['type'], id=video or saved['_id'])
+                entry.setProperty('StremioResumeMilliseconds', str(progress.get('timeOffset', 0)))
+            else:
+                target = route(action='meta', kind=saved['type'], id=saved['_id'])
+            xbmcplugin.addDirectoryItem(HANDLE, target, entry, True)
     elif action == 'provider':
         manifest = descriptor['manifest'] if descriptor else fetch(manifest_url)
         available = catalogs(manifest)

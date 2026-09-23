@@ -29,8 +29,8 @@ class WidgetRoutesTest(unittest.TestCase):
                 {'id': 'stream-only', 'manifest': {'name': 'Streams', 'catalogs': []}}]}
             entry.run({'action': 'widgets'})
             calls = modules['xbmcplugin'].addDirectoryItem.call_args_list
-            self.assertEqual(len(calls), 2)  # Manual and one catalog provider.
-            route = calls[1].args[1]
+            self.assertEqual(len(calls), 4)  # Library, Continue, manual, catalog provider.
+            route = calls[3].args[1]
             self.assertNotIn('private-config', route)
             self.assertEqual(parse_qs(urlsplit(route).query)['provider'], ['opaque-provider-id'])
             modules['xbmcplugin'].addDirectoryItem.reset_mock()

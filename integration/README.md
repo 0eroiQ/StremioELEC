@@ -29,6 +29,16 @@ Required before removing TMDB/widgets: install pilot on a compatible Kodi instan
 The builder checks archive paths, CRC, addon identity and dependency minimum versions. It produces a version/source/hash inventory, `SHA256SUMS` and a dependency-first `INSTALL.md`. Hashes are local integrity records, not upstream signatures. This does not install anything, rewrite an image, or validate runtime compatibility. No update repository addon is bundled. Dependencies are retained until the Stremio replacement passes runtime acceptance.
 # Home widget picker
 
+Account data: fresh sign-in imports the library read-only; existing accounts use
+Refresh library. My Library and Continue Watching are also widget sources. The
+Continue Watching list uses Stremio's removed/temp/timeOffset rule; its cards open
+the saved episode's sources when video_id exists. Resume seeking and progress
+upload are NOT implemented yet. Addon refresh preserves imported library data.
+Language/subtitle appearance preferences are local Stremio app settings, not
+exposed by the verified account sync endpoints; Kodi settings are unchanged.
+Verified protocol: https://github.com/Stremio/stremio-core/blob/master/src/models/ctx/update_library.rs
+and https://github.com/Stremio/stremio-core/blob/master/src/unit_tests/ctx/update_settings.rs
+
 In the skin's widget selector choose **Stremio catalogs**, browse an imported
 provider, open its catalog, and use Skin Shortcuts' **Use as widget** selection.
 Only providers with unfiltered catalogs appear; stream-only providers remain

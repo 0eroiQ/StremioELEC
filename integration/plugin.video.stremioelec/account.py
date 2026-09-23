@@ -85,6 +85,27 @@ def pull_addons(token):
     return addons, skipped
 
 
+def pull_library(token):
+    result = request('https://api.strem.io/api/datastoreGet', {
+        'authKey': token, 'collection': 'libraryItem', 'ids': [], 'all': True}).get('result')
+    if not isinstance(result, list):
+        raise AccountError('Unable to read the Stremio library. Existing local data was kept.')
+    return [entry for entry in result if isinstance(entry, dict)
+            and isinstance(entry.get('_id'), str) and isinstance(entry.get('state'), dict)]
+
+
+def library_rows(entries, continuing=False):
+    def eligible(entry):
+        if entry.get('type') not in ('movie', 'series'):
+            return False
+        if continuing:
+            offset = entry['state'].get('timeOffset', 0)
+            return (not entry.get('removed') or entry.get('temp')) and isinstance(offset, (int, float)) and offset > 0
+        return not entry.get('removed') and not entry.get('temp')
+    return sorted((entry for entry in entries if eligible(entry)),
+                  key=lambda entry: str(entry['state'].get('lastWatched') or entry.get('_mtime') or ''), reverse=True)
+
+
 class Store:
     """Owner-only local file, not encrypted. Exclude Kodi addon_data from backups."""
     def __init__(self, directory):
