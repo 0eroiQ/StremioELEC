@@ -15,7 +15,11 @@ running Android 14. Generic compatibility is a candidate, not physical boot proo
 Run **StremioELEC N60 test image** in Actions, or push the pipeline development
 branch. It uses an ordinary Linux GitHub-hosted runner, no self-hosted runner,
 Mac disk, USB or Android device. Only read permission is granted to the workflow.
-PRs/builds cannot publish a release or modify the stable feed.
+Ordinary pushes and PRs cannot publish releases. Manual dispatch offers an
+optional `publish_prerelease` switch: after a successful build, a separate job
+verifies the exact asset set and source revision, uploads a draft, downloads it
+again and verifies hashes, then publishes it as a Pre-release (never Latest).
+Existing release tags cannot be overwritten. No workflow modifies the stable feed.
 
 Outputs: `.img.gz` installer, `.tar` update candidate, `SHA256SUMS`, provenance,
 `*-addons.zip`, an intentionally expired `update-candidate.json`,

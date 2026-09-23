@@ -2,6 +2,11 @@ name: StremioELEC N60 test image
 
 on:
   workflow_dispatch:
+    inputs:
+      publish_prerelease:
+        description: Publish verified test packages to Releases (never promotes box updates)
+        type: boolean
+        default: false
   push:
     branches: [stremioelec/n60-image-pipeline]
     paths: [stremioelec/**, .github/workflows/stremioelec-n60.yml]
@@ -76,3 +81,25 @@ jobs:
         run: |
           echo '### N60 test image only' >> "$GITHUB_STEP_SUMMARY"
           echo 'Verified hashes, package dependency closure and image contents. Not yet boot-tested on N60; no USB or Android disk written. This build cannot publish/promote the independent approved update channel.' >> "$GITHUB_STEP_SUMMARY"
+
+  prerelease:
+    needs: image
+    if: github.event_name == 'workflow_dispatch' && inputs.publish_prerelease && github.ref == 'refs/heads/stremioelec/n60-image-pipeline'
+    runs-on: ubuntu-22.04
+    timeout-minutes: 20
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+          sparse-checkout: stremioelec
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: StremioELEC-N60-test-${{ github.run_number }}
+          path: release-assets
+      - name: Publish verified prerelease (no stable channel change)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 stremioelec/publish_prerelease.py release-assets
