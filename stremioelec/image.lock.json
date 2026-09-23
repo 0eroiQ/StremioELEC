@@ -1,9 +1,9 @@
 {
   "schema": 1,
-  "version": "0.1.0-test.2",
+  "version": "0.1.0-test.3",
   "update_schema": 1,
-  "sequence": 2,
-  "addons_sequence": 1,
+  "sequence": 3,
+  "addons_sequence": 2,
   "kodi_major": 21,
   "libreelec_major": 12,
   "target": "Generic.x86_64",
@@ -15,7 +15,7 @@
   },
   "skin": {
     "repository": "0eroiQ/skin.bingie",
-    "commit": "57a0bc459cb95720891fb85f81f49d7f4e9a2585"
+    "commit": "a624747088024c688a880a45266d3088abdcce44"
   },
   "addons": [
     {
