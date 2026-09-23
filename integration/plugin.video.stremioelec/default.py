@@ -11,6 +11,7 @@ import xbmcplugin
 
 from protocol import base_url, catalogs, fetch, resource_url
 from account import AccountError, Store, create_link, read_link, pull_addons
+from sources import collect, direct_url
 
 HANDLE = int(sys.argv[1])
 BASE = sys.argv[0]
@@ -85,6 +86,7 @@ def run(params):
         elif xbmcgui.Dialog().yesno('Disconnect this device',
                 'Remove the local token and imported addon list? Your Stremio account stays unchanged.'):
             STORE.forget()
+            Store(STORE.directory / 'streams').forget()
         xbmcplugin.endOfDirectory(HANDLE, succeeded=False)
         xbmc.executebuiltin('Container.Refresh')
         return
@@ -129,7 +131,7 @@ def run(params):
         manifest = descriptor['manifest'] if descriptor else fetch(manifest_url)
         available = catalogs(manifest)
         if not available:
-            xbmcgui.Dialog().ok('Stremio', 'This addon has no unfiltered catalogs. Stream-only addons are imported; cross-addon playback is the next step.')
+            xbmcgui.Dialog().ok('Stremio', 'This addon has no unfiltered catalogs. Its supported streams are requested when opening sources for a matching title.')
         for catalog in available:
             label = catalog.get('name', catalog['id']) + ' · ' + catalog['type']
             xbmcplugin.addDirectoryItem(HANDLE, provider_route(action='catalog', kind=catalog['type'],
@@ -161,30 +163,36 @@ def run(params):
             xbmcplugin.addDirectoryItem(HANDLE, provider_route(action='streams', kind=kind,
                 id=identity), item(meta), True)
     elif action == 'streams':
-        manifest = fetch(manifest_url)
-        supported = any((r if isinstance(r, str) else r.get('name')) == 'stream'
-                        for r in manifest.get('resources', []))
-        if not supported:
-            xbmcgui.Dialog().ok('StremioELEC', 'This addon provides metadata only. Stream addon aggregation is not connected yet.')
-        else:
-            streams = fetch(resource_url(manifest_url, 'stream', params['kind'], params['id'])).get('streams', [])
-            playable = [s for s in streams if urlsplit(s.get('url', '')).scheme in ('https', 'http')
-                        and not s.get('behaviorHints', {}).get('proxyHeaders')
-                        and '|' not in s.get('url', '')]
-            labels = [s.get('name') or s.get('title') or 'Stream {}'.format(i + 1)
-                      for i, s in enumerate(playable)]
-            choice = xbmcgui.Dialog().select('Select stream', labels) if labels else -1
-            if choice >= 0:
-                # Use a playable plugin item so Kodi owns playback resolution.
-                entry = xbmcgui.ListItem(label=labels[choice])
-                entry.setProperty('IsPlayable', 'true')
-                xbmcplugin.addDirectoryItem(HANDLE, route(action='play', url=playable[choice]['url']), entry, False)
-            elif not labels:
-                xbmcgui.Dialog().ok('StremioELEC', 'No supported direct HTTP stream. Torrents, external players and custom proxy headers are not supported yet.')
+        providers = list(STORE.load().get('addons', []))
+        if not provider:
+            try:
+                providers.append({'transportUrl': manifest_url, 'manifest': fetch(manifest_url)})
+            except Exception:
+                pass  # Account providers can still work if the manual provider is down.
+        playable, skipped, failed = collect(providers, params['kind'], params['id'])
+        # Keep signed stream URLs out of saved plugin routes and widget configuration.
+        import secrets
+        cache = Store(STORE.directory / 'streams')
+        cached = {}
+        for stream in playable:
+            key = secrets.token_hex(16)
+            cached[key] = stream['url']
+            entry = xbmcgui.ListItem(label=stream['label'])
+            entry.setProperty('IsPlayable', 'true')
+            xbmcplugin.addDirectoryItem(HANDLE, route(action='play', key=key), entry, False)
+        cache.save({'created': time.time(), 'urls': cached})
+        if not playable:
+            xbmcgui.Dialog().ok('StremioELEC',
+                'No supported direct HTTP streams. {} unsupported; {} addons failed. '
+                'Torrents, DRM and custom proxy headers are not supported yet.'.format(skipped, failed))
+        elif skipped or failed:
+            xbmcgui.Dialog().notification('StremioELEC',
+                '{} unsupported streams; {} addons failed'.format(skipped, failed))
     elif action == 'play':
-        url = params.get('url', '')
-        if urlsplit(url).scheme not in ('http', 'https') or '|' in url:
-            raise ValueError('Unsupported stream URL')
+        cache = Store(STORE.directory / 'streams').load()
+        url = cache.get('urls', {}).get(params.get('key'), '')
+        if time.time() - cache.get('created', 0) > 3600 or not direct_url({'url': url}):
+            raise ValueError('Source expired; reopen the stream list')
         xbmcplugin.setResolvedUrl(HANDLE, True, xbmcgui.ListItem(path=url))
         return
     else:
