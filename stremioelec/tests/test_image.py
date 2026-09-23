@@ -144,6 +144,31 @@ class ImageTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 build.validate_base(self.root, lock)
 
+    def test_patch_root_defaults_and_closure(self):
+        root = self.root / 'rootfs'
+        kodi = root / 'usr/share/kodi'
+        for folder in ('system/settings', 'config', 'addons/skin.estuary'):
+            (kodi / folder).mkdir(parents=True, exist_ok=True)
+        (root / 'etc').mkdir()
+        (kodi / 'addons/skin.estuary/addon.xml').write_text('<addon id="skin.estuary" version="1"/>')
+        (kodi / 'system/addon-manifest.xml').write_text('<addons><addon>skin.estuary</addon></addons>')
+        (kodi / 'system/settings/settings.xml').write_text('<settings><setting id="lookandfeel.skin"><default>skin.estuary</default></setting></settings>')
+        (kodi / 'config/guisettings.xml').write_text('<settings><setting id="test.preserved">yes</setting></settings>')
+        source = self.root / 'source'
+        bridge = source / 'integration/plugin.video.stremioelec'
+        bridge.mkdir(parents=True)
+        (source / 'addon.xml').write_text('<addon id="skin.stremio" version="1"/>')
+        (source / 'LICENSE').write_text('test fixture')
+        (bridge / 'addon.xml').write_text('<addon id="plugin.video.stremioelec" version="1"/>')
+        result = build.patch_kodi(root, source, {'addons': []}, self.root)
+        self.assertEqual(set(result['dependency_closure']), set(build.OWN_IDS))
+        self.assertFalse((kodi / 'addons/skin.estuary').exists())
+        self.assertEqual(ET.parse(kodi / 'system/settings/settings.xml').find(".//default").text, 'skin.stremio')
+        config = ET.parse(kodi / 'config/guisettings.xml')
+        self.assertEqual(config.find("setting[@id='general.addonupdates']").text, '2')
+        self.assertEqual(config.find("setting[@id='test.preserved']").text, 'yes')
+        self.assertTrue((root / 'usr/lib/systemd/system/kodi.service.d/stremioelec.conf').is_file())
+
 
 if __name__ == '__main__':
     unittest.main()
