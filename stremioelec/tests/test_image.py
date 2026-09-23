@@ -160,8 +160,11 @@ class ImageTests(unittest.TestCase):
         (source / 'addon.xml').write_text('<addon id="skin.stremio" version="1"/>')
         (source / 'LICENSE').write_text('test fixture')
         (bridge / 'addon.xml').write_text('<addon id="plugin.video.stremioelec" version="1"/>')
+        python = kodi / 'addons/xbmc.python'
+        python.mkdir()
+        (python / 'addon.xml').write_text('<addon id="xbmc.python" version="3.0.0"/>')
         result = build.patch_kodi(root, source, {'addons': []}, self.root)
-        self.assertEqual(set(result['dependency_closure']), set(build.OWN_IDS))
+        self.assertEqual(set(result['dependency_closure']), set(build.IMAGE_IDS) | {'xbmc.python'})
         self.assertFalse((kodi / 'addons/skin.estuary').exists())
         self.assertEqual(ET.parse(kodi / 'system/settings/settings.xml').find(".//default").text, 'skin.stremio')
         config = ET.parse(kodi / 'config/guisettings.xml')

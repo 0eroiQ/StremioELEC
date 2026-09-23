@@ -18,6 +18,7 @@ import zipfile
 
 HERE = Path(__file__).resolve().parent
 OWN_IDS = ('skin.stremio', 'plugin.video.stremioelec', 'repository.stremioelec')
+IMAGE_IDS = OWN_IDS + ('service.stremioelec.updates',)
 
 
 def digest(path, algorithm='sha256'):
@@ -138,7 +139,9 @@ def patch_kodi(root, skin, lock, scratch):
     shutil.copy2(skin / 'LICENSE', addons / 'plugin.video.stremioelec/LICENSE')
     shutil.copytree(HERE / 'repository.stremioelec', addons / 'repository.stremioelec')
     shutil.copy2(skin / 'LICENSE', addons / 'repository.stremioelec/LICENSE')
-    closure = validate_closure(addons, OWN_IDS)
+    copy_source(HERE / 'service.stremioelec.updates', addons / 'service.stremioelec.updates')
+    shutil.copy2(skin / 'LICENSE', addons / 'service.stremioelec.updates/LICENSE')
+    closure = validate_closure(addons, IMAGE_IDS)
 
     settings = kodi / 'system/settings/settings.xml'
     tree = ET.parse(settings)
@@ -180,7 +183,8 @@ def patch_kodi(root, skin, lock, scratch):
     shutil.copy2(HERE / 'bootstrap.py', script_dir / 'bootstrap.py')
     unit = root / 'usr/lib/systemd/system/kodi.service.d'
     unit.mkdir(parents=True, exist_ok=True)
-    (unit / 'stremioelec.conf').write_text('[Service]\nExecStartPre=/usr/bin/python3 /usr/lib/stremioelec/bootstrap.py\n')
+    (unit / 'stremioelec.conf').write_text('[Service]\nExecStartPre=/usr/bin/python3 /usr/lib/stremioelec/bootstrap.py\n'
+        'ExecStartPre=-/usr/bin/python3 /usr/share/kodi/addons/service.stremioelec.updates/engine.py\n')
     build = dict(lock, build_commit=os.environ.get('BUILD_COMMIT', ''), dependency_closure=closure,
                  acceptance='UNTESTED ON N60', upstream_autoupdates=False)
     (root / 'etc/stremioelec-release.json').write_text(json.dumps(build, indent=2) + '\n')
@@ -209,6 +213,35 @@ def repository_zip(addons, output):
             for path in sorted(stage.rglob('*')):
                 if path.is_file():
                     archive.write(path, str(path.relative_to(stage)))
+
+
+def update_metadata(lock, kind):
+    return {'kind': kind, 'target': lock['target'], 'version': lock['version'],
+            'sequence': lock['sequence'] if kind == 'os' else lock['addons_sequence'],
+            'kodi_major': lock['kodi_major'], 'libreelec_major': lock['libreelec_major']}
+
+
+def app_bundle(addons, output, lock):
+    identities = OWN_IDS[:2]
+    info = update_metadata(lock, 'addons')
+    info['addons'] = {i: ET.parse(addons / i / 'addon.xml').getroot().get('version') for i in identities}
+    with zipfile.ZipFile(output, 'w', zipfile.ZIP_DEFLATED) as archive:
+        archive.writestr('update.json', json.dumps(info))
+        for identity in identities:
+            for path in sorted((addons / identity).rglob('*')):
+                if path.is_file():
+                    archive.write(path, str(path.relative_to(addons)))
+
+
+def candidate_feed(output, lock, name):
+    # Offline candidate only. Publishing/promoting a stable feed is never a build side effect.
+    result = {'schema': 1, 'target': lock['target'], 'expires': 0}
+    for kind, filename in [('os', name + '.tar'), ('addons', name + '-addons.zip')]:
+        path = output / filename
+        result[kind] = dict(update_metadata(lock, kind), minimum_sequence=1,
+            url='https://github.com/0eroiQ/StremioELEC/releases/download/v' + lock['version'] + '/' + filename,
+            sha256=digest(path), size=path.stat().st_size)
+    (output / 'update-candidate.json').write_text(json.dumps(result, indent=2) + '\n')
 
 
 def main():
@@ -270,11 +303,14 @@ def main():
                 shutil.copyfile(mount / file, target / file)
                 (target / (file + '.md5')).write_text(digest(target / file, 'md5') + '  target/' + file + '\n')
             (release / 'RELEASE').write_text(lock['version'] + '\nLibreELEC base: ' + lock['libreelec']['version'] + '\n')
+            (release / 'update.json').write_text(json.dumps(update_metadata(lock, 'os')))
             shutil.copytree(HERE.parent / 'licenses', release / 'licenses')
             shutil.copy2(HERE / 'README.md', release / 'README.md')
             with tarfile.open(output / (name + '.tar'), 'w') as archive:
                 archive.add(release, arcname=name)
             repository_zip(root / 'usr/share/kodi/addons', output / 'addon-repository.zip')
+            app_bundle(root / 'usr/share/kodi/addons', output / (name + '-addons.zip'), lock)
+            candidate_feed(output, lock, name)
             (output / 'provenance.json').write_text(json.dumps(build, indent=2) + '\n')
             shutil.copy2(HERE / 'README.md', output / 'README.md')
             run('sync')

@@ -18,6 +18,7 @@ Mac disk, USB or Android device. Only read permission is granted to the workflow
 PRs/builds cannot publish a release or modify the stable feed.
 
 Outputs: `.img.gz` installer, `.tar` update candidate, `SHA256SUMS`, provenance,
+`*-addons.zip`, an intentionally expired `update-candidate.json`,
 and `addon-repository.zip` containing our skin/bridge/repository packages. Hashes
 are integrity checks, **not signing or proof of a safe boot**. Artifacts expire
 after 14 days. Keep accepted binaries and their corresponding sources in a release.
@@ -35,8 +36,22 @@ reset or altered. The image starts with a fresh Stremio sign-in, not an account.
   disabled. Do not enable original LibreELEC updates: they replace our SYSTEM.
 - `repository.stremioelec` is bundled, but its release feed is not published by
   this workflow. Publishing the reviewed repository assets is a separate step.
-- Independent OS and skin/addon ON/OFF controls and the verified stable OS feed
-  are **not implemented by this first build workflow**. Do not label them ready.
+- The second pilot bundles `service.stremioelec.updates` and **System > Updates**.
+  Independent OS and skin/bridge download switches default OFF. ON checks at
+  most every six hours while idle; it downloads but never forces a reboot.
+  Manual download is available with both switches OFF. Installation requires
+  explicit confirmation and playback must be stopped. One channel per restart.
+- The client uses only our fixed `update-channel/stable.json` GitHub endpoint
+  and our GitHub release assets. Target, major ABI, sequence, size, SHA256 and
+  archive contents are checked before staging. HTTPS/GitHub write access is the
+  trust anchor: **this is not a cryptographically signed update system**.
+- OS packages enter `/storage/.update` only after full verification. Skin/bridge
+  packages replace code overrides in `/storage/.kodi/addons` before Kodi starts;
+  addon_data, accounts and guisettings are not in the packages. Interrupted code
+  replacement has a rollback journal. This is not an OS A/B rollback mechanism.
+- Synthetic upgrade, cancellation, tamper and rollback tests are included.
+  A real N60 upgrade/reboot and retention test is still mandatory before stable
+  promotion; do not equate unit tests or a successful image build with that test.
 - SlyGuy playback worked in the Mac test runtime. Its packages are not
   redistributed in this candidate pending redistribution/licence review; trailers
   on this fresh image therefore need the original upstream installation.
@@ -52,6 +67,16 @@ reset or altered. The image starts with a fresh Stremio sign-in, not an account.
 4. Publish an immutable StremioELEC release only after that acceptance.
 5. Advance our stable update manifest, with target, minimum compatible version,
    artifact size/hash and required restart. Major Kodi changes need explicit review.
+
+The candidate manifest has `expires: 0` so it cannot accidentally be used as a
+live channel. After hardware acceptance, publish the exact checked artifacts
+under its immutable release tag, verify downloaded bytes, then promote the
+reviewed manifest with a finite future Unix expiry. `os` and `addons` can each
+be null when no update is offered. Keep the channel alive by renewing expiry
+when reviewed. An expired/unreachable feed leaves the installed system running.
+The updater and third-party dependency changes travel in the OS channel, not
+the skin/bridge bundle. Preserve monotonically increasing sequence numbers and
+addon versions. Never replace binaries under an already published release tag.
 
 Future automatic upstream detection may propose a PR/build, never promote itself
 to stable. The box must consume our update package, not reflash its whole disk.
