@@ -71,6 +71,18 @@ def version_tuple(value):
     return tuple(int(x) for x in re.findall(r'\d+', value))
 
 
+def validate_base(root, lock):
+    # LibreELEC 12 records its target in os-release, not /etc/arch.
+    values = {}
+    for line in (root / 'etc/os-release').read_text().splitlines():
+        if '=' in line:
+            key, value = line.split('=', 1)
+            values[key] = value.strip().strip('"')
+    if (values.get('ID') != 'libreelec' or values.get('LIBREELEC_ARCH') != lock['target']
+            or values.get('VERSION') != lock['libreelec']['version']):
+        raise ValueError('Rootfs identity, version or architecture mismatch')
+
+
 def validate_closure(addons, roots):
     pending, selected = list(roots), {}
     while pending:
@@ -238,9 +250,7 @@ def main():
             original_kernel = digest(mount / 'KERNEL')
             root = scratch / 'rootfs'
             run('unsquashfs', '-no-progress', '-d', root, mount / 'SYSTEM')
-            arch_file = root / 'etc/arch'
-            if not arch_file.is_file() or arch_file.read_text().strip() != lock['target']:
-                raise ValueError('Rootfs architecture mismatch')
+            validate_base(root, lock)
             build = patch_kodi(root, args.skin, lock, scratch)
             system = scratch / 'SYSTEM'
             run('mksquashfs', root, system, '-noappend', '-comp', 'gzip', '-b', '262144', '-no-progress')

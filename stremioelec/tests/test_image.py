@@ -133,6 +133,17 @@ class ImageTests(unittest.TestCase):
             self.assertRegex(item['sha256'], r'^[a-f0-9]{64}$')
             self.assertTrue(item['url'].startswith('https://'))
 
+    def test_base_identity_uses_libreelec_os_release(self):
+        (self.root / 'etc').mkdir()
+        file = self.root / 'etc/os-release'
+        lock = {'target': 'Generic.x86_64', 'libreelec': {'version': '12.2.1'}}
+        file.write_text('ID="libreelec"\nVERSION="12.2.1"\nLIBREELEC_ARCH="Generic.x86_64"\n')
+        build.validate_base(self.root, lock)
+        for bad in ('RPi4.aarch64', 'Generic-legacy.x86_64'):
+            file.write_text('ID="libreelec"\nVERSION="12.2.1"\nLIBREELEC_ARCH="' + bad + '"\n')
+            with self.assertRaises(ValueError):
+                build.validate_base(self.root, lock)
+
 
 if __name__ == '__main__':
     unittest.main()

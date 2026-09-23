@@ -48,18 +48,22 @@ jobs:
       - name: Test Stremio integration
         run: python3 -m unittest discover -s skin-source/integration -p 'test_*.py'
       - name: Install image tools
+        if: github.event_name != 'pull_request'
         run: |
           sudo apt-get update
           sudo apt-get install --no-install-recommends -y squashfs-tools dosfstools util-linux
       - name: Build pinned test image (no publishing or device writes)
+        if: github.event_name != 'pull_request'
         run: |
           sudo env GITHUB_ACTIONS=true BUILD_COMMIT="$GITHUB_SHA" python3 stremioelec/build_image.py \
             --skin "$GITHUB_WORKSPACE/skin-source" --output "$GITHUB_WORKSPACE/image-output"
           sudo chown -R "$(id -u):$(id -g)" image-output
       - name: Verify final artifacts
+        if: github.event_name != 'pull_request'
         working-directory: image-output
         run: sha256sum -c SHA256SUMS
       - name: Upload test artifacts
+        if: github.event_name != 'pull_request'
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: StremioELEC-N60-test-${{ github.run_number }}
@@ -68,6 +72,7 @@ jobs:
           retention-days: 14
           compression-level: 0
       - name: Acceptance boundary
+        if: github.event_name != 'pull_request'
         run: |
           echo '### N60 test image only' >> "$GITHUB_STEP_SUMMARY"
           echo 'Verified hashes, package dependency closure and image contents. Not yet boot-tested on N60; no USB or Android disk written. No stable update feed published.' >> "$GITHUB_STEP_SUMMARY"
