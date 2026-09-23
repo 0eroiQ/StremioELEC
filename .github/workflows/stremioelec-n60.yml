@@ -1,0 +1,73 @@
+name: StremioELEC N60 test image
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [stremioelec/n60-image-pipeline]
+    paths: [stremioelec/**, .github/workflows/stremioelec-n60.yml]
+  pull_request:
+    paths: [stremioelec/**, .github/workflows/stremioelec-n60.yml]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: n60-image-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  image:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+          sparse-checkout: |
+            stremioelec
+            licenses
+      - name: Validate image tooling
+        run: python3 -m unittest discover -s stremioelec/tests -v
+      - name: Read pinned skin revision
+        id: pins
+        run: |
+          python3 - <<'PY'
+          import json, os, re
+          lock = json.load(open('stremioelec/image.lock.json'))
+          assert re.fullmatch(r'[0-9a-f]{40}', lock['skin']['commit'])
+          assert lock['skin']['repository'] == '0eroiQ/skin.bingie'
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as out:
+              out.write('skin=' + lock['skin']['commit'] + '\n')
+          PY
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          repository: 0eroiQ/skin.bingie
+          ref: ${{ steps.pins.outputs.skin }}
+          path: skin-source
+          persist-credentials: false
+      - name: Test Stremio integration
+        run: python3 -m unittest discover -s skin-source/integration -p 'test_*.py'
+      - name: Install image tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y squashfs-tools dosfstools util-linux
+      - name: Build pinned test image (no publishing or device writes)
+        run: |
+          sudo env GITHUB_ACTIONS=true BUILD_COMMIT="$GITHUB_SHA" python3 stremioelec/build_image.py \
+            --skin "$GITHUB_WORKSPACE/skin-source" --output "$GITHUB_WORKSPACE/image-output"
+          sudo chown -R "$(id -u):$(id -g)" image-output
+      - name: Verify final artifacts
+        working-directory: image-output
+        run: sha256sum -c SHA256SUMS
+      - name: Upload test artifacts
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: StremioELEC-N60-test-${{ github.run_number }}
+          path: image-output/
+          if-no-files-found: error
+          retention-days: 14
+          compression-level: 0
+      - name: Acceptance boundary
+        run: |
+          echo '### N60 test image only' >> "$GITHUB_STEP_SUMMARY"
+          echo 'Verified hashes, package dependency closure and image contents. Not yet boot-tested on N60; no USB or Android disk written. No stable update feed published.' >> "$GITHUB_STEP_SUMMARY"
