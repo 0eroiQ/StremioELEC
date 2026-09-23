@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- BINGIE -->
 <window>
+    <!-- All original Kodi settings categories return to the appliance UI. -->
+    <onload>ReplaceWindow(Settings)</onload>
     <defaultcontrol always="true">3</defaultcontrol>
     <include>DefaultSkinSettings</include>
     <controls>

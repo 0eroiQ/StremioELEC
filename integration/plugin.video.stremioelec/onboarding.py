@@ -56,9 +56,19 @@ def run():
         if cancelled():
             return
         store.save(state)
+        status('Preparing your Bingie Home and safe playback defaults...')
+        from setup_profile import prepare
+        prepare(store.directory, xbmcvfs.translatePath(xbmcaddon.Addon('plugin.video.stremioelec').getAddonInfo('path')))
+        if cancelled():
+            return
         status('Your account is ready. {} addons, {} library titles, {} Continue Watching. {} unsupported addons skipped.'.format(
             len(state['addons']), len(library_rows(state['library'])), len(library_rows(state['library'], True)), skipped))
         home.setProperty('StremioOnboardingReady', '1')
+        for flag in ('StremioHomeDefaults', 'StremioOnboardingDone', 'BingieFirstStartupDone', 'BingieSecondStartupDone'):
+            xbmc.executebuiltin('Skin.SetBool({})'.format(flag))
+        xbmc.executebuiltin('ClearProperty(StartupMask,Home)')
+        xbmc.executebuiltin('ReplaceWindow(Home)')
+        xbmc.executebuiltin('ReloadSkin()')
     except AccountError:
         status('Could not finish connecting. Go back and retry. Any imported data was kept.')
     except Exception:

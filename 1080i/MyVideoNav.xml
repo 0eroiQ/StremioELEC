@@ -20,7 +20,7 @@
 	<onunload condition="!String.IsEmpty(Window(Home).Property(FadeFanart))">AlarmClock(FadeFanart,ClearProperty(FadeFanart,home),00:01,silent)</onunload>
 	<onunload condition="!String.IsEmpty(Window(Home).Property(AnimationRight))">AlarmClock(AnimationRight,ClearProperty(AnimationRight,home),00:01,silent)</onunload>
 	<onunload condition="!String.IsEmpty(Window(Home).Property(NoFadeOut))">ClearProperty(NoFadeOut,home)</onunload>
-    
+
 	<controls>
 		<include>Defs_TMDbBingieHelper_Loader</include>
         <!-- Video Background -->
@@ -48,46 +48,17 @@
                 <onup>9000</onup>
                 <ondown>9000</ondown>
                 <orientation>vertical</orientation>
-				
+
                 <control type="radiobutton" id="14">
                     <!--Button Watched Toggle-->
                     <include>SideBladeMenuButton</include>
                     <label>$LOCALIZE[20367]</label>
                 </control>
 
-               <control type="button" id="3">
-					<description>Sort by button</description>
-					<include>SideBladeMenuButton</include>
-					<label>$LOCALIZE[103]</label>
-				</control>
-				<control type="togglebutton" id="4">
-					<description>Sort asc</description>
-					<include>SideBladeMenuButton</include>
-					<alttexturefocus border="10" colordiffuse="$INFO[Skin.String(ButtonFocusColor)]">diffuse/panel.png</alttexturefocus>
-					<alttexturenofocus/>
-					<label>$LOCALIZE[584]</label>
-					<altlabel>$LOCALIZE[585]</altlabel>
-					<usealttexture>Container.SortDirection(Ascending)</usealttexture>
-				</control>
 
-				<control type="edit" id="19">
-					<visible>Container.CanFilter + !Container.CanFilterAdvanced</visible>
-					<description>Filter</description>
-					<textwidth>230</textwidth>
-					<include>SideBladeMenuButton</include>
-					<textoffsetx>50</textoffsetx>
-					<textoffsety>13</textoffsety>
-					<label>$LOCALIZE[587]</label>
-				</control>
-				<control type="radiobutton" id="98">
-					<visible>Container.CanFilterAdvanced</visible>
-					<description>Filter</description>
-					<include>SideBladeMenuButton</include>
-					<label>$LOCALIZE[587]</label>
-					<selected>Container.Filtered</selected>
-					<onclick>right</onclick>
-					<onclick>Filter</onclick>
-				</control>
+
+
+
 				<control type="togglebutton" id="20">
 					<description>Update library</description>
 					<include>SideBladeMenuButton</include>
@@ -98,22 +69,11 @@
 					<usealttexture>library.isscanningvideo</usealttexture>
 					<visible>!String.Contains(Container.FolderPath,plugin://plugin.video)</visible>
 				</control>
-				<control type="button" id="4401">
-                    <!--current playlist-->
-                    <include>SideBladeMenuButton</include>
-                    <label>$LOCALIZE[13350]</label>
-					<onclick>ActivateWindow(videoplaylist)</onclick>
-					<visible>!String.IsEqual(Playlist.Length(video),0)</visible>
-                </control>
-				<control type="button" id="4402">
-                    <!--Playlists-->
-                    <include>SideBladeMenuButton</include>
-                    <label>$LOCALIZE[20012]</label>
-					<onclick>ActivateWindow(Videos,special://videoplaylists/,return)</onclick>
-                </control>
-				
+
+
+
 				<include>SideBladeViewCommands</include>
-				
+
 				<control type="radiobutton" id="4406">
 					<description>Unlock Shares</description>
 					<include>SideBladeMenuButton</include>
@@ -124,7 +84,7 @@
 				</control>
              </control>
         </control>
-		
+
 		<!--Header-->
         <include>Header</include>
         <include condition="Skin.HasSetting(DebugGrid) | Skin.HasSetting(DebugInfo)">DebugInfo</include>

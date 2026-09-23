@@ -78,6 +78,28 @@ def item(meta):
 
 def run(params):
     action = params.get('action', 'root')
+    # Kodi may dispatch the subtitle extension through the addon's primary
+    # plugin entry point; support both entry paths explicitly.
+    if action in ('search', 'manualsearch', 'download'):
+        from subtitle_service import run as subtitle_service
+        return subtitle_service()
+    if action == 'helper_play':
+        from helper_player import resolve
+        from subtitles import prepare_selected
+        providers = STORE.load().get('addons', [])
+        return resolve(params, providers, collect,
+                       xbmcgui.Dialog(), xbmcplugin, xbmcgui, HANDLE,
+                       lambda kind, identity, stream, item: prepare_selected(STORE.directory, kind, identity, stream, providers, item))
+    if action == 'subtitles':
+        from subtitles import manual_selection
+        manual_selection(STORE.directory, STORE.load().get('addons', []))
+        return
+    if action == 'setup_home':
+        if xbmcgui.Dialog().yesno('StremioELEC setup', 'Replace Home with Continue Watching and nine Bingie catalogs? Existing Home will be backed up. Kodi language choices are kept.'):
+            from setup_profile import prepare
+            prepare(STORE.directory, xbmcvfs.translatePath(ADDON.getAddonInfo('path')), force_home=True)
+            xbmc.executebuiltin('ReloadSkin()')
+        return
     if action == 'first_catalog':
         for addon in STORE.load().get('addons', []):
             available = catalogs(addon['manifest'])
@@ -108,6 +130,8 @@ def run(params):
                 'Remove the local token and imported addon list? Your Stremio account stays unchanged.'):
             STORE.forget()
             Store(STORE.directory / 'streams').forget()
+            Store(STORE.directory / 'playback').forget()
+            Store(STORE.directory / 'subtitle-results').forget()
         xbmcplugin.endOfDirectory(HANDLE, succeeded=False)
         xbmc.executebuiltin('Container.Refresh')
         return
@@ -145,6 +169,8 @@ def run(params):
                        ('library', 'My Library'), ('continue', 'Continue Watching'), ('disconnect', 'Disconnect this device')]
         for target, label in options:
             xbmcplugin.addDirectoryItem(HANDLE, route(action=target), xbmcgui.ListItem(label=label), True)
+        for target, label in [('setup_home', 'Set up Bingie Home (10 rows)'), ('subtitles', 'Stremio subtitles for current video')]:
+            xbmcplugin.addDirectoryItem(HANDLE, route(action=target), xbmcgui.ListItem(label=label), False)
         xbmcplugin.addDirectoryItem(HANDLE, route(action='provider'),
                                    xbmcgui.ListItem(label='Manual catalog'), True)
         for addon in state.get('addons', []):
@@ -213,7 +239,7 @@ def run(params):
         cached = {}
         for stream in playable:
             key = secrets.token_hex(16)
-            cached[key] = stream['url']
+            cached[key] = dict(stream, kind=params['kind'], id=params['id'])
             entry = xbmcgui.ListItem(label=stream['label'])
             entry.setProperty('IsPlayable', 'true')
             xbmcplugin.addDirectoryItem(HANDLE, route(action='play', key=key), entry, False)
@@ -227,10 +253,19 @@ def run(params):
                 '{} unsupported streams; {} addons failed'.format(skipped, failed))
     elif action == 'play':
         cache = Store(STORE.directory / 'streams').load()
-        url = cache.get('urls', {}).get(params.get('key'), '')
+        stream = cache.get('urls', {}).get(params.get('key'), '')
+        url = stream.get('url', '') if isinstance(stream, dict) else stream
         if time.time() - cache.get('created', 0) > 3600 or not direct_url({'url': url}):
             raise ValueError('Source expired; reopen the stream list')
-        xbmcplugin.setResolvedUrl(HANDLE, True, xbmcgui.ListItem(path=url))
+        entry = xbmcgui.ListItem(path=url)
+        if isinstance(stream, dict):
+            from subtitles import prepare_selected
+            try:
+                prepare_selected(STORE.directory, stream['kind'], stream['id'], stream,
+                                 STORE.load().get('addons', []), entry)
+            except Exception:
+                xbmcgui.Dialog().notification('Stremio subtitles', 'Subtitles unavailable; video will still start.')
+        xbmcplugin.setResolvedUrl(HANDLE, True, entry)
         return
     else:
         raise ValueError('Unknown route')
@@ -247,7 +282,7 @@ if __name__ == '__main__':
     except Exception:
         # Provider URLs can contain secrets: never log exceptions/URLs here.
         xbmcgui.Dialog().ok('StremioELEC', 'Unable to load this addon response. Check the manifest setting and connection.')
-        if params.get('action') == 'play':
+        if params.get('action') in ('play', 'helper_play'):
             xbmcplugin.setResolvedUrl(HANDLE, False, xbmcgui.ListItem())
         else:
             xbmcplugin.endOfDirectory(HANDLE, succeeded=False)

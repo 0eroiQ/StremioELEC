@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<addon id="plugin.video.stremioelec" name="StremioELEC catalogs" version="0.4.0" provider-name="0eroiQ">
+<addon id="plugin.video.stremioelec" name="StremioELEC catalogs" version="0.5.0" provider-name="0eroiQ">
   <requires><import addon="xbmc.python" version="3.0.0" /></requires>
   <extension point="xbmc.python.pluginsource" library="default.py"><provides>video</provides></extension>
+  <extension point="xbmc.subtitle.module" library="subtitle_service.py" />
   <extension point="xbmc.addon.metadata">
     <summary lang="en_GB">Browse Stremio addon catalogs in Kodi</summary>
-    <description lang="en_GB">Experimental Stremio catalog bridge with device-link sign-in, account addon import and cross-addon direct HTTP stream selection. Library sync and torrents are not yet supported.</description>
+    <description lang="en_GB">Bingie Home setup, Stremio device-link sign-in, imported Continue Watching, direct HTTP playback and Kodi-language filtered subtitles. Progress writeback and torrent playback are not yet supported.</description>
     <platform>all</platform><license>GPL-2.0-or-later</license>
     <source>https://github.com/0eroiQ/skin.bingie</source>
   </extension>

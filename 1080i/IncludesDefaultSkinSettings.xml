@@ -373,7 +373,8 @@
         <onload condition="!Skin.String(View514_DisplayInfo.label)">Skin.SetString(View514_DisplayInfo.label,$LOCALIZE[1223])</onload>
 		<onload condition="!Skin.String(cast_number)">Skin.SetString(cast_number,20)</onload>
         <onload condition="!Skin.String(cast_number.label)">Skin.SetString(cast_number.label,20 [LOWERCASE]$LOCALIZE[29994][/LOWERCASE])</onload>
-		<onload condition="!Skin.String(splash_screen)">Skin.SetString(splash_screen,none)</onload>
+		<onload>Skin.SetBool(DisableBingieLogo)</onload>
+		<onload>Skin.SetString(splash_screen,none)</onload>
         <onload condition="!Skin.String(splash_screen.label)">Skin.SetString(splash_screen.label,None)</onload>
 		<onload condition="!Skin.String(scrollbar_visibility)">Skin.SetString(scrollbar_visibility,)</onload>
         <onload condition="!Skin.String(scrollbar_visibility.label)">Skin.SetString(scrollbar_visibility.label,$LOCALIZE[571])</onload>
@@ -388,8 +389,11 @@
 		<onload condition="!Skin.String(skin.forcedview.movies)">Skin.SetString(skin.forcedview.movies,$LOCALIZE[31027])</onload>
 		<onload condition="!Skin.String(skin.forcedview.sets)">Skin.SetString(skin.forcedview.sets,$LOCALIZE[31027])</onload>
 		<onload condition="!Skin.String(skin.forcedview.tvshows)">Skin.SetString(skin.forcedview.tvshows,$LOCALIZE[31027])</onload>
-		<onload condition="!Skin.String(skin.forcedview.seasons)">Skin.SetString(skin.forcedview.seasons,$LOCALIZE[31095])</onload>
-		<onload condition="!Skin.String(skin.forcedview.episodes)">Skin.SetString(skin.forcedview.episodes,$LOCALIZE[31318])</onload>
+		<onload condition="!Skin.HasSetting(StremioSeasonViewDefault) | !Skin.String(skin.forcedview.seasons)">Skin.SetString(skin.forcedview.seasons,$LOCALIZE[31095])</onload>
+		<onload>Skin.SetBool(StremioSeasonViewDefault)</onload>
+		<!-- StremioELEC episode default, also applied to existing installations once. -->
+		<onload condition="!Skin.HasSetting(StremioEpisodeViewDefault) | !Skin.String(skin.forcedview.episodes)">Skin.SetString(skin.forcedview.episodes,$LOCALIZE[31318])</onload>
+		<onload>Skin.SetBool(StremioEpisodeViewDefault)</onload>
 		<onload condition="!Skin.String(skin.forcedview.songs)">Skin.SetString(skin.forcedview.songs,$LOCALIZE[31122])</onload>
 		<onload condition="!Skin.String(skin.forcedview.artists)">Skin.SetString(skin.forcedview.artists,$LOCALIZE[31122])</onload>
 		<onload condition="!Skin.String(skin.forcedview.albums)">Skin.SetString(skin.forcedview.albums,$LOCALIZE[31122])</onload>
