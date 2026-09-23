@@ -94,7 +94,7 @@
         <include>ThumbsViewItemBingieLayout</include>
      </include>
     <include name="ThumbsViewBingieLayoutFocus">
-        <include condition="![Skin.HasSetting(EnableFixedFrameWidgets) + [Window.IsActive(Home) | $EXP[IsBingieHubsActive2]]]">ThumbsFOBingie</include>
+        <include condition="![$EXP[UseOriginalFixedFocus] + [Window.IsActive(Home) | $EXP[IsBingieHubsActive2]]]">ThumbsFOBingie</include>
         <include>ThumbsViewItemBingieLayout</include>
     </include>
 	<include name="ThumbsViewBingieLayoutFocusInfo">

@@ -2,6 +2,8 @@
 
 ## Home view modes
 
+Stremio view always uses moving focus and hides the moving-focus and spotlight switches. Original Bingie retains both switches and their saved values. The fixed-frame render paths use an effective view expression, not a destructive reset of the user's original preference.
+
 Skin settings / Home offers Stremio view and Original Bingie view. Both currently share the original Bingie layout and all widget/content settings. Stremio view is the starting variant with spotlight hidden; it does not overwrite the original DisableSpotlightContent preference. Switching back restores original behavior. Other preferences are shared, not separate per-view profiles. Only newly initialized profiles default to Stremio view; existing profiles keep their selection. The view switch does not enable the Stremio catalog pilot or change content providers.
 
 `plugin.video.stremioelec` is a separate Kodi video addon, not part of the skin package. It uses only Kodi Python APIs and the Python standard library. Package/install this folder separately; putting it inside the skin ZIP does not install it.

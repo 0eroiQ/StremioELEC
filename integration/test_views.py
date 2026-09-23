@@ -7,6 +7,16 @@ ROOT = pathlib.Path(__file__).resolve().parents[1]
 
 
 class HomeViewsTest(unittest.TestCase):
+    def test_stremio_forces_moving_focus_and_hides_owned_options(self):
+        root = ET.parse(ROOT / '1080i/Includes.xml').getroot()
+        self.assertEqual(root.find("expression[@name='UseOriginalFixedFocus']").text,
+                         '!Skin.HasSetting(StremioView) + Skin.HasSetting(EnableFixedFrameWidgets)')
+        settings = ET.parse(ROOT / '1080i/IncludesSkinSettings.xml').getroot()
+        for identity in ('31123', '31297', '23002', '31169'):
+            control = settings.find(".//control[@id='%s']" % identity)
+            self.assertIn('!Skin.HasSetting(StremioView)',
+                          [node.text for node in control.findall('visible')])
+
     def test_row_position_is_scoped_to_stremio(self):
         root = ET.parse(ROOT / '1080i/IncludesHomeBingie.xml').getroot()
         self.assertEqual(root.find("include[@name='StremioHomeRowPosition']/top").text, '649')

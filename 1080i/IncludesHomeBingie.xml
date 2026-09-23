@@ -790,7 +790,7 @@
 			<!-- Fixed Focus Frame -->
 			<control type="group">
                 <animation effect="slide" end="0,85" time="0" condition="Skin.HasSetting(StremioView)">Conditional</animation>
-				<include condition="Skin.HasSetting(EnableFixedFrameWidgets) + [Window.IsActive(Home) | $EXP[IsBingieHubsActive2]]">Bingie_Screens_Fixed_Focus_Frame</include>
+				<include condition="$EXP[UseOriginalFixedFocus] + [Window.IsActive(Home) | $EXP[IsBingieHubsActive2]]">Bingie_Screens_Fixed_Focus_Frame</include>
 			</control>
 				<!-- gradient overlays on widgets -->
                 <include>Bingie_Left_Gradient</include>

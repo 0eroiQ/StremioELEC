@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- BINGIE -->
 <includes>
+    <expression name="UseOriginalFixedFocus">!Skin.HasSetting(StremioView) + Skin.HasSetting(EnableFixedFrameWidgets)</expression>
     <!-- Stremio shares the original layout; its spotlight override never alters Bingie preferences. -->
     <expression name="StremioSpotlightEnabled">!Skin.HasSetting(StremioView) + !Skin.HasSetting(DisableSpotlightContent)</expression>
     <include file="Defaults.xml" />

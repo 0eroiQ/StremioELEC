@@ -422,6 +422,7 @@
     </include>
     <include name="Home_Spotlight_Settings">
         <control type="label" id="23002">
+            <visible>!Skin.HasSetting(StremioView)</visible>
             <include>SkinSettings_Header</include>
             <label>$LOCALIZE[31185]</label>
         </control>       	
@@ -432,6 +433,7 @@
             <onclick>Skin.ToggleSetting(DisableSpotlightContent)</onclick>
             <selected>Skin.HasSetting(DisableSpotlightContent)</selected>
             <enable>!Skin.HasSetting(StremioView)</enable>
+            <visible>!Skin.HasSetting(StremioView)</visible>
         </control>
 		<!-- Auto Hide Plot on System Idle -->	
 		<control type="radiobutton" id="31177">
@@ -462,6 +464,7 @@
             <label>$LOCALIZE[31123]</label>
             <onclick>Skin.ToggleSetting(EnableFixedFrameWidgets)</onclick>
             <selected>!Skin.HasSetting(EnableFixedFrameWidgets)</selected>
+            <visible>!Skin.HasSetting(StremioView)</visible>
         </control>
 		<!-- set global items limit -->
         <control type="button" id="31037">
@@ -490,6 +493,7 @@
             <label>$LOCALIZE[31169]</label>
             <onclick>Skin.ToggleSetting(DisableDummySpotlight)</onclick>
             <selected>Skin.HasSetting(DisableDummySpotlight)</selected>
+            <visible>!Skin.HasSetting(StremioView)</visible>
         </control>
     </include>
 	

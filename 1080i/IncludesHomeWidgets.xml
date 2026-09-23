@@ -254,7 +254,7 @@
                 <width>240</width>
                 <height>340</height>
                 <control type="image">
-                    <visible>![Skin.HasSetting(EnableFixedFrameWidgets) + [Window.IsActive(Home) | $EXP[IsBingieHubsActive]]] | Window.IsActive(1114)</visible>
+                    <visible>![$EXP[UseOriginalFixedFocus] + [Window.IsActive(Home) | $EXP[IsBingieHubsActive]]] | Window.IsActive(1114)</visible>
                     <include>PosterThumbFO_DefsBingie</include>
                     <include>thumbsborder_focused</include>
                 </control>
@@ -360,7 +360,7 @@
                 <width>280</width>
                 <height>280</height>
 				<control type="image">
-					<visible>![Skin.HasSetting(EnableFixedFrameWidgets) + [Window.IsActive(Home) | $EXP[IsBingieHubsActive]]] | Window.IsActive(1114)</visible>
+					<visible>![$EXP[UseOriginalFixedFocus] + [Window.IsActive(Home) | $EXP[IsBingieHubsActive]]] | Window.IsActive(1114)</visible>
 					<include>SquareThumbFO</include>
 					<include>thumbsborder_focused</include>
 				</control>
@@ -460,7 +460,7 @@
                 <width>419</width>
                 <height>242</height>
                 <control type="image">
-                    <visible>![Skin.HasSetting(EnableFixedFrameWidgets) + [Window.IsActive(Home) | $EXP[IsBingieHubsActive]]] | Window.IsActive(1114)</visible>
+                    <visible>![$EXP[UseOriginalFixedFocus] + [Window.IsActive(Home) | $EXP[IsBingieHubsActive]]] | Window.IsActive(1114)</visible>
                     <include>ThumbsFO_DefsBingie</include>
                     <include>thumbsborder_focused</include>
                 </control>

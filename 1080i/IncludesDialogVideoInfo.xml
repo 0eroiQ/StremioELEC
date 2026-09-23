@@ -1,4 +1,4 @@
- <?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <!-- BINGIE -->
 <includes>
 	<include name="BingieAltInfo">	
@@ -226,8 +226,8 @@
 					<control type="group">
 						<width>240</width>
 						<height>340</height>
-						<include condition="!Skin.HasSetting(EnableFixedFrameWidgets)">PosterPanelBingieLayoutFocus</include>
-						<include condition="Skin.HasSetting(EnableFixedFrameWidgets)">PosterPanelBingieLayout</include>
+						<include condition="!$EXP[UseOriginalFixedFocus]">PosterPanelBingieLayoutFocus</include>
+						<include condition="$EXP[UseOriginalFixedFocus]">PosterPanelBingieLayout</include>
 						<include>PosterTagOverlayBingieNoOverride</include>
 					</control>
 					</focusedlayout>
@@ -247,7 +247,7 @@
 					<bordersize>2</bordersize>
 					<param name="xAxisAnim" value="238" />
 					<param name="yAxisAnim" value="350" />
-					<param name="visibility" value="Skin.HasSetting(EnableFixedFrameWidgets)" />
+					<param name="visibility" value="$EXP[UseOriginalFixedFocus]" />
 				</include>
 				</control>
 			
@@ -293,8 +293,8 @@
 							<control type="group">
 								<width>240</width>
 								<height>340</height>
-								<include condition="!Skin.HasSetting(EnableFixedFrameWidgets)">PosterPanelBingieLayoutFocus</include>
-								<include condition="Skin.HasSetting(EnableFixedFrameWidgets)">PosterPanelBingieLayout</include>
+								<include condition="!$EXP[UseOriginalFixedFocus]">PosterPanelBingieLayoutFocus</include>
+								<include condition="$EXP[UseOriginalFixedFocus]">PosterPanelBingieLayout</include>
 								<include>PosterTagOverlayBingieNoOverride</include>
 							</control>
 						</focusedlayout>
@@ -318,7 +318,7 @@
 					<bordersize>2</bordersize>
 					<param name="xAxisAnim" value="238" />
 					<param name="yAxisAnim" value="350" />
-					<param name="visibility" value="Skin.HasSetting(EnableFixedFrameWidgets)" />
+					<param name="visibility" value="$EXP[UseOriginalFixedFocus]" />
 				</include>
 				</control>
 				
@@ -589,7 +589,7 @@
                                 <onclick condition="System.HasAddon(plugin.video.youtube) + !String.IsEmpty(ListItem.Trailer) + [![String.IsEqual(Skin.String(trailersource),imdb) + String.IsEqual(Skin.String(AutoYoutubeTrailer),true)] | [String.IsEqual(Skin.String(trailersource),imdb) + !String.IsEqual(Skin.String(AutoYoutubeTrailer),true)]]">
 									PlayMedia($ESCINFO[ListItem.Trailer],1)</onclick>
 								<onclick condition="System.HasAddon(plugin.video.imdb.trailers) + String.IsEqual(Skin.String(trailersource),imdb) + String.IsEqual(Skin.String(AutoYoutubeTrailer),true)">
-									PlayMedia(plugin://plugin.video.imdb.trailers/?action=play_id&imdb=$VAR[IMDb_Trailers],1)</onclick>
+									PlayMedia(plugin://plugin.video.imdb.trailers/?action=play_id&amp;imdb=$VAR[IMDb_Trailers],1)</onclick>
 								<!-- plugin with fallback -->
 								<onclick condition="System.HasAddon(plugin.video.youtube) + String.IsEmpty(ListItem.Trailer) + String.IsEqual(ListItem.DBType,movie) + String.IsEqual(Skin.String(AutoYoutubeTrailer),true) + String.IsEqual(Skin.String(trailersource),youtube)">
 									RunScript(script.bingie.helper,action=playtrailer,title=$INFO[ListItem.Title]$INFO[ListItem.Year])</onclick>
@@ -1846,7 +1846,7 @@
                                 <onclick condition="System.HasAddon(plugin.video.youtube) + !String.IsEmpty(ListItem.Trailer) + [![String.IsEqual(Skin.String(trailersource),imdb) + String.IsEqual(Skin.String(AutoYoutubeTrailer),true)] | [String.IsEqual(Skin.String(trailersource),imdb) + !String.IsEqual(Skin.String(AutoYoutubeTrailer),true)]]">
 									PlayMedia($ESCINFO[ListItem.Trailer],1)</onclick>
 								<onclick condition="System.HasAddon(plugin.video.imdb.trailers) + String.IsEqual(Skin.String(trailersource),imdb) + String.IsEqual(Skin.String(AutoYoutubeTrailer),true)">
-									PlayMedia(plugin://plugin.video.imdb.trailers/?action=play_id&imdb=$VAR[IMDb_Trailers],1)</onclick>	
+									PlayMedia(plugin://plugin.video.imdb.trailers/?action=play_id&amp;imdb=$VAR[IMDb_Trailers],1)</onclick>
 								<!-- plugin with fallback -->
 								<onclick condition="System.HasAddon(plugin.video.youtube) + String.IsEmpty(ListItem.Trailer) + String.IsEqual(ListItem.DBType,movie) + String.IsEqual(Skin.String(AutoYoutubeTrailer),true) + String.IsEqual(Skin.String(trailersource),youtube)">
 									RunScript(script.bingie.helper,action=playtrailer,title=$INFO[ListItem.Title]$INFO[ListItem.Year])</onclick>
@@ -2367,7 +2367,7 @@
                     <focusedlayout width="1050" height="280">
                         <!-- panel/border -->
                         <control type="image">
-							<visible>!Skin.HasSetting(EnableFixedFrameWidgets)</visible>
+							<visible>!$EXP[UseOriginalFixedFocus]</visible>
                             <visible>Control.HasFocus(352)</visible>
                             <height>episodes_thumb_height</height>
                             <width>episodes_thumb_width</width>
@@ -2482,7 +2482,7 @@
 								
 				<!-- fixed border moving with screen -->
                 <control type="image">
-                    <visible>Skin.HasSetting(EnableFixedFrameWidgets) + Integer.IsGreater(Container(352).NumItems,0) + Control.HasFocus(352)</visible>
+                    <visible>$EXP[UseOriginalFixedFocus] + Integer.IsGreater(Container(352).NumItems,0) + Control.HasFocus(352)</visible>
 					<animation effect="fade" start="100" end="0" time="0" condition="Container(352).IsUpdating">Conditional</animation>
 					<animation effect="fade" start="0" end="100" time="400" condition="!Container(352).IsUpdating">Conditional</animation>
                     <top>127</top>
@@ -2555,7 +2555,7 @@
                     <focusedlayout width="1050" height="280">
                         <!-- panel/border -->
                         <control type="image">
-							<visible>!Skin.HasSetting(EnableFixedFrameWidgets)</visible>
+							<visible>!$EXP[UseOriginalFixedFocus]</visible>
                             <visible>Control.HasFocus(354)</visible>
                             <height>episodes_thumb_height</height>
                             <width>episodes_thumb_width</width>
@@ -2667,7 +2667,7 @@
 				</control>
 				<!-- fixed border moving with screen -->
                 <control type="image">
-                    <visible>Skin.HasSetting(EnableFixedFrameWidgets) + Integer.IsGreater(Container(354).NumItems,0) + Control.HasFocus(354)</visible>
+                    <visible>$EXP[UseOriginalFixedFocus] + Integer.IsGreater(Container(354).NumItems,0) + Control.HasFocus(354)</visible>
 					<animation effect="fade" start="100" end="0" time="0" condition="Container(354).IsUpdating">Conditional</animation>
 					<animation effect="fade" start="0" end="100" time="400" condition="!Container(354).IsUpdating">Conditional</animation>
                     <top>127</top>
@@ -4289,8 +4289,8 @@
                     <control type="group">
                         <width>$PARAM[layoutwidth]</width>
                         <height>$PARAM[layoutheight]</height>
-                        <include condition="!Skin.HasSetting(EnableFixedFrameWidgets)">$PARAM[layout]LayoutFocus</include>
-						<include condition="Skin.HasSetting(EnableFixedFrameWidgets)">$PARAM[layout]Layout</include>
+                        <include condition="!$EXP[UseOriginalFixedFocus]">$PARAM[layout]LayoutFocus</include>
+						<include condition="$EXP[UseOriginalFixedFocus]">$PARAM[layout]Layout</include>
                         <include>PosterTagOverlayBingieNoOverride</include>
                     </control>
                 </focusedlayout>
@@ -4298,7 +4298,7 @@
             </control>
 			<!-- Fixed Frame -->
 			<control type="image">
-                <visible>Skin.HasSetting(EnableFixedFrameWidgets)</visible>
+                <visible>$EXP[UseOriginalFixedFocus]</visible>
                 <visible>Integer.IsGreater(Container($PARAM[id]).NumItems, 0) + Control.HasFocus($PARAM[id])</visible>
                 <top>0</top>
                 <width>240</width>

@@ -71,7 +71,7 @@
         </control>
     </include>
     <include name="PosterPanelBingieLayoutFocus">
-        <include condition="![Skin.HasSetting(EnableFixedFrameWidgets) + [Window.IsActive(Home) | $EXP[IsBingieHubsActive2] | Window.IsActive(videoosd)]] | [Window.IsActive(DialogVideoInfo.xml) + Skin.HasSetting(UseBingieInfoDialog)] | Window.IsActive(1109) | Window.IsActive(1190)">PosterThumbFOBingie</include>
+        <include condition="![$EXP[UseOriginalFixedFocus] + [Window.IsActive(Home) | $EXP[IsBingieHubsActive2] | Window.IsActive(videoosd)]] | [Window.IsActive(DialogVideoInfo.xml) + Skin.HasSetting(UseBingieInfoDialog)] | Window.IsActive(1109) | Window.IsActive(1190)">PosterThumbFOBingie</include>
         <include>PosterThumbBingieLayout</include>
         <control type="group">
             <!--Watched Overlay-->

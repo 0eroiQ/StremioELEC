@@ -2383,7 +2383,7 @@ msgid "Home view"
 msgstr ""
 
 msgctxt "#31991"
-msgid "Stremio view (Bingie without spotlight)"
+msgid "Stremio view"
 msgstr ""
 
 msgctxt "#31992"
