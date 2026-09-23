@@ -2377,3 +2377,15 @@ msgstr ""
 msgctxt "#31579"
 msgid "color for play icon"
 msgstr ""
+
+msgctxt "#31990"
+msgid "Home view"
+msgstr ""
+
+msgctxt "#31991"
+msgid "Stremio view (Bingie without spotlight)"
+msgstr ""
+
+msgctxt "#31992"
+msgid "Original Bingie view"
+msgstr ""

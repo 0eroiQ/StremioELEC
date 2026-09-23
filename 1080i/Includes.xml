@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- BINGIE -->
 <includes>
+    <!-- Stremio shares the original layout; its spotlight override never alters Bingie preferences. -->
+    <expression name="StremioSpotlightEnabled">!Skin.HasSetting(StremioView) + !Skin.HasSetting(DisableSpotlightContent)</expression>
     <include file="Defaults.xml" />
     <include file="IncludesVariables.xml" />
     <include file="IncludesBingie.xml" />

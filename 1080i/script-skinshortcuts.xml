@@ -429,7 +429,7 @@
 					<label>$LOCALIZE[31379]</label>
 					<onclick>RunScript(script.skinshortcuts,type=widgets&amp;showNone=true&amp;skinWidgetPath=spotlighthome.path)</onclick>
 					<visible>String.EndsWith(Window.Property(groupname),.1)</visible>
-					<visible>!Skin.HasSetting(DisableSpotlightContent)</visible>
+					<visible>$EXP[StremioSpotlightEnabled]</visible>
 				</control>
 				
 				<!--Spotlight Custom Hub-->
@@ -440,7 +440,7 @@
 					<label>$LOCALIZE[31379]</label>
 					<onclick>RunScript(script.skinshortcuts,type=widgets&amp;showNone=true&amp;skinWidgetPath=spotlightmyhub.path)</onclick>
 					<visible>String.IsEqual(Window.Property(groupname),customhub)</visible>
-					<visible>!Skin.HasSetting(DisableSpotlightContent)</visible>
+					<visible>$EXP[StremioSpotlightEnabled]</visible>
 				</control>
 				
 				<!--Spotlight Movie Hub-->
@@ -451,7 +451,7 @@
 					<label>$LOCALIZE[31379]</label>
 					<onclick>RunScript(script.skinshortcuts,type=widgets&amp;showNone=true&amp;skinWidgetPath=spotlightmovies.path)</onclick>
 					<visible>String.IsEqual(Window.Property(groupname),moviehub)</visible>
-					<visible>!Skin.HasSetting(DisableSpotlightContent)</visible>
+					<visible>$EXP[StremioSpotlightEnabled]</visible>
 				</control>
 				
 				<!--Spotlight TV Show Hub-->
@@ -462,7 +462,7 @@
 					<label>$LOCALIZE[31379]</label>
 					<onclick>RunScript(script.skinshortcuts,type=widgets&amp;showNone=true&amp;skinWidgetPath=spotlighttvshows.path)</onclick>
 					<visible>String.IsEqual(Window.Property(groupname),tvshowhub)</visible>
-					<visible>!Skin.HasSetting(DisableSpotlightContent)</visible>
+					<visible>$EXP[StremioSpotlightEnabled]</visible>
 				</control>
 				
 				<!--Spotlight New Hub-->
@@ -473,7 +473,7 @@
 					<label>$LOCALIZE[31379]</label>
 					<onclick>RunScript(script.skinshortcuts,type=widgets&amp;showNone=true&amp;skinWidgetPath=spotlightnew.path)</onclick>
 					<visible>String.IsEqual(Window.Property(groupname),newhub)</visible>
-					<visible>!Skin.HasSetting(DisableSpotlightContent)</visible>
+					<visible>$EXP[StremioSpotlightEnabled]</visible>
 				</control>
 				
 				<!--Spotlight Music Hub-->
@@ -484,7 +484,7 @@
 					<label>$LOCALIZE[31379]</label>
 					<onclick>RunScript(script.skinshortcuts,type=widgets&amp;showNone=true&amp;skinWidgetPath=spotlightmusic.path)</onclick>
 					<visible>String.IsEqual(Window.Property(groupname),musichub)</visible>
-					<visible>!Skin.HasSetting(DisableSpotlightContent)</visible>
+					<visible>$EXP[StremioSpotlightEnabled]</visible>
 				</control>
 				
 				<!--edit thumbnail -->

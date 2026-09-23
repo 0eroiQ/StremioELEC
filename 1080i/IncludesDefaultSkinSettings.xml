@@ -14,6 +14,7 @@
   
   <!-- various default settings  -->
   <include name="DefaultSkinSettingsValues">
+    <onload condition="!Skin.HasSetting(HomeMenuDefaults46)">Skin.SetBool(StremioView)</onload>
 	<onload condition="!Skin.HasSetting(HomeMenuDefaults46)">Skin.SetBool(View514_ShowCDart)</onload>
 	<onload condition="!Skin.HasSetting(HomeMenuDefaults46)">Skin.SetBool(View513_ShowCDart)</onload>
     <onload condition="!Skin.HasSetting(HomeMenuDefaults46)">Skin.SetBool(View525_DisableFixedBingieFrame)</onload>

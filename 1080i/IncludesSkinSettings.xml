@@ -148,6 +148,7 @@
         <include content="SkinSettings_Tab">
             <param name="id" value="12"/>
             <!-- content -->            
+            <include>Stremio_View_Settings</include>
             <include>Home_Spotlight_Settings</include>
 			<include>Home_Widgets_Settings</include>
 			<include>Home_Trailers</include>
@@ -399,6 +400,26 @@
 
     <!-- HOME TAB INCLUDES-->
     <!-- Home Spotlight Settings -->
+    <include name="Stremio_View_Settings">
+        <control type="label" id="31990">
+            <include>SkinSettings_Header</include>
+            <label>$LOCALIZE[31990]</label>
+        </control>
+        <control type="radiobutton" id="31991">
+            <include>SkinSettings_Button</include>
+            <label>$LOCALIZE[31991]</label>
+            <selected>Skin.HasSetting(StremioView)</selected>
+            <onclick>Skin.SetBool(StremioView)</onclick>
+            <onclick>ReloadSkin()</onclick>
+        </control>
+        <control type="radiobutton" id="31992">
+            <include>SkinSettings_Button</include>
+            <label>$LOCALIZE[31992]</label>
+            <selected>!Skin.HasSetting(StremioView)</selected>
+            <onclick>Skin.Reset(StremioView)</onclick>
+            <onclick>ReloadSkin()</onclick>
+        </control>
+    </include>
     <include name="Home_Spotlight_Settings">
         <control type="label" id="23002">
             <include>SkinSettings_Header</include>
@@ -410,6 +431,7 @@
             <label>$LOCALIZE[31297]</label>
             <onclick>Skin.ToggleSetting(DisableSpotlightContent)</onclick>
             <selected>Skin.HasSetting(DisableSpotlightContent)</selected>
+            <enable>!Skin.HasSetting(StremioView)</enable>
         </control>
 		<!-- Auto Hide Plot on System Idle -->	
 		<control type="radiobutton" id="31177">
@@ -417,7 +439,7 @@
             <label>$LOCALIZE[31177]</label>
             <onclick>Skin.ToggleSetting(AutoHidePlotOnIdle)</onclick>
             <selected>Skin.HasSetting(AutoHidePlotOnIdle)</selected>
-            <visible>!Skin.HasSetting(DisableSpotlightContent)</visible>
+            <visible>$EXP[StremioSpotlightEnabled]</visible>
         </control>			
 	</include>
 
@@ -485,7 +507,7 @@
 			<onclick condition="!System.HasAddon(plugin.video.imdb.trailers) + String.IsEqual(Skin.String(trailersource),imdb) + String.IsEqual(Skin.String(AutoYoutubeTrailer),true)">InstallAddon(plugin.video.imdb.trailers)</onclick>
             <onclick condition="String.IsEqual(Skin.String(AutoYoutubeTrailer),false) | System.HasAddon(plugin.video.youtube) + String.IsEqual(Skin.String(trailersource),youtube) | System.HasAddon(plugin.video.imdb.trailers) + System.HasAddon(plugin.video.imdb.trailers)">Skin.ToggleSetting(SpotLightTrailers)</onclick>
             <selected>Skin.HasSetting(SpotLightTrailers)</selected>
-            <visible>!Skin.HasSetting(DisableSpotlightContent)</visible>
+            <visible>$EXP[StremioSpotlightEnabled]</visible>
         </control>
        	<!-- Auto Play Trailers in Home & Hubs -->
         <control type="radiobutton" id="31173">

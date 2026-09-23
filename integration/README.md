@@ -1,5 +1,9 @@
 # Stremio bridge pilot
 
+## Home view modes
+
+Skin settings / Home offers Stremio view and Original Bingie view. Both currently share the original Bingie layout and all widget/content settings. Stremio view is the starting variant with spotlight hidden; it does not overwrite the original DisableSpotlightContent preference. Switching back restores original behavior. Other preferences are shared, not separate per-view profiles. Only newly initialized profiles default to Stremio view; existing profiles keep their selection. The view switch does not enable the Stremio catalog pilot or change content providers.
+
 `plugin.video.stremioelec` is a separate Kodi video addon, not part of the skin package. It uses only Kodi Python APIs and the Python standard library. Package/install this folder separately; putting it inside the skin ZIP does not install it.
 
 Current scope: browse catalogs without mandatory filters, map metadata to Kodi artwork/info, list series episodes, and expose direct HTTP(S) streams from the same manifest as playable Kodi items. The default Cinemeta manifest is metadata-only; it will not supply movie streams. HTTP request timeout is 15 seconds and response limit is 8 MiB. Provider URLs and errors are not logged because configured manifests can contain secrets.
