@@ -7,6 +7,15 @@ ROOT = pathlib.Path(__file__).resolve().parents[1]
 
 
 class HomeViewsTest(unittest.TestCase):
+    def test_row_position_is_scoped_to_stremio(self):
+        root = ET.parse(ROOT / '1080i/IncludesHomeBingie.xml').getroot()
+        self.assertEqual(root.find("include[@name='StremioHomeRowPosition']/top").text, '649')
+        self.assertEqual(root.find("include[@name='OriginalBingieHomeRowPosition']/top").text, '564')
+        rows = root.find(".//control[@id='77777']")
+        includes = {node.text: node.get('condition') for node in rows.findall('include')}
+        self.assertEqual(includes['StremioHomeRowPosition'], 'Skin.HasSetting(StremioView)')
+        self.assertEqual(includes['OriginalBingieHomeRowPosition'], '!Skin.HasSetting(StremioView)')
+
     def test_selector_preserves_original_spotlight_preference(self):
         settings = ET.parse(ROOT / '1080i/IncludesSkinSettings.xml').getroot()
         selector = settings.find("include[@name='Stremio_View_Settings']")

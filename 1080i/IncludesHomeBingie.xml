@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- BINGIE -->
 <includes>
+    <!-- Keep original Bingie geometry; Stremio leaves only the next row heading at the bottom. -->
+    <include name="StremioHomeRowPosition">
+        <top>649</top>
+    </include>
+    <include name="OriginalBingieHomeRowPosition">
+        <top>564</top>
+    </include>
     <include name="HomeBingie">
         <include content="Bingie_Base_BG">
             <param name="visibility" value="!$EXP[IsPlayingRecognizedContent]" />
@@ -751,7 +758,8 @@
 				<animation effect="slide" end="0,38" time="300" condition="$EXP[IsCurrentWidgetSpotlight]">Conditional</animation>
 				<animation effect="slide" end="0,42" time="0" condition="Window.IsActive(1114)">Conditional</animation>
                 <usecontrolcoords>true</usecontrolcoords>
-				<top>564</top>
+                <include condition="Skin.HasSetting(StremioView)">StremioHomeRowPosition</include>
+                <include condition="!Skin.HasSetting(StremioView)">OriginalBingieHomeRowPosition</include>
                 <include condition="Window.IsActive(Home) | $EXP[IsBingieHubsActive]">Fixed_Focus_Bottom</include>
                 <bottom>0</bottom>
                 <include condition="Window.IsActive(Home) | $EXP[IsBingieHubsActive]">Fixed_Focus_Itemgap</include>
@@ -781,6 +789,7 @@
          			
 			<!-- Fixed Focus Frame -->
 			<control type="group">
+                <animation effect="slide" end="0,85" time="0" condition="Skin.HasSetting(StremioView)">Conditional</animation>
 				<include condition="Skin.HasSetting(EnableFixedFrameWidgets) + [Window.IsActive(Home) | $EXP[IsBingieHubsActive2]]">Bingie_Screens_Fixed_Focus_Frame</include>
 			</control>
 				<!-- gradient overlays on widgets -->
