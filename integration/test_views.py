@@ -7,6 +7,12 @@ ROOT = pathlib.Path(__file__).resolve().parents[1]
 
 
 class HomeViewsTest(unittest.TestCase):
+    def test_stremio_widget_picker_is_browsable_and_optional(self):
+        root = ET.parse(ROOT / 'shortcuts/overrides.xml').getroot()
+        node = root.find("widget-groupings/shortcut[@label='Stremio catalogs']")
+        self.assertEqual(node.text, '||BROWSE||plugin.video.stremioelec/?action=widgets')
+        self.assertEqual(node.get('condition'), 'System.HasAddon(plugin.video.stremioelec)')
+
     def test_stremio_forces_moving_focus_and_hides_owned_options(self):
         root = ET.parse(ROOT / '1080i/Includes.xml').getroot()
         self.assertEqual(root.find("expression[@name='UseOriginalFixedFocus']").text,

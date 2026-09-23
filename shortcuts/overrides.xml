@@ -166,6 +166,8 @@
     
     <widget-groupings>
 
+        <shortcut label="Stremio catalogs" type="32014" icon="DefaultAddonVideo.png" condition="System.HasAddon(plugin.video.stremioelec)">||BROWSE||plugin.video.stremioelec/?action=widgets</shortcut>
+
 		<content>widgets</content>
 		<node label="32030">
 			<content>video</content>
@@ -247,5 +249,4 @@
 	<propertydefault labelID="20360" group="searchmenu" property="widgetTags">enable</propertydefault>
 
 </overrides>
-
 

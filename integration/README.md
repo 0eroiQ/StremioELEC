@@ -27,3 +27,13 @@ Required before removing TMDB/widgets: install pilot on a compatible Kodi instan
 `build_bundle.py --inputs INPUT_DIRECTORY --output OUTPUT_DIRECTORY` packages the local skin and bridge and resolves mandatory dependencies recursively from actual ZIP manifests. Inputs are `bingie.xml` (Bingie Omega repository index), `kodi.xml.gz` (official Kodi Omega index), and `builtins/*/addon.xml` extracted from the target LibreELEC image. Use a fresh output directory for a new dependency snapshot.
 
 The builder checks archive paths, CRC, addon identity and dependency minimum versions. It produces a version/source/hash inventory, `SHA256SUMS` and a dependency-first `INSTALL.md`. Hashes are local integrity records, not upstream signatures. This does not install anything, rewrite an image, or validate runtime compatibility. No update repository addon is bundled. Dependencies are retained until the Stremio replacement passes runtime acceptance.
+# Home widget picker
+
+In the skin's widget selector choose **Stremio catalogs**, browse an imported
+provider, open its catalog, and use Skin Shortcuts' **Use as widget** selection.
+Only providers with unfiltered catalogs appear; stream-only providers remain
+available in the account collection but are not Home row sources. Manual catalog
+browsing works without signing in. Saved widget paths contain an opaque provider
+identifier, not the configured manifest URL. Reconfiguring/removing that provider
+may require selecting its widget again. Existing Home rows are not overwritten.
+Account-backed selection still needs a signed-in runtime acceptance test.

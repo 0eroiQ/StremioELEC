@@ -102,7 +102,17 @@ def run(params):
     def provider_route(**values):
         return route(provider=provider, **values)
 
-    if action == 'root':
+    if action == 'widgets':
+        # Widget picker has no login/logout actions and excludes stream-only addons.
+        xbmcplugin.addDirectoryItem(HANDLE, route(action='provider'),
+                                   xbmcgui.ListItem(label='Manual catalog'), True)
+        for addon in STORE.load().get('addons', []):
+            if not catalogs(addon['manifest']):
+                continue
+            label = addon['manifest'].get('name') or 'Stremio addon'
+            xbmcplugin.addDirectoryItem(HANDLE, route(action='provider', provider=addon['id']),
+                                       xbmcgui.ListItem(label=label), True)
+    elif action == 'root':
         state = STORE.load()
         options = [('connect', 'Connect Stremio account')]
         if state.get('token'):
