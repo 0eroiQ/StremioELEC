@@ -75,4 +75,4 @@ jobs:
         if: github.event_name != 'pull_request'
         run: |
           echo '### N60 test image only' >> "$GITHUB_STEP_SUMMARY"
-          echo 'Verified hashes, package dependency closure and image contents. Not yet boot-tested on N60; no USB or Android disk written. No stable update feed published.' >> "$GITHUB_STEP_SUMMARY"
+          echo 'Verified hashes, package dependency closure and image contents. Not yet boot-tested on N60; no USB or Android disk written. This build cannot publish/promote the independent approved update channel.' >> "$GITHUB_STEP_SUMMARY"

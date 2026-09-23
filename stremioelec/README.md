@@ -52,6 +52,9 @@ reset or altered. The image starts with a fresh Stremio sign-in, not an account.
 - Synthetic upgrade, cancellation, tamper and rollback tests are included.
   A real N60 upgrade/reboot and retention test is still mandatory before stable
   promotion; do not equate unit tests or a successful image build with that test.
+- The initial live channel is published with `os: null` and `addons: null`:
+  https://raw.githubusercontent.com/0eroiQ/StremioELEC/update-channel/stable.json
+  This provides a working endpoint without offering unaccepted pilot packages.
 - SlyGuy playback worked in the Mac test runtime. Its packages are not
   redistributed in this candidate pending redistribution/licence review; trailers
   on this fresh image therefore need the original upstream installation.

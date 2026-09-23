@@ -62,6 +62,21 @@ def sha(path):
     return result.hexdigest()
 
 
+def sync_directory(path):
+    fd = os.open(path, os.O_RDONLY)
+    try:
+        os.fsync(fd)
+    finally:
+        os.close(fd)
+
+
+def durable_move(source, target):
+    source.rename(target)
+    sync_directory(source.parent)
+    if target.parent != source.parent:
+        sync_directory(target.parent)
+
+
 def network(url):
     response = urllib.request.urlopen(urllib.request.Request(url, headers={'User-Agent': 'StremioELEC-updater/1'}), timeout=20)
     if not response.url.startswith('https://'):
@@ -317,10 +332,10 @@ class Updater:
             target, old = self.addons / identity, backup / identity
             if old.exists():
                 if target.exists():
-                    target.rename(backup / ('failed-' + identity))
-                old.rename(target)
+                    durable_move(target, backup / ('failed-' + identity))
+                durable_move(old, target)
             elif not journal['old'][identity] and target.exists():
-                target.rename(backup / ('failed-' + identity))
+                durable_move(target, backup / ('failed-' + identity))
         atomic(self.root / 'transaction.json', dict(journal, phase='rolled-back'))
         (self.root / 'pending-addons.json').unlink(missing_ok=True)
         self.save(last_error='Interrupted addon update was rolled back; download and confirm again.')
@@ -340,7 +355,7 @@ class Updater:
             raise ValueError('Not enough space for addon rollback')
         backup = self.root / 'rollback'
         if backup.exists():
-            backup.rename(self.root / ('rollback-' + str(time.time_ns())))
+            durable_move(backup, self.root / ('rollback-' + str(time.time_ns())))
         backup.mkdir()
         self.addons.mkdir(parents=True, exist_ok=True)
         old = {i: (self.addons / i).exists() for i in IDS}
@@ -349,13 +364,22 @@ class Updater:
         with tempfile.TemporaryDirectory(prefix='prepared-', dir=self.root) as tmp:
             with zipfile.ZipFile(path) as archive:
                 archive.extractall(tmp)
+            # Flush extracted code before committing directory swaps. A journal
+            # alone does not make unflushed file contents power-loss durable.
+            for file in Path(tmp).rglob('*'):
+                if file.is_file():
+                    with file.open('rb') as stream:
+                        os.fsync(stream.fileno())
+            for directory in sorted((p for p in Path(tmp).rglob('*') if p.is_dir()), key=lambda p: len(p.parts), reverse=True):
+                sync_directory(directory)
+            sync_directory(Path(tmp))
             atomic(self.root / 'transaction.json', {'phase': 'applying', 'sequence': entry['sequence'], 'old': old})
             try:
                 for identity in IDS:
                     target = self.addons / identity
                     if old[identity]:
-                        target.rename(backup / identity)
-                    (Path(tmp) / identity).rename(target)
+                        durable_move(target, backup / identity)
+                    durable_move(Path(tmp) / identity, target)
                 self.save(installed_addons=entry['sequence'], last_error='')
                 atomic(self.root / 'transaction.json', {'phase': 'committed', 'sequence': entry['sequence'], 'old': old})
                 (self.root / 'pending-addons.json').unlink(missing_ok=True)

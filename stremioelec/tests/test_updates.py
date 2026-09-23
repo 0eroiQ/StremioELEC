@@ -3,11 +3,12 @@ import hashlib
 import importlib.util
 import io
 import json
+import sys
 from pathlib import Path
 import tarfile
 import tempfile
 import unittest
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 import zipfile
 
 HERE = Path(__file__).resolve().parents[1]
@@ -189,6 +190,35 @@ class UpdateTests(unittest.TestCase):
         with self.updater.locked(), self.assertRaises(RuntimeError):
             with self.updater.locked():
                 pass
+
+    def ui(self, selections, playing=False):
+        kodi, gui = MagicMock(), MagicMock()
+        kodi.Player.return_value.isPlaying.return_value = playing
+        dialog = gui.Dialog.return_value
+        dialog.select.side_effect = selections
+        dialog.yesno.return_value = False
+        module_spec = importlib.util.spec_from_file_location('update_ui', HERE / 'service.stremioelec.updates/ui.py')
+        module = importlib.util.module_from_spec(module_spec)
+        with patch.dict(sys.modules, {'xbmc': kodi, 'xbmcgui': gui, 'engine': engine}):
+            module_spec.loader.exec_module(module)
+        with patch.object(module, 'device', return_value=self.updater):
+            module.main()
+        return kodi
+
+    def test_ui_switch_does_not_install_or_restart(self):
+        kodi = self.ui([0, -1])
+        self.assertTrue(self.updater.state()['auto_os'])
+        kodi.executebuiltin.assert_not_called()
+
+    def test_ui_install_blocked_during_playback(self):
+        kodi = self.ui([3, -1], playing=True)
+        kodi.executebuiltin.assert_not_called()
+
+    def test_ui_cancel_install_does_not_stage(self):
+        self.fetch()
+        kodi = self.ui([3, 0, -1])
+        kodi.executebuiltin.assert_not_called()
+        self.assertFalse((self.updater.root / 'pending-addons.json').exists())
 
 
 if __name__ == '__main__':
