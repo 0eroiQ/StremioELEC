@@ -40,6 +40,11 @@ def request(url, payload=None):
 
 
 def create_link():
+    code, link, _ = create_link_details()
+    return code, link
+
+
+def create_link_details():
     data = request('https://link.stremio.com/api/create?type=Create').get('result')
     if not isinstance(data, dict) or not isinstance(data.get('code'), str):
         raise AccountError('Unable to create a sign-in link.')
@@ -47,7 +52,11 @@ def create_link():
     parsed = urlsplit(link)
     if parsed.scheme != 'https' or parsed.netloc not in ('stremio.com', 'www.stremio.com', 'link.stremio.com'):
         raise AccountError('Unexpected sign-in link.')
-    return data['code'], link
+    qr = data.get('qrcode', '')
+    parsed_qr = urlsplit(qr)
+    if parsed_qr.scheme != 'https' or parsed_qr.netloc != 'link.stremio.com' or parsed_qr.path != '/qr':
+        qr = ''  # Link remains usable if QR format changes.
+    return data['code'], link, qr
 
 
 def read_link(code):

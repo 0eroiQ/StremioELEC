@@ -78,6 +78,14 @@ def item(meta):
 
 def run(params):
     action = params.get('action', 'root')
+    if action == 'first_catalog':
+        for addon in STORE.load().get('addons', []):
+            available = catalogs(addon['manifest'])
+            if available:
+                return run({'action': 'catalog', 'provider': addon['id'],
+                            'kind': available[0]['type'], 'id': available[0]['id']})
+        xbmcplugin.endOfDirectory(HANDLE)
+        return
     if action in ('connect', 'sync', 'sync_library', 'disconnect'):
         if action == 'connect':
             connect_account()

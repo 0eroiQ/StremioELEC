@@ -29,6 +29,20 @@ Required before removing TMDB/widgets: install pilot on a compatible Kodi instan
 The builder checks archive paths, CRC, addon identity and dependency minimum versions. It produces a version/source/hash inventory, `SHA256SUMS` and a dependency-first `INSTALL.md`. Hashes are local integrity records, not upstream signatures. This does not install anything, rewrite an image, or validate runtime compatibility. No update repository addon is bundled. Dependencies are retained until the Stremio replacement passes runtime acceptance.
 # Home widget picker
 
+## First-run onboarding (0.4)
+
+New profiles show StremioELEC Welcome, then official QR/link sign-in. Connect
+discloses local unencrypted token storage; Skip leaves account data untouched.
+No recommended Kodi device settings are automatically changed. Existing profiles
+that completed Bingie onboarding are not forced through setup again. New profiles
+default to no Bingie intro video; existing splash preferences are preserved.
+The QR expires after five minutes; Back cancels polling, then Connect retries.
+After successful addon/library import, Open Home enables Stremio defaults for
+the first three default widgets (Continue Watching, My Library, first account
+catalog). Custom widget paths are not replaced. End-to-end QR authorization and
+Home default acceptance still require the user's sign-in; QR rendering was
+verified in the isolated Mac Kodi runtime. This is not LibreELEC device proof.
+
 Account data: fresh sign-in imports the library read-only; existing accounts use
 Refresh library. My Library and Continue Watching are also widget sources. The
 Continue Watching list uses Stremio's removed/temp/timeOffset rule; its cards open

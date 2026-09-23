@@ -1,126 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- BINGIE -->
-<window id="1102">
-	<zorder>999</zorder>
-	<defaultcontrol always="true">100</defaultcontrol>
-	<onload>AlarmClock(FocusStartUpButton,SetFocus(100),00:00,silent)</onload>
-	<controls>
-		<control type="group">
-			<control type="image">
-				<animation effect="fade" end="100" time="200">WindowOpen</animation>
-				<animation effect="fade" start="100" end="0" time="200">WindowClose</animation>
-				<animation effect="fade" end="100" time="200">Visible</animation>
-				<animation effect="fade" start="100" end="0" time="200">Hidden</animation>
-				<include>FullscreenDimensions</include>
-				<texture background="true" colordiffuse="$VAR[BingiePanelColor]">colors/color_white.png</texture>
-			</control>
-			<control type="scrollbar" id="3000">
-				<include>HiddenObject</include>
-			</control>
-			<control type="grouplist">
-				<include>Startup_Dialog_OpenClose</include>
-				<centerleft>50%</centerleft>
-				<centertop>50%</centertop>
-				<width>900</width>
-				<height max="940">auto</height>
-				<orientation>vertical</orientation>
-				<itemgap>25</itemgap>
-				<align>center</align>
-				<!-- logo -->
-				<control type="group">
-					<width>300</width>
-					<height>180</height>
-					<control type="image">
-						<left>290</left>
-						<align>left</align>
-						<width>100%</width>
-						<height>100%</height>
-						<aspectratio align="center">keep</aspectratio>
-						<texture background="true">bingie_logo.png</texture>
-					</control>
-				</control>
-				<!-- message -->
-				<control id="5" type="textbox">
-					<centerleft>50%</centerleft>
-					<width>100%</width>
-					<height max="745">auto</height>
-					<font>Reg24</font>
-					<autoscroll>false</autoscroll>
-					<align>left</align>
-					<textcolor>white</textcolor>
-					<aligny>top</aligny>
-					<pagecontrol>3000</pagecontrol>
-					<label>$LOCALIZE[31395]</label>
-				</control>
-				<!-- Button -->
-				<control type="grouplist" id="100">
-					<height>55</height>
-					<width>100%</width>
-					<orientation>horizontal</orientation>
-					<itemgap>25</itemgap>
-					<align>center</align>
-					<onright>noop</onright>
-					<onleft>noop</onleft>
-					<control type="button" id="101">
-						<width min="302" max="438">auto</width>
-						<height>54</height>
-						<font>Reg24</font>
-						<textcolor>a6ffffff</textcolor>
-						<focusedcolor>ff000000</focusedcolor>
-						<selectedcolor>ff000000</selectedcolor>
-						<textoffsetx>20</textoffsetx>
-						<aligny>center</aligny>
-						<align>center</align>
-						<texturefocus border="10" colordiffuse="white">bingie/border/default_button_focus.png</texturefocus>
-						<alttexturefocus border="10" colordiffuse="white">bingie/border/default_button_focus.png</alttexturefocus>
-						<label>$LOCALIZE[31396]</label>
-						<onclick>Skin.SetBool(BingieSecondStartupDone)</onclick>
-						<onclick>SetProperty(finishBingieStartup2,1,Home)</onclick>
-						<onclick>ClearProperty(StartupMask,Home)</onclick>
-						<onclick>AlarmClock(clear_property,ClearProperty(finishBingieStartup2,Home),00:02,silent)</onclick>
-						<onclick>AlarmClock(delay_window,ReplaceWindow(Videos,sources://video/),00:01,silent)</onclick>
-						<onup>PageUp(3000)</onup>
-						<ondown>PageDown(3000)</ondown>
-					</control>
-					<control type="button" id="102">
-						<width min="302" max="438">auto</width>
-						<height>54</height>
-						<font>Reg24</font>
-						<textcolor>a6ffffff</textcolor>
-						<focusedcolor>ff000000</focusedcolor>
-						<selectedcolor>ff000000</selectedcolor>
-						<textoffsetx>20</textoffsetx>
-						<aligny>center</aligny>
-						<align>center</align>
-						<texturefocus border="10" colordiffuse="white">bingie/border/default_button_focus.png</texturefocus>
-						<alttexturefocus border="10" colordiffuse="white">bingie/border/default_button_focus.png</alttexturefocus>
-						<label>$LOCALIZE[31397]</label>
-						<onclick>Skin.SetBool(BingieSecondStartupDone)</onclick>
-						<onclick>SetProperty(finishBingieStartup2,1,Home)</onclick>
-						<onclick>ClearProperty(StartupMask,Home)</onclick>
-						<onclick>AlarmClock(clear_property,ClearProperty(finishBingieStartup2,Home),00:02,silent)</onclick>
-						<onclick>AlarmClock(delay_window,ReplaceWindow($VAR[StartUpWindow]),00:01,silent)</onclick>
-						<onup>PageUp(3000)</onup>
-						<ondown>PageDown(3000)</ondown>
-					</control>
-				</control>
-				<!-- fake progress -->
-				<control type="group">
-					<width>901</width>
-					<height>10</height>
-					<control type="image">
-						<width>100%</width>
-						<height>100%</height>
-						<texture colordiffuse="ff414141" border="2">colors/color_white.png</texture>
-					</control>
-					<control type="image">
-						<width>50%</width>
-						<height>100%</height>
-						<texture colordiffuse="ffe50914" border="4">diffuse/panel2.png</texture>
-						<animation effect="zoom" end="200,100" easing="in" tween="cubic" time="600" condition="!String.IsEmpty(Window(Home).Property(finishBingieStartup2))">Conditional</animation>
-					</control>
-				</control>
-			</control>
-		</control>
-	</controls>
-</window>
+<window id="1102"><defaultcontrol always="true">102</defaultcontrol>
+<onload>RunScript(special://home/addons/plugin.video.stremioelec/onboarding.py)</onload>
+<onunload>SetProperty(StremioOnboardingCancel,1,Home)</onunload>
+<controls><control type="image"><include>FullscreenDimensions</include><texture colordiffuse="ff000000">colors/color_white.png</texture></control><control type="label"><left>400</left><top>150</top><width>1120</width><height>100</height><font>Bold60</font><align>center</align><textcolor>ff9b7cff</textcolor><label>StremioELEC</label></control>
+<control type="label"><left>420</left><top>310</top><width>1080</width><height>60</height><font>Bold40</font><label>Connect your Stremio account</label></control>
+<control type="image"><left>420</left><top>410</top><width>320</width><height>320</height><aspectratio>keep</aspectratio><texture>$INFO[Window(Home).Property(StremioOnboardingQR)]</texture><visible>!String.IsEmpty(Window(Home).Property(StremioOnboardingQR))</visible></control>
+<control type="textbox"><left>790</left><top>410</top><width>720</width><height>200</height><font>Reg28</font><label>$INFO[Window(Home).Property(StremioOnboardingStatus)]</label></control>
+<control type="textbox"><left>790</left><top>635</top><width>720</width><height>160</height><font>Reg24</font><label>$INFO[Window(Home).Property(StremioOnboardingLink)]</label></control>
+<control type="button" id="101"><left>450</left><top>840</top><width>420</width><height>65</height><font>Reg24</font><align>center</align><aligny>center</aligny><textcolor>white</textcolor><focusedcolor>black</focusedcolor><texturefocus border="10" colordiffuse="white">bingie/border/default_button_focus.png</texturefocus><texturenofocus colordiffuse="ff202020">colors/color_white.png</texturenofocus><label>Open Home</label><onleft>102</onleft><onright>102</onright><enable>!String.IsEmpty(Window(Home).Property(StremioOnboardingReady))</enable><onclick>Skin.SetBool(StremioHomeDefaults)</onclick><onclick>Skin.SetBool(StremioOnboardingDone)</onclick><onclick>Skin.SetBool(BingieFirstStartupDone)</onclick><onclick>Skin.SetBool(BingieSecondStartupDone)</onclick><onclick>ClearProperty(StartupMask,Home)</onclick><onclick>ReplaceWindow(Home)</onclick></control>
+<control type="button" id="102"><left>900</left><top>840</top><width>420</width><height>65</height><font>Reg24</font><align>center</align><aligny>center</aligny><textcolor>white</textcolor><focusedcolor>black</focusedcolor><texturefocus border="10" colordiffuse="white">bingie/border/default_button_focus.png</texturefocus><texturenofocus colordiffuse="ff202020">colors/color_white.png</texturenofocus><label>Back</label><onleft>101</onleft><onright>101</onright><onclick>ReplaceWindow(1101)</onclick></control>
+<control type="image"><left>450</left><top>945</top><width>870</width><height>6</height><texture colordiffuse="ff9b7cff">colors/color_white.png</texture></control>
+</controls></window>
