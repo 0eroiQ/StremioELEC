@@ -110,39 +110,27 @@ def community_search(dialog):
     refresh_community()
 
 
-def community_selected(transport_url, dialog):
-    if not transport_url:
-        return
-    progress = xbmcgui.DialogProgress()
-    progress.create('Community Addons', 'Loading addon details…')
-    try:
-        row = next((item for item in community_catalog()
-                    if item.get('transportUrl') == transport_url), None)
-    except Exception:
-        row = None
-    finally:
-        progress.close()
-    if not row:
-        dialog.ok('Community Addons', 'This addon is no longer available in the Community catalog.')
+def community_selected(row, dialog):
+    if not isinstance(row, dict):
         return
     state = STORE.load()
-    manifest = row['manifest']
+    manifest = row.get('manifest') or {}
+    transport_url = row.get('transportUrl', '')
     installed = next((item for item in state.get('addons', [])
                       if item.get('manifest', {}).get('id') == manifest.get('id')), None)
     if installed:
         addon_actions(dialog, installed.get('id'))
         return
     if configuration_state(manifest)['required']:
-        show_config(manifest, row['transportUrl'], dialog)
+        show_config(manifest, transport_url, dialog)
         return
     try:
-        descriptor = install_descriptor_local(state, row['transportUrl'], manifest)
+        descriptor = install_descriptor_local(state, transport_url, manifest)
     except Exception:
         dialog.ok('Community Addons', 'This catalog entry is not a supported Stremio addon.')
         return
     finish_install(state, descriptor, dialog)
     refresh_community()
-
 
 def show_config(manifest, transport_url, dialog):
     url = configure_url(transport_url)
