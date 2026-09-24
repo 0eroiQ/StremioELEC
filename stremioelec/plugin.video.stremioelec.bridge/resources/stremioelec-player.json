@@ -1,0 +1,9 @@
+{
+  "name": "StremioELEC",
+  "plugin": "plugin.video.stremioelec",
+  "priority": 1,
+  "is_resolvable": "true",
+  "assert": {"play_movie": ["imdb"], "play_episode": ["imdb", "season", "episode"]},
+  "play_movie": "plugin://plugin.video.stremioelec/?action=helper_play&kind=movie&imdb={imdb}",
+  "play_episode": "plugin://plugin.video.stremioelec/?action=helper_play&kind=series&imdb={imdb}&season={season}&episode={episode}"
+}
