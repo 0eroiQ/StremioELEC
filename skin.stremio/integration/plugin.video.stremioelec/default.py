@@ -15,7 +15,7 @@ from protocol import base_url, catalogs, fetch, resource_url
 from account import AccountError, Store, create_link, read_link, pull_addons, pull_library, library_rows
 from sources import collect, direct_url
 from continue_playback import button_label, resume_seconds
-from addons_core import active_addons
+from addons_core import active_addons, merge_account
 
 HANDLE = int(sys.argv[1])
 BASE = sys.argv[0]
@@ -45,10 +45,14 @@ def connect_account():
                 addons, skipped = pull_addons(token)
                 if progress.iscanceled() or monitor.abortRequested():
                     return
-                STORE.save({'token': token, 'addons': addons})
+                state = STORE.load()
+                state['token'] = token
+                state['addons'] = merge_account(state, addons)
+                STORE.save(state)
                 try:
                     library = pull_library(token)
-                    STORE.save({'token': token, 'addons': addons, 'library': library})
+                    state['library'] = library
+                    STORE.save(state)
                 except AccountError:
                     xbmcgui.Dialog().notification('Stremio', 'Library import failed; retry Refresh library.')
                 progress.close()
@@ -123,7 +127,7 @@ def run(params):
             if not state.get('token'):
                 raise AccountError('Connect your account first.')
             addons, skipped = pull_addons(state['token'])
-            state['addons'] = addons
+            state['addons'] = merge_account(state, addons)
             STORE.save(state)
             xbmcgui.Dialog().ok('Stremio', '{} addons imported. {} skipped.'.format(len(addons), skipped))
         elif action == 'sync_library':
@@ -134,8 +138,12 @@ def run(params):
             STORE.save(state)
             xbmcgui.Dialog().ok('Stremio', '{} library entries imported. Account unchanged.'.format(len(state['library'])))
         elif xbmcgui.Dialog().yesno('Disconnect this device',
-                'Remove the local token and imported addon list? Your Stremio account stays unchanged.'):
-            STORE.forget()
+                'Remove this device login and account-synced addons? Local-only Stremio addons stay on this device. Your online account stays unchanged.'):
+            state = STORE.load()
+            local = [item for item in state.get('addons', []) if item.get('account') is not True]
+            disabled = set(state.get('disabledAddons', []))
+            STORE.save({'addons': local,
+                        'disabledAddons': sorted(disabled & {item.get('id') for item in local})})
             Store(STORE.directory / 'streams').forget()
             Store(STORE.directory / 'playback').forget()
             Store(STORE.directory / 'subtitle-results').forget()
