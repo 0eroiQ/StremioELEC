@@ -53,6 +53,21 @@ configure actions. Card actions use short local cache keys rather than embedding
 addon transport URLs in Kodi routes. Configurable addons use the addon's
 `/configure` flow, with a TV QR/URL handoff instead of an embedded browser.
 
+## Stremio Addons
+
+StremioELEC now treats Stremio addons as the user-facing addon system. Kodi's
+addon framework remains an internal dependency/runtime mechanism and its
+management screens are hidden from the appliance UI.
+
+The built-in Stremio Addons manager supports local install/remove, per-device
+enable/disable, Stremio account sync with descriptor flags preserved, QR-based
+configuration fallback, and the official Stremio Community Addons catalog.
+Community Addons has a TV grid with search and filters for movies/series,
+streams, subtitles, catalogs and live TV/channels. Catalog cards are loaded from
+Cinemeta's Stremio addon_catalog resource; installing/configuring still requires
+explicit user action. Local-only addons are never silently pushed to the user's
+Stremio account.
+
 ## First-image limitations and acceptance
 
 - N60 boot, network, HDMI, audio, remote input, QR login and playback remain tests.
