@@ -42,6 +42,17 @@ The source snapshot excludes account.json, userdata, caches, logs, local setting
 API keys and unused yt-dlp vendor files. The original developer checkout is not
 reset or altered. The image starts with a fresh Stremio sign-in, not an account.
 
+## Stremio Addons experience
+
+The appliance exposes Stremio addons as the user-facing extension system. Kodi
+addon management remains internal. **Stremio Addons** provides My Addons,
+Install from URL, account sync and a TV-oriented Community Addons browser backed
+by Stremio's Cinemeta `addon_catalog/all/community.json` catalog. The browser
+supports category filters, search, artwork/details, installed state, install and
+configure actions. Card actions use short local cache keys rather than embedding
+addon transport URLs in Kodi routes. Configurable addons use the addon's
+`/configure` flow, with a TV QR/URL handoff instead of an embedded browser.
+
 ## First-image limitations and acceptance
 
 - N60 boot, network, HDMI, audio, remote input, QR login and playback remain tests.
