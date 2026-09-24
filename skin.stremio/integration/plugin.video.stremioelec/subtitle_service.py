@@ -11,6 +11,7 @@ import xbmcgui
 import xbmcplugin
 import xbmcvfs
 from account import Store
+from addons_core import active_addons
 from subtitles import collect_subtitles, download, preferences
 
 
@@ -37,7 +38,7 @@ def run():
             xbmcplugin.addDirectoryItem(handle, path, xbmcgui.ListItem(label=path), False)
         else:
             allowed, preferred, _ = preferences()
-            entries = collect_subtitles(Store(profile).load().get('addons', []), context['kind'], context['id'],
+            entries = collect_subtitles(active_addons(Store(profile).load()), context['kind'], context['id'],
                                         allowed, preferred, context.get('subtitles'), context.get('filename', ''))
             saved = {}
             for entry in entries:
