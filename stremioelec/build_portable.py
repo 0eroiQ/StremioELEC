@@ -28,6 +28,7 @@ EXCLUDE = {
     'slyguy.trailers',
 }
 OWN = ('plugin.video.stremioelec', 'skin.stremio', 'service.stremioelec.portable')
+KODI_BUILTINS = {'kodi.resource', 'script.module.pil'}
 
 
 def digest(path, algorithm='sha256'):
@@ -127,7 +128,7 @@ def dependency_closure(index):
             if dep.get('optional', 'false') == 'true':
                 continue
             identity = dep.get('addon', '')
-            if identity.startswith('xbmc.'):
+            if identity.startswith('xbmc.') or identity in KODI_BUILTINS:
                 continue
             if identity not in identities:
                 missing.add(identity)
