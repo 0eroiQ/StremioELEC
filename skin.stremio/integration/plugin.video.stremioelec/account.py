@@ -1,4 +1,4 @@
-"""Read-only Stremio account integration. Never log tokens or configured URLs."""
+"""Stremio account integration. Never log tokens or configured addon URLs."""
 import hashlib
 import json
 import os
