@@ -254,9 +254,10 @@ def main():
     lock = json.loads((HERE / 'image.lock.json').read_text())
     if lock['target'] != 'Generic.x86_64':
         raise ValueError('Only reviewed Generic x86-64 target is supported')
-    actual = subprocess.check_output(['git', '-c', 'safe.directory=' + str(args.skin), '-C', str(args.skin), 'rev-parse', 'HEAD'], text=True).strip()
-    if actual != lock['skin']['commit']:
-        raise ValueError('Skin revision differs from lock')
+    if lock['skin']['path'] != 'skin.stremio' or args.skin.resolve() != (HERE.parent / 'skin.stremio').resolve():
+        raise ValueError('Skin must come from this StremioELEC checkout')
+    run('git', '-c', 'safe.directory=' + str(HERE.parent), '-C', HERE.parent,
+        'diff', '--exit-code', 'HEAD', '--', 'skin.stremio')
     args.output.mkdir(parents=True, exist_ok=False)
     output = args.output.resolve()
     name = 'StremioELEC-Generic.x86_64-' + lock['version']

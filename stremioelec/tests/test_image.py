@@ -125,7 +125,8 @@ class ImageTests(unittest.TestCase):
     def test_lock_is_immutable_and_targeted(self):
         lock = json.loads((BASE / 'image.lock.json').read_text())
         self.assertEqual(lock['target'], 'Generic.x86_64')
-        self.assertRegex(lock['skin']['commit'], r'^[a-f0-9]{40}$')
+        self.assertEqual(lock['skin']['path'], 'skin.stremio')
+        self.assertRegex(lock['skin']['imported_commit'], r'^[a-f0-9]{40}$')
         self.assertRegex(lock['libreelec']['sha256'], r'^[a-f0-9]{64}$')
         ids = [a['id'] for a in lock['addons']]
         self.assertEqual(len(ids), len(set(ids)))
