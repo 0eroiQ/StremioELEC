@@ -124,14 +124,18 @@ def display_value(value):
 
 
 def helper_menu():
-    selection = choose('Catalogs & artwork', ['Catalog source', 'TMDb trailer API key', 'Ratings'])
+    selection = choose('Catalogs & Artwork', [
+        'Stremio Addons',
+        'TMDb trailer API key',
+        'Ratings display',
+    ])
     if selection < 0:
         return
-    if selection == 2:
-        ratings_menu()
-        return
-    if selection == 1:
-        action = choose('TMDb trailer API key', ['Replace key (stored locally)', 'Remove key'])
+    if selection == 0:
+        xbmc.executebuiltin('ActivateWindow(1196)')
+    elif selection == 1:
+        action = choose('TMDb trailer API key',
+                        ['Replace key (stored locally)', 'Remove key'])
         if action == 0:
             value = DIALOG.input('TMDb API key', type=xbmcgui.INPUT_ALPHANUM,
                                  option=xbmcgui.ALPHANUM_HIDE_INPUT)
@@ -139,44 +143,33 @@ def helper_menu():
                 ADDON.setSetting('tmdb_api_key', value.strip())
         elif action == 1:
             ADDON.setSetting('tmdb_api_key', '')
-        return
-    current = ADDON.getSetting('manifest').strip() or 'https://v3-cinemeta.strem.io/manifest.json'
-    action = choose('Catalog source', ['Use official Cinemeta', 'Change manifest URL', 'Current: ' + current])
-    if action == 0:
-        ADDON.setSetting('manifest', 'https://v3-cinemeta.strem.io/manifest.json')
-    elif action == 1:
-        value = DIALOG.input('Stremio catalog manifest URL', defaultt=current,
-                             type=xbmcgui.INPUT_ALPHANUM)
-        if value.strip():
-            from protocol import base_url
-            try:
-                base_url(value.strip())
-            except Exception:
-                DIALOG.ok('Catalog source', 'Use an HTTP(S) URL ending in /manifest.json.')
-                return
-            ADDON.setSetting('manifest', value.strip())
-
+    elif selection == 2:
+        ratings_menu()
 
 def ratings_menu():
-    toggles = [('EnableRatings', 'Show ratings'),
-               ('EnableTop250WhiteLabel', 'White Top 250 label'),
-               ('details_row_rating', 'Rating in details row'),
-               ('DisableRatingsPlotCritics', 'Hide ratings / critics in plot'),
-               ('videoinfo_button_myrating', 'My rating button in info')]
+    toggles = [
+        ('EnableRatings', 'Show ratings'),
+        ('EnableStudioLogo', 'Show available studio logos'),
+        ('details_row_rating', 'Rating in details row'),
+        ('DisableRatingsPlotCritics', 'Hide ratings / critics in plot'),
+    ]
     while True:
-        values = [xbmc.getCondVisibility('Skin.HasSetting(' + key + ')') for key, _ in toggles]
-        labels = [label + ': ' + display_value(value) for (_, label), value in zip(toggles, values)]
-        index = choose('Ratings', labels + ['Details rating color'])
+        values = [xbmc.getCondVisibility('Skin.HasSetting(' + key + ')')
+                  for key, _ in toggles]
+        labels = [label + ': ' + display_value(value)
+                  for (_, label), value in zip(toggles, values)]
+        index = choose('Ratings display', labels + ['Details rating color'])
         if index < 0:
             return
         if index < len(toggles):
             key = toggles[index][0]
-            xbmc.executebuiltin(('Skin.Reset(' if values[index] else 'Skin.SetBool(') + key + ')')
+            xbmc.executebuiltin(
+                ('Skin.Reset(' if values[index] else 'Skin.SetBool(') + key + ')')
         else:
             color = choose('Details rating color', [label for label, _ in COLORS])
             if color >= 0:
-                xbmc.executebuiltin('Skin.SetString(BingieRatingInDetailsColor,' + COLORS[color][1] + ')')
-
+                xbmc.executebuiltin(
+                    'Skin.SetString(BingieRatingInDetailsColor,' + COLORS[color][1] + ')')
 
 def weather_menu():
     """Configure the built-in StremioELEC weather provider."""
@@ -215,33 +208,25 @@ def weather_menu():
 
 
 def home_menu():
-    from setup_profile import HOME_ROWS
-    current = [not xbmc.getCondVisibility('Skin.HasSetting(StremioHideHomeRow{})'.format(i))
-               for i in range(len(HOME_ROWS))]
-    selected = DIALOG.multiselect('Visible Home rows', [label for label, _ in HOME_ROWS],
-                                  preselect=[i for i, enabled in enumerate(current) if enabled])
-    if selected is None:
-        return
-    if not selected:
-        DIALOG.ok('Home', 'Keep at least one Home row visible.')
-        return
-    chosen = set(selected)
-    for i in range(len(HOME_ROWS)):
-        xbmc.executebuiltin(('Skin.Reset(' if i in chosen else 'Skin.SetBool(') +
-                            'StremioHideHomeRow{})'.format(i))
-    xbmc.executebuiltin('ReloadSkin()')
-
-
-def card_layout_menu():
-    values = [('Landscape', 'landscape'), ('Posters', 'poster'), ('Square', 'square')]
-    current = xbmc.getInfoLabel('Skin.String(widgetstyle)') or 'landscape'
-    index = DIALOG.select('Card layout', [label for label, _ in values],
-                          preselect=next((i for i, (_, value) in enumerate(values)
-                                          if value == current), 0))
-    if index >= 0:
-        xbmc.executebuiltin('Skin.SetString(widgetstyle,' + values[index][1] + ')')
-        xbmc.executebuiltin('ReloadSkin()')
-
+    while True:
+        style = xbmc.getInfoLabel('Skin.String(widgetstyle)') or 'poster'
+        index = choose('Home & Appearance', [
+            'Appearance',
+            'Card layout: ' + style.title(),
+            'Refresh Home',
+        ])
+        if index < 0:
+            return
+        if index == 0:
+            appearance_menu()
+        elif index == 1:
+            selected = choose('Card layout', ['Posters', 'Landscape'])
+            if selected >= 0:
+                xbmc.executebuiltin(
+                    'Skin.SetString(widgetstyle,' + ('poster' if selected == 0 else 'landscape') + ')')
+                xbmc.executebuiltin('ReloadSkin()')
+        elif index == 2:
+            xbmc.executebuiltin('Container.Refresh')
 
 def appearance_menu():
     while True:

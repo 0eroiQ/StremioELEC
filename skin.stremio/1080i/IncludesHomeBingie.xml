@@ -785,13 +785,7 @@
                 <include content="BingieSpotlightWidget" condition="[Window.IsActive(Home) | $EXP[IsBingieHubsActive2]] + $EXP[StremioSpotlightEnabled]">
                     <param name="widgetid" value="1508"/>
                 </include>
-                <include condition="Window.IsActive(Home)">skinshortcuts-template-Widgets</include>
-                <include condition="Window.IsActive(1110)">skinshortcuts-template-tvshowhub</include>
-                <include condition="Window.IsActive(1111)">skinshortcuts-template-moviehub</include>
-                <include condition="Window.IsActive(1112)">skinshortcuts-template-newhub</include>
-                <include condition="Window.IsActive(1113)">skinshortcuts-template-customhub</include>
-                <include condition="Window.IsActive(1114)">skinshortcuts-template-mylisthub</include>
-				<include condition="Window.IsActive(1120)">skinshortcuts-template-musichub</include>				
+                <include condition="Window.IsActive(Home)">StremioHomeRows</include>				
             </control>
             <!-- Compact rows: retain the next heading, conceal its artwork. -->
             <control type="image">

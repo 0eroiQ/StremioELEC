@@ -1197,4 +1197,128 @@
         </include>
     </include>
 
+
+    <!-- StremioELEC-owned Home. No skinshortcuts or TMDb Bingie Helper. -->
+    <include name="StremioHomeRows">
+        <include content="widget_header_multi"><param name="widgetid" value="5100" /><param name="widgetName" value="Continue Watching" /></include>
+        <include content="widget_base_normal">
+            <param name="widgetid" value="5100" />
+            <param name="contentStyle" value="normal" />
+            <param name="container" value="fixedlist" />
+            <param name="position" value="horizontal" />
+            <param name="width" value="100%" />
+            <param name="height" value="339" />
+            <param name="widgetStyle" value="widget_layout_poster" />
+            <param name="widgetTarget" value="videos" />
+            <param name="widgetPath" value="plugin://plugin.video.stremioelec/?action=continue" />
+            <param name="widgetSortBy" value="none" />
+            <param name="widgetSortOrder" value="ascending" />
+            <param name="widgetLimit" value="20" />
+        </include>
+        <include content="widget_header_multi"><param name="widgetid" value="5101" /><param name="widgetName" value="My Library" /></include>
+        <include content="widget_base_normal">
+            <param name="widgetid" value="5101" />
+            <param name="contentStyle" value="normal" />
+            <param name="container" value="fixedlist" />
+            <param name="position" value="horizontal" />
+            <param name="width" value="100%" />
+            <param name="height" value="339" />
+            <param name="widgetStyle" value="widget_layout_poster" />
+            <param name="widgetTarget" value="videos" />
+            <param name="widgetPath" value="plugin://plugin.video.stremioelec/?action=library" />
+            <param name="widgetSortBy" value="none" />
+            <param name="widgetSortOrder" value="ascending" />
+            <param name="widgetLimit" value="20" />
+        </include>
+        <include content="widget_header_multi"><param name="widgetid" value="5102" /><param name="widgetName" value="Popular Movies" /></include>
+        <include content="widget_base_normal">
+            <param name="widgetid" value="5102" />
+            <param name="contentStyle" value="normal" />
+            <param name="container" value="fixedlist" />
+            <param name="position" value="horizontal" />
+            <param name="width" value="100%" />
+            <param name="height" value="339" />
+            <param name="widgetStyle" value="widget_layout_poster" />
+            <param name="widgetTarget" value="videos" />
+            <param name="widgetPath" value="plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=movie&amp;slot=0" />
+            <param name="widgetSortBy" value="none" />
+            <param name="widgetSortOrder" value="ascending" />
+            <param name="widgetLimit" value="20" />
+        </include>
+        <include content="widget_header_multi"><param name="widgetid" value="5103" /><param name="widgetName" value="Popular Series" /></include>
+        <include content="widget_base_normal">
+            <param name="widgetid" value="5103" />
+            <param name="contentStyle" value="normal" />
+            <param name="container" value="fixedlist" />
+            <param name="position" value="horizontal" />
+            <param name="width" value="100%" />
+            <param name="height" value="339" />
+            <param name="widgetStyle" value="widget_layout_poster" />
+            <param name="widgetTarget" value="videos" />
+            <param name="widgetPath" value="plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=series&amp;slot=0" />
+            <param name="widgetSortBy" value="none" />
+            <param name="widgetSortOrder" value="ascending" />
+            <param name="widgetLimit" value="20" />
+        </include>
+        <include content="widget_header_multi"><param name="widgetid" value="5104" /><param name="widgetName" value="More Movies" /></include>
+        <include content="widget_base_normal">
+            <param name="widgetid" value="5104" />
+            <param name="contentStyle" value="normal" />
+            <param name="container" value="fixedlist" />
+            <param name="position" value="horizontal" />
+            <param name="width" value="100%" />
+            <param name="height" value="339" />
+            <param name="widgetStyle" value="widget_layout_poster" />
+            <param name="widgetTarget" value="videos" />
+            <param name="widgetPath" value="plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=movie&amp;slot=1" />
+            <param name="widgetSortBy" value="none" />
+            <param name="widgetSortOrder" value="ascending" />
+            <param name="widgetLimit" value="20" />
+        </include>
+        <include content="widget_header_multi"><param name="widgetid" value="5105" /><param name="widgetName" value="More Series" /></include>
+        <include content="widget_base_normal">
+            <param name="widgetid" value="5105" />
+            <param name="contentStyle" value="normal" />
+            <param name="container" value="fixedlist" />
+            <param name="position" value="horizontal" />
+            <param name="width" value="100%" />
+            <param name="height" value="339" />
+            <param name="widgetStyle" value="widget_layout_poster" />
+            <param name="widgetTarget" value="videos" />
+            <param name="widgetPath" value="plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=series&amp;slot=1" />
+            <param name="widgetSortBy" value="none" />
+            <param name="widgetSortOrder" value="ascending" />
+            <param name="widgetLimit" value="20" />
+        </include>
+        <include content="widget_header_multi"><param name="widgetid" value="5106" /><param name="widgetName" value="Discover Movies" /></include>
+        <include content="widget_base_normal">
+            <param name="widgetid" value="5106" />
+            <param name="contentStyle" value="normal" />
+            <param name="container" value="fixedlist" />
+            <param name="position" value="horizontal" />
+            <param name="width" value="100%" />
+            <param name="height" value="339" />
+            <param name="widgetStyle" value="widget_layout_poster" />
+            <param name="widgetTarget" value="videos" />
+            <param name="widgetPath" value="plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=movie&amp;slot=2" />
+            <param name="widgetSortBy" value="none" />
+            <param name="widgetSortOrder" value="ascending" />
+            <param name="widgetLimit" value="20" />
+        </include>
+        <include content="widget_header_multi"><param name="widgetid" value="5107" /><param name="widgetName" value="Discover Series" /></include>
+        <include content="widget_base_normal">
+            <param name="widgetid" value="5107" />
+            <param name="contentStyle" value="normal" />
+            <param name="container" value="fixedlist" />
+            <param name="position" value="horizontal" />
+            <param name="width" value="100%" />
+            <param name="height" value="339" />
+            <param name="widgetStyle" value="widget_layout_poster" />
+            <param name="widgetTarget" value="videos" />
+            <param name="widgetPath" value="plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=series&amp;slot=2" />
+            <param name="widgetSortBy" value="none" />
+            <param name="widgetSortOrder" value="ascending" />
+            <param name="widgetLimit" value="20" />
+        </include>
+    </include>
 </includes>

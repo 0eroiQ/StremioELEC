@@ -286,6 +286,66 @@ def run(params):
         xbmcplugin.endOfDirectory(HANDLE, succeeded=False)
         xbmc.executebuiltin('Container.Refresh')
         return
+    if action in ('home_catalog', 'search_prompt'):
+        providers = list(active_addons(STORE.load()))
+        try:
+            manual = fetch(MANIFEST)
+            if not any(item.get('transportUrl') == MANIFEST for item in providers):
+                providers.append({'id': '', 'transportUrl': MANIFEST, 'manifest': manual})
+        except Exception:
+            pass
+
+        if action == 'home_catalog':
+            kind = params.get('kind', 'movie')
+            try:
+                slot = max(0, int(params.get('slot', '0')))
+            except ValueError:
+                slot = 0
+            choices = []
+            for addon in providers:
+                for catalog in catalogs(addon.get('manifest', {})):
+                    if catalog.get('type') == kind:
+                        choices.append((addon, catalog))
+            if slot >= len(choices):
+                xbmcplugin.endOfDirectory(HANDLE)
+                return
+            addon, catalog = choices[slot]
+            return run({'action': 'catalog', 'provider': addon.get('id', ''),
+                        'kind': kind, 'id': catalog['id']})
+
+        query = xbmcgui.Dialog().input('Search Stremio')
+        if not query.strip():
+            xbmcplugin.endOfDirectory(HANDLE, succeeded=False)
+            return
+        xbmcplugin.setContent(HANDLE, 'videos')
+        seen = set()
+        for addon in providers:
+            manifest = addon.get('manifest', {})
+            for catalog in manifest.get('catalogs', []):
+                if catalog.get('type') not in ('movie', 'series') or not catalog.get('id'):
+                    continue
+                if not any(isinstance(extra, dict) and extra.get('name') == 'search'
+                           for extra in catalog.get('extra', [])):
+                    continue
+                try:
+                    response = fetch(resource_url(
+                        addon['transportUrl'], 'catalog', catalog['type'],
+                        catalog['id'], {'search': query.strip()}))
+                except Exception:
+                    continue
+                for meta in response.get('metas', [])[:25]:
+                    identity = meta.get('id')
+                    if not identity or (catalog['type'], identity) in seen:
+                        continue
+                    seen.add((catalog['type'], identity))
+                    xbmcplugin.addDirectoryItem(
+                        HANDLE,
+                        route(action='meta', provider=addon.get('id', ''),
+                              kind=meta.get('type', catalog['type']), id=identity),
+                        item(meta), True)
+        xbmcplugin.endOfDirectory(HANDLE)
+        return
+
     provider = params.get('provider', '')
     home_context = params.get('home') == '1'
     manifest_url = HOME_MANIFEST if home_context else MANIFEST

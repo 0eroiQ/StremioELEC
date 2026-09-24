@@ -984,25 +984,21 @@
     <include name="DisableVisibility"><visible>false</visible></include>
 
     <include name="hiddenSubmenu">
-        <!-- hidden submenu to do count calculations -->
         <control type="list" id="4445">
-            <left>-3000</left>
-            <top>-3000</top>
-            <width>1</width>
-            <height>1</height>
-            <pagecontrol/>
-            <orientation>vertical</orientation>
-            <itemlayout width="1" height="1">
-            </itemlayout>
-            <focusedlayout width="1" height="1">
-            </focusedlayout>
-            <content><include>skinshortcuts-submenu</include></content>
+            <left>-3000</left><top>-3000</top><width>1</width><height>1</height>
+            <itemlayout width="1" height="1" /><focusedlayout width="1" height="1" />
+            <content />
         </control>
     </include>
 
     <include name="MainMenuContent">
         <content>
-            <include>skinshortcuts-mainmenu</include>
+            <item id="1"><label>Search</label><icon>shortcuts/search.png</icon><onclick>ActivateWindow(Videos,plugin://plugin.video.stremioelec/?action=search_prompt,return)</onclick><property name="path">search</property></item>
+            <item id="2"><label>Home</label><icon>shortcuts/home.png</icon><onclick>ActivateWindow(Home)</onclick><property name="path">ActivateWindow(home,return)</property></item>
+            <item id="3"><label>Discover</label><icon>shortcuts/new.png</icon><onclick>ActivateWindow(Videos,plugin://plugin.video.stremioelec/?action=widgets,return)</onclick><property name="path">discover</property></item>
+            <item id="4"><label>My Library</label><icon>shortcuts/mylist.png</icon><onclick>ActivateWindow(Videos,plugin://plugin.video.stremioelec/?action=library&amp;hub=1,return)</onclick><property name="path">library</property></item>
+            <item id="5"><label>Stremio Addons</label><icon>shortcuts/categories.png</icon><onclick>ActivateWindow(1196)</onclick><property name="path">addons</property></item>
+            <item id="6"><label>Settings</label><icon>settings.png</icon><onclick>ActivateWindow(1198)</onclick><property name="path">settings</property></item>
         </content>
     </include>
     <!-- variables -->
@@ -1832,7 +1828,10 @@
 				<focusedlayout width="384" height="55"  condition="!Control.HasFocus(40003)">
                     <include content="BingiePowerMenuItemLabel"></include>
                 </focusedlayout>
-                <content><include>skinshortcuts-group-powermenu</include></content>
+                <content>
+                    <item id="1"><label>Settings</label><onclick>ActivateWindow(1198)</onclick></item>
+                    <item id="2"><label>Exit</label><onclick>Quit</onclick></item>
+                </content>
             </control>
         </control>
         <include condition="!Skin.HasSetting(DisableAllSubmenus)">SideBladeSubMenu</include>
