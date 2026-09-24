@@ -3,6 +3,7 @@
 Part of the StremioELEC SYSTEM runtime. No Kodi weather addon or API key.
 """
 import json
+import time
 from datetime import datetime
 from urllib.parse import urlencode, urlsplit
 from urllib.request import Request, urlopen
@@ -126,13 +127,19 @@ def apply(payload,location,window=None):
     _set(window,'Hourly.IsFetched','true' if count else '')
     return window
 
-def refresh():
+def refresh(force=False):
     import xbmcaddon, xbmcgui
     addon=xbmcaddon.Addon('plugin.video.stremioelec'); window=xbmcgui.Window(12600)
+    try: last=float(window.getProperty('Stremio.LastRefreshEpoch') or 0)
+    except ValueError: last=0
+    if not force and time.time()-last < 900 and window.getProperty('Current.Condition'):
+        return
     loc=addon.getSetting('weather_location').strip(); lat=addon.getSetting('weather_lat').strip(); lon=addon.getSetting('weather_lon').strip()
     if not loc or not lat or not lon:
         _set(window,'Current.Condition','Set a location in Weather settings'); _set(window,'Daily.IsFetched',''); _set(window,'Hourly.IsFetched',''); return
-    try: apply(forecast(float(lat),float(lon)),loc,window)
+    try:
+        apply(forecast(float(lat),float(lon)),loc,window)
+        _set(window,'Stremio.LastRefreshEpoch',time.time())
     except Exception:
         _set(window,'Current.Condition','Weather unavailable')
         xbmcgui.Dialog().notification('Weather','Unable to refresh weather. Check the network connection.')
