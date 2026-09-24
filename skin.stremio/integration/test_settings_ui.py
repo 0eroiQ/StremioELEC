@@ -99,20 +99,33 @@ class SettingsTests(unittest.TestCase):
                              ['.', 'streams', 'playback', 'subtitle-results', 'setup'])
             self.xbmc.executebuiltin.assert_called_with('ReplaceWindow(1102)')
 
-    def test_native_settings_restored_with_safe_entry_points(self):
+    def test_three_layer_settings_architecture(self):
         skin = ADDON.parent.parent / '1080i'
-        actions = [(n.text or '').lower() for n in ET.parse(skin / 'Settings.xml').findall('.//onclick')]
-        for allowed in ('playersettings', 'servicesettings', 'systemsettings', 'skinsettings', '1198'):
-            self.assertTrue(any(allowed in action for action in actions))
-        for blocked in ('addonbrowser', 'profiles', 'interfacesettings', 'mediasettings', 'gamesettings', 'filemanager'):
-            self.assertFalse(any(blocked in action for action in actions))
-        self.assertIn('SkinSettings_HomeLayout', (skin / 'SkinSettings.xml').read_text())
-        self.assertIn('settings_ui.py,account', (skin / 'Custom_1198_StremioSettings.xml').read_text())
-        settings = (skin / 'IncludesSkinSettings.xml').read_text()
-        self.assertNotIn('type=resetall', settings)
-        self.assertNotIn('action=RESTORE', settings)
-        self.assertNotIn('action=RESET', settings)
-        self.assertNotIn('value="plugin.video.tmdb.bingie.helper"', settings)
+        top = ET.parse(skin / 'Settings.xml')
+        actions = [(n.text or '') for n in top.findall('.//onclick')]
+        joined = '\n'.join(actions).lower()
+        self.assertIn('activatewindow(1198)', joined)
+        self.assertIn('service.libreelec.settings/default.py', joined)
+        self.assertIn('activatewindow(1199)', joined)
+        self.assertEqual(len(top.findall('.//content/item')), 3)
+
+        stremio = (skin / 'Custom_1198_StremioSettings.xml').read_text()
+        for section in ('account', 'home', 'catalogs', 'subtitles', 'weather', 'maintenance', 'about'):
+            self.assertIn('settings_ui.py,' + section, stremio)
+        self.assertNotIn('settings_ui.py,system', stremio)
+        self.assertNotIn('settings_ui.py,audio', stremio)
+        self.assertNotIn('settings_ui.py,video', stremio)
+
+        kodi = (skin / 'Custom_1199_KodiSettings.xml').read_text().lower()
+        for window in ('playersettings', 'mediasettings', 'pvrsettings', 'servicesettings',
+                       'interfacesettings', 'systemsettings', 'skinsettings',
+                       'addonbrowser', 'filemanager'):
+            self.assertIn(window, kodi)
+
+        system = (skin / 'service-LibreELEC-Settings-mainWindow.xml').read_text()
+        self.assertIn('StremioELEC System', system)
+        self.assertNotIn('openelec_logo.png', system)
+
 
     def test_rejected_setting_is_not_reported_success(self):
         with patch.object(self.module, 'rpc', side_effect=[{'settings': [
