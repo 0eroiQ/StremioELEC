@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<includes>
+  <include name="skinshortcuts-mainmenu">
+    <item>
+      <label>Search</label><icon>shortcuts/search.png</icon>
+      <property name="path">StremioELEC.Search</property>
+      <onclick>RunScript(special://skin/extras/stremio_dispatch.py,search_ui.py)</onclick>
+    </item>
+    <item>
+      <label>Home</label><icon>shortcuts/home.png</icon>
+      <property name="path">ActivateWindow(home,return)</property>
+      <onclick>ActivateWindow(home,return)</onclick>
+    </item>
+    <item>
+      <label>Discover</label><icon>shortcuts/new.png</icon>
+      <property name="path">StremioELEC.Discover</property>
+      <onclick>ActivateWindow(Videos,plugin://plugin.video.stremioelec/?action=provider,return)</onclick>
+    </item>
+    <item>
+      <label>Library</label><icon>shortcuts/mylist.png</icon>
+      <property name="path">StremioELEC.Library</property>
+      <onclick>ActivateWindow(Videos,plugin://plugin.video.stremioelec/?action=library&amp;hub=1,return)</onclick>
+    </item>
+    <item>
+      <label>Addons</label><icon>DefaultAddon.png</icon>
+      <property name="path">ActivateWindow(1196)</property>
+      <onclick>ActivateWindow(1196)</onclick>
+    </item>
+    <item>
+      <label>Settings</label><icon>settings.png</icon>
+      <property name="path">ActivateWindow(1198)</property>
+      <onclick>ActivateWindow(1198)</onclick>
+    </item>
+  </include>
+
+  <include name="skinshortcuts-submenu" />
+  <include name="skinshortcuts-template-Widgets"><include>StremioHomeWidgets</include></include>
+  <include name="skinshortcuts-template-tvshowhub"><include>StremioHomeWidgets</include></include>
+  <include name="skinshortcuts-template-moviehub"><include>StremioHomeWidgets</include></include>
+  <include name="skinshortcuts-template-newhub"><include>StremioHomeWidgets</include></include>
+  <include name="skinshortcuts-template-customhub"><include>StremioHomeWidgets</include></include>
+  <include name="skinshortcuts-template-mylisthub"><include>StremioHomeWidgets</include></include>
+  <include name="skinshortcuts-template-musichub"><include>StremioHomeWidgets</include></include>
+  <include name="skinshortcuts-template-somethinghub"><include>StremioHomeWidgets</include></include>
+  <include name="skinshortcuts-template-search" />
+  <include name="skinshortcuts-template-tmdbsearch" />
+</includes>

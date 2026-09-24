@@ -20,13 +20,7 @@ HERE = Path(__file__).resolve().parent
 ROOT = HERE.parent
 TEST_BRANCH = 'portable-repository-test'
 TEST_BASE = 'https://raw.githubusercontent.com/0eroiQ/StremioELEC/' + TEST_BRANCH + '/'
-EXCLUDE = {
-    'inputstream.adaptive',       # platform-specific LibreELEC binary
-    'repository.slyguy',          # trailers remain optional in portable pilot
-    'slyguy.dependencies',
-    'script.module.slyguy',
-    'slyguy.trailers',
-}
+PORTABLE_THIRD_PARTY = ()
 OWN = ('plugin.video.stremioelec', 'skin.stremio', 'service.stremioelec.portable')
 KODI_BUILTINS = {'kodi.resource', 'script.module.pil'}
 
@@ -187,13 +181,8 @@ def main():
             node, _ = package_folder(own_stage / identity, repo_root)
             index[identity] = node
 
-        for record in lock['addons']:
-            if record['id'] in EXCLUDE:
-                continue
-            package = repo_root / record['id'] / (record['id'] + '-' + record['version'] + '.zip')
-            package.parent.mkdir(parents=True, exist_ok=True)
-            download(record['url'], package, record['sha256'])
-            index[record['id']] = zip_manifest(package, record['id'], record['version'])
+        # Portable StremioELEC is self-contained. Kodi provides only its built-in APIs.
+        # No Bingie/TMDb-helper/Skin-Shortcuts package is mirrored into this repository.
 
     missing = dependency_closure(index)
     if missing:
@@ -214,7 +203,7 @@ def main():
         'repository_branch': TEST_BRANCH,
         'install_first': bootstrap.name,
         'addons': {identity: index[identity].get('version') for identity in OWN},
-        'excluded_os_components': sorted(EXCLUDE),
+        'third_party_addons': list(PORTABLE_THIRD_PARTY),
     }
     (args.output / 'portable-manifest.json').write_text(json.dumps(info, indent=2) + '\n')
     hashes = ''.join(digest(p) + '  ' + str(p.relative_to(args.output)) + '\n'

@@ -1094,4 +1094,107 @@
             </item>
         </content>
     </include>
+    <!-- StremioELEC-owned Home. These rows do not depend on Skin Shortcuts or TMDb Bingie Helper. -->
+    <include name="StremioHomeRow">
+        <include content="widget_header_multi">
+            <param name="widgetid" value="$PARAM[widgetid]" />
+            <param name="widgetName" value="$PARAM[widgetName]" />
+        </include>
+        <include content="widget_base_normal" condition="String.IsEqual(Skin.String(widgetstyle),poster)">
+            <param name="widgetid" value="$PARAM[widgetid]" />
+            <param name="contentStyle" value="normal" />
+            <param name="container" value="fixedlist" />
+            <param name="position" value="horizontal" />
+            <param name="width" value="100%" />
+            <param name="height" value="339" />
+            <param name="widgetStyle" value="widget_layout_poster" />
+            <param name="widgetTarget" value="videos" />
+            <param name="widgetPath" value="$PARAM[widgetPath]" />
+            <param name="widgetSortBy" value="none" />
+            <param name="widgetSortOrder" value="ascending" />
+            <param name="widgetLimit" value="20" />
+        </include>
+        <include content="widget_base_normal" condition="String.IsEqual(Skin.String(widgetstyle),square)">
+            <param name="widgetid" value="$PARAM[widgetid]" />
+            <param name="contentStyle" value="normal" />
+            <param name="container" value="fixedlist" />
+            <param name="position" value="horizontal" />
+            <param name="width" value="100%" />
+            <param name="height" value="339" />
+            <param name="widgetStyle" value="widget_layout_square" />
+            <param name="widgetTarget" value="videos" />
+            <param name="widgetPath" value="$PARAM[widgetPath]" />
+            <param name="widgetSortBy" value="none" />
+            <param name="widgetSortOrder" value="ascending" />
+            <param name="widgetLimit" value="20" />
+        </include>
+        <include content="widget_base_normal" condition="!String.IsEqual(Skin.String(widgetstyle),poster) + !String.IsEqual(Skin.String(widgetstyle),square)">
+            <param name="widgetid" value="$PARAM[widgetid]" />
+            <param name="contentStyle" value="normal" />
+            <param name="container" value="fixedlist" />
+            <param name="position" value="horizontal" />
+            <param name="width" value="100%" />
+            <param name="height" value="339" />
+            <param name="widgetStyle" value="widget_layout_landscape" />
+            <param name="widgetTarget" value="videos" />
+            <param name="widgetPath" value="$PARAM[widgetPath]" />
+            <param name="widgetSortBy" value="none" />
+            <param name="widgetSortOrder" value="ascending" />
+            <param name="widgetLimit" value="20" />
+        </include>
+    </include>
+
+    <include name="StremioHomeWidgets">
+        <include content="StremioHomeRow" condition="!Skin.HasSetting(StremioHideHomeRow0)">
+            <param name="widgetid" value="1510" />
+            <param name="widgetName" value="Continue Watching" />
+            <param name="widgetPath" value="plugin://plugin.video.stremioelec/?action=continue" />
+        </include>
+        <include content="StremioHomeRow" condition="!Skin.HasSetting(StremioHideHomeRow1)">
+            <param name="widgetid" value="1511" />
+            <param name="widgetName" value="My Library" />
+            <param name="widgetPath" value="plugin://plugin.video.stremioelec/?action=library" />
+        </include>
+        <include content="StremioHomeRow" condition="!Skin.HasSetting(StremioHideHomeRow2)">
+            <param name="widgetid" value="1512" />
+            <param name="widgetName" value="Popular Movies" />
+            <param name="widgetPath" value="plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=movie&amp;id=top" />
+        </include>
+        <include content="StremioHomeRow" condition="!Skin.HasSetting(StremioHideHomeRow3)">
+            <param name="widgetid" value="1513" />
+            <param name="widgetName" value="Popular Series" />
+            <param name="widgetPath" value="plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=series&amp;id=top" />
+        </include>
+        <include content="StremioHomeRow" condition="!Skin.HasSetting(StremioHideHomeRow4)">
+            <param name="widgetid" value="1514" />
+            <param name="widgetName" value="New Movies" />
+            <param name="widgetPath" value="plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=movie&amp;id=year" />
+        </include>
+        <include content="StremioHomeRow" condition="!Skin.HasSetting(StremioHideHomeRow5)">
+            <param name="widgetid" value="1515" />
+            <param name="widgetName" value="New Series" />
+            <param name="widgetPath" value="plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=series&amp;id=year" />
+        </include>
+        <include content="StremioHomeRow" condition="!Skin.HasSetting(StremioHideHomeRow6)">
+            <param name="widgetid" value="1516" />
+            <param name="widgetName" value="Featured Movies" />
+            <param name="widgetPath" value="plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=movie&amp;id=imdbRating" />
+        </include>
+        <include content="StremioHomeRow" condition="!Skin.HasSetting(StremioHideHomeRow7)">
+            <param name="widgetid" value="1517" />
+            <param name="widgetName" value="Featured Series" />
+            <param name="widgetPath" value="plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=series&amp;id=imdbRating" />
+        </include>
+        <include content="StremioHomeRow" condition="!Skin.HasSetting(StremioHideHomeRow8)">
+            <param name="widgetid" value="1518" />
+            <param name="widgetName" value="Action Movies" />
+            <param name="widgetPath" value="plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=movie&amp;id=top&amp;genre=Action" />
+        </include>
+        <include content="StremioHomeRow" condition="!Skin.HasSetting(StremioHideHomeRow9)">
+            <param name="widgetid" value="1519" />
+            <param name="widgetName" value="Comedy Series" />
+            <param name="widgetPath" value="plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=series&amp;id=top&amp;genre=Comedy" />
+        </include>
+    </include>
+
 </includes>

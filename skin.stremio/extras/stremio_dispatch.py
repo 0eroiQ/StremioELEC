@@ -6,7 +6,7 @@ import xbmcaddon
 import xbmcgui
 import xbmcvfs
 
-SCRIPTS = {'onboarding.py', 'settings_ui.py', 'trailer_player.py', 'library_ui.py', 'library_filters.py', 'settings_guard.py', 'addons_ui.py', 'setup_mode.py'}
+SCRIPTS = {'onboarding.py', 'settings_ui.py', 'trailer_player.py', 'library_ui.py', 'library_filters.py', 'settings_guard.py', 'addons_ui.py', 'setup_mode.py', 'search_ui.py'}
 
 
 def main():

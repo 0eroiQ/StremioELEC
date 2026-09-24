@@ -124,14 +124,14 @@ def display_value(value):
 
 
 def helper_menu():
-    selection = choose('Catalogs and artwork', ['Catalog and artwork options', 'TMDb trailer API key', 'Ratings'])
+    selection = choose('Catalogs & artwork', ['Catalog source', 'TMDb trailer API key', 'Ratings'])
     if selection < 0:
         return
     if selection == 2:
         ratings_menu()
         return
     if selection == 1:
-        action = choose('TMDb trailer API key', ['Replace key (stored locally)', 'Remove key (use existing trailer list)'])
+        action = choose('TMDb trailer API key', ['Replace key (stored locally)', 'Remove key'])
         if action == 0:
             value = DIALOG.input('TMDb API key', type=xbmcgui.INPUT_ALPHANUM,
                                  option=xbmcgui.ALPHANUM_HIDE_INPUT)
@@ -140,85 +140,42 @@ def helper_menu():
         elif action == 1:
             ADDON.setSetting('tmdb_api_key', '')
         return
-    helper = xbmcaddon.Addon('plugin.video.tmdb.bingie.helper')
-    allowed = {'language', 'artwork_quality', 'fanarttv_enfallback', 'hide_unaired_movies',
-               'hide_unaired_episodes', 'flatten_seasons', 'fanarttv_lookup',
-               'omdb_apikey', 'mdblist_apikey', 'fanarttv_clientkey'}
-    schema = ET.parse(Path(xbmcvfs.translatePath(helper.getAddonInfo('path'))) / 'resources/settings.xml')
-    items = [node for node in schema.findall('.//setting') if node.get('id') in allowed]
-    while True:
-        labels = [helper.getLocalizedString(int(n.get('label'))) for n in items]
-        shown = [label + (': ' + display_value(helper.getSettingBool(n.get('id'))) if n.get('type') == 'boolean' else '') for label, n in zip(labels, items)]
-        index = choose('Catalogs and artwork', shown)
-        if index < 0:
-            return
-        node = items[index]
-        key = node.get('id')
-        if node.get('type') == 'boolean':
-            helper.setSettingBool(key, not helper.getSettingBool(key))
-        elif key in ('omdb_apikey', 'mdblist_apikey', 'fanarttv_clientkey'):
-            action = choose(labels[index], ['Replace key (stored locally)', 'Remove key'])
-            if action == 0:
-                value = DIALOG.input('New API key', type=xbmcgui.INPUT_ALPHANUM,
-                                     option=xbmcgui.ALPHANUM_HIDE_INPUT)
-                if value.strip():
-                    helper.setSetting(key, value.strip())
-            elif action == 1 and DIALOG.yesno('Remove API key', 'Remove the stored key from this device?'):
-                helper.setSetting(key, '')
-        else:
-            options = node.findall('./constraints/options/option')
-            names = [helper.getLocalizedString(int(o.get('label'))) if o.get('label', '').isdigit()
-                     else (o.get('label') or o.text or '') for o in options]
-            selected = choose(labels[index], names)
-            if selected >= 0:
-                helper.setSetting(key, options[selected].text)
+    current = ADDON.getSetting('manifest').strip() or 'https://v3-cinemeta.strem.io/manifest.json'
+    action = choose('Catalog source', ['Use official Cinemeta', 'Change manifest URL', 'Current: ' + current])
+    if action == 0:
+        ADDON.setSetting('manifest', 'https://v3-cinemeta.strem.io/manifest.json')
+    elif action == 1:
+        value = DIALOG.input('Stremio catalog manifest URL', defaultt=current,
+                             type=xbmcgui.INPUT_ALPHANUM)
+        if value.strip():
+            from protocol import base_url
+            try:
+                base_url(value.strip())
+            except Exception:
+                DIALOG.ok('Catalog source', 'Use an HTTP(S) URL ending in /manifest.json.')
+                return
+            ADDON.setSetting('manifest', value.strip())
 
 
 def ratings_menu():
     toggles = [('EnableRatings', 'Show ratings'),
-               ('EnableStudioLogo', 'Show studio logos'),
-               ('PreferWhiteFooter', 'White ratings / studio logos'),
                ('EnableTop250WhiteLabel', 'White Top 250 label'),
                ('details_row_rating', 'Rating in details row'),
                ('DisableRatingsPlotCritics', 'Hide ratings / critics in plot'),
                ('videoinfo_button_myrating', 'My rating button in info')]
-    selectors = [('ratings', 'Choose ratings and awards'),
-                 ('footer_visibility', 'Ratings visibility'),
-                 ('top250_visibility', 'Top 250 visibility')]
     while True:
         values = [xbmc.getCondVisibility('Skin.HasSetting(' + key + ')') for key, _ in toggles]
         labels = [label + ': ' + display_value(value) for (_, label), value in zip(toggles, values)]
-        index = choose('Ratings', labels + [label for _, label in selectors] + ['Details rating color', 'Ratings API keys (MDBList / OMDb)'])
+        index = choose('Ratings', labels + ['Details rating color'])
         if index < 0:
             return
         if index < len(toggles):
             key = toggles[index][0]
-            if key == 'PreferWhiteFooter' and not values[index] and not xbmc.getCondVisibility('System.HasAddon(resource.images.studios.white)'):
-                DIALOG.ok('White studio logos', 'The white studio artwork pack is not included on this device. No addon will be installed automatically.')
-                continue
             xbmc.executebuiltin(('Skin.Reset(' if values[index] else 'Skin.SetBool(') + key + ')')
-        elif index < len(toggles) + len(selectors):
-            key, label = selectors[index - len(toggles)]
-            xbmc.executebuiltin('RunScript(script.bingie.toolbox,action=setskinsetting,setting=' + key + ',header=' + label + ')')
-            return
-        elif index == len(toggles) + len(selectors):
+        else:
             color = choose('Details rating color', [label for label, _ in COLORS])
             if color >= 0:
                 xbmc.executebuiltin('Skin.SetString(BingieRatingInDetailsColor,' + COLORS[color][1] + ')')
-        else:
-            helper = xbmcaddon.Addon('plugin.video.tmdb.bingie.helper')
-            selected = choose('Ratings API keys', ['MDBList', 'OMDb'])
-            if selected < 0:
-                continue
-            key = ('mdblist_apikey', 'omdb_apikey')[selected]
-            action = choose('API key', ['Replace key (stored locally)', 'Remove key'])
-            if action == 0:
-                value = DIALOG.input('New API key', type=xbmcgui.INPUT_ALPHANUM, option=xbmcgui.ALPHANUM_HIDE_INPUT)
-                if value.strip():
-                    helper.setSetting(key, value.strip())
-            elif action == 1 and DIALOG.yesno('Remove API key', 'Remove this key from the device?'):
-                helper.setSetting(key, '')
-
 
 
 def weather_menu():
@@ -258,40 +215,32 @@ def weather_menu():
 
 
 def home_menu():
-    target = Path(xbmcvfs.translatePath(HOME))
-    if not target.exists():
-        DIALOG.ok('Home', 'Sign in first to prepare Home.')
+    from setup_profile import HOME_ROWS
+    current = [not xbmc.getCondVisibility('Skin.HasSetting(StremioHideHomeRow{})'.format(i))
+               for i in range(len(HOME_ROWS))]
+    selected = DIALOG.multiselect('Visible Home rows', [label for label, _ in HOME_ROWS],
+                                  preselect=[i for i, enabled in enumerate(current) if enabled])
+    if selected is None:
         return
-    tree = ET.parse(target)
-    rows = list(tree.getroot())
-    active = len(rows)
-    # Keep disabled defaults available so users can add them back later.
-    existing = {r.findtext('action') for r in rows}
-    rows.extend(r for r in ET.fromstring(home_xml()) if r.findtext('action') not in existing)
-    selected = DIALOG.multiselect('Visible Home rows', [r.findtext('label', '') for r in rows],
-                                  preselect=list(range(active)))
-    if selected is None or not selected:
+    if not selected:
+        DIALOG.ok('Home', 'Keep at least one Home row visible.')
         return
-    limit = choose('Cards per row', ['10', '20', '30', '40'])
-    if limit < 0:
-        return
-    ordered = [rows[i] for i in selected]
-    while True:
-        move = choose('Home order', ['Save changes', 'Cancel'] + [r.findtext('label', '') for r in ordered])
-        if move < 0 or move == 1:
-            return
-        if move == 0:
-            break
-        move -= 2
-        position = choose('New position', [str(i + 1) for i in range(len(ordered))])
-        if position >= 0:
-            ordered.insert(position, ordered.pop(move))
-    root = ET.Element('shortcuts')
-    for row in ordered:
-        update_row_limit(row, [10, 20, 30, 40][limit])
-        root.append(row)
-    replace_backed_up(target, ET.tostring(root, encoding='utf-8', xml_declaration=True), PROFILE / 'setup-backup')
+    chosen = set(selected)
+    for i in range(len(HOME_ROWS)):
+        xbmc.executebuiltin(('Skin.Reset(' if i in chosen else 'Skin.SetBool(') +
+                            'StremioHideHomeRow{})'.format(i))
     xbmc.executebuiltin('ReloadSkin()')
+
+
+def card_layout_menu():
+    values = [('Landscape', 'landscape'), ('Posters', 'poster'), ('Square', 'square')]
+    current = xbmc.getInfoLabel('Skin.String(widgetstyle)') or 'landscape'
+    index = DIALOG.select('Card layout', [label for label, _ in values],
+                          preselect=next((i for i, (_, value) in enumerate(values)
+                                          if value == current), 0))
+    if index >= 0:
+        xbmc.executebuiltin('Skin.SetString(widgetstyle,' + values[index][1] + ')')
+        xbmc.executebuiltin('ReloadSkin()')
 
 
 def appearance_menu():
@@ -561,13 +510,13 @@ def run(section):
     if section == 'account':
         account_menu()
     elif section == 'home':
-        index = choose('Home & Appearance', ['Choose and order Home rows', 'Appearance', 'Card layout: Posters / Landscapes'])
+        index = choose('Home & Appearance', ['Visible Home rows', 'Card layout', 'Appearance'])
         if index == 0:
             home_menu()
         elif index == 1:
-            appearance_menu()
+            card_layout_menu()
         elif index == 2:
-            xbmc.executebuiltin('RunScript(script.bingie.toolbox,action=setskinsetting,setting=widgetstyle,header=Card layout)')
+            appearance_menu()
     elif section == 'catalogs':
         helper_menu()
     elif section == 'weather':

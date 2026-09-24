@@ -57,7 +57,7 @@
 	<include file="IncludesPaths.xml" />
 	<include file="IncludesCategories.xml" />
     <include file="IncludesOSDDialogs.xml" />
-	<include file="script-skinshortcuts-includes.xml"/>
+	<include file="IncludesStremioCore.xml" />
     <include file="IncludesDebugInfo.xml" condition="Skin.HasSetting(DebugGrid) | Skin.HasSetting(DebugInfo)" />
 
     <!-- Constants -->

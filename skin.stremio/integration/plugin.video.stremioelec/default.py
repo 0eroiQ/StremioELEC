@@ -4,6 +4,7 @@ import time
 import re
 import json
 import html
+from datetime import datetime
 from urllib.parse import parse_qsl, urlencode, urlsplit
 
 import xbmcaddon
@@ -22,6 +23,7 @@ HANDLE = int(sys.argv[1])
 BASE = sys.argv[0]
 ADDON = xbmcaddon.Addon()
 MANIFEST = ADDON.getSetting('manifest').strip()
+HOME_MANIFEST = 'https://v3-cinemeta.strem.io/manifest.json'
 STORE = Store(xbmcvfs.translatePath(ADDON.getAddonInfo('profile')))
 
 
@@ -132,10 +134,10 @@ def run(params):
         manual_selection(STORE.directory, active_addons(STORE.load()))
         return
     if action == 'setup_home':
-        if xbmcgui.Dialog().yesno('StremioELEC setup', 'Replace Home with Continue Watching and nine Bingie catalogs? Existing Home will be backed up. Kodi language choices are kept.'):
-            from setup_profile import prepare
-            prepare(STORE.directory, xbmcvfs.translatePath(ADDON.getAddonInfo('path')), force_home=True)
-            xbmc.executebuiltin('ReloadSkin()')
+        from setup_profile import prepare
+        prepare(STORE.directory, xbmcvfs.translatePath(ADDON.getAddonInfo('path')), force_home=True)
+        xbmcgui.Dialog().notification('StremioELEC', 'Home defaults restored')
+        xbmc.executebuiltin('ReloadSkin()')
         return
     if action == 'first_catalog':
         for addon in active_addons(STORE.load()):
@@ -237,7 +239,8 @@ def run(params):
         xbmc.executebuiltin('Container.Refresh')
         return
     provider = params.get('provider', '')
-    manifest_url = MANIFEST
+    home_context = params.get('home') == '1'
+    manifest_url = HOME_MANIFEST if home_context else MANIFEST
     descriptor = None
     if provider:
         descriptor = next((entry for entry in active_addons(STORE.load())
@@ -248,9 +251,51 @@ def run(params):
     base_url(manifest_url)
 
     def provider_route(**values):
-        return route(provider=provider, **values)
+        context = {}
+        if provider:
+            context['provider'] = provider
+        if home_context:
+            context['home'] = '1'
+        context.update(values)
+        return route(**context)
 
-    if action == 'widgets':
+    if action == 'home_catalog':
+        kind = params.get('kind', 'movie')
+        catalog = params.get('id', 'top')
+        extras = {}
+        genre = params.get('genre', '')
+        if catalog == 'year' and not genre:
+            genre = str(datetime.now().year)
+        if genre:
+            extras['genre'] = genre
+        xbmcplugin.setContent(HANDLE, 'tvshows' if kind == 'series' else 'movies')
+        response = fetch(resource_url(HOME_MANIFEST, 'catalog', kind, catalog, extras or None))
+        for meta in response.get('metas', []):
+            if not meta.get('id'):
+                continue
+            xbmcplugin.addDirectoryItem(
+                HANDLE,
+                route(action='meta', home='1', kind=meta.get('type', kind), id=meta['id']),
+                item(meta),
+                True)
+    elif action == 'search_results':
+        query = params.get('query', '').strip()
+        xbmcplugin.setContent(HANDLE, 'videos')
+        if query:
+            seen = set()
+            for kind in ('movie', 'series'):
+                response = fetch(resource_url(HOME_MANIFEST, 'catalog', kind, 'top', {'search': query}))
+                for meta in response.get('metas', []):
+                    identity = meta.get('id')
+                    if not identity or (kind, identity) in seen:
+                        continue
+                    seen.add((kind, identity))
+                    xbmcplugin.addDirectoryItem(
+                        HANDLE,
+                        route(action='meta', home='1', kind=meta.get('type', kind), id=identity),
+                        item(meta),
+                        True)
+    elif action == 'widgets':
         for target, label in [('library', 'My Library'), ('continue', 'Continue Watching')]:
             xbmcplugin.addDirectoryItem(HANDLE, route(action=target), xbmcgui.ListItem(label=label), True)
         # Widget picker has no login/logout actions and excludes stream-only addons.
@@ -270,7 +315,7 @@ def run(params):
                        ('library', 'My Library'), ('continue', 'Continue Watching'), ('disconnect', 'Disconnect this device')]
         for target, label in options:
             xbmcplugin.addDirectoryItem(HANDLE, route(action=target), xbmcgui.ListItem(label=label), True)
-        for target, label in [('setup_home', 'Set up Bingie Home (10 rows)'), ('subtitles', 'Stremio subtitles for current video')]:
+        for target, label in [('setup_home', 'Restore StremioELEC Home defaults'), ('subtitles', 'Stremio subtitles for current video')]:
             xbmcplugin.addDirectoryItem(HANDLE, route(action=target), xbmcgui.ListItem(label=label), False)
         xbmcplugin.addDirectoryItem(HANDLE, route(action='provider'),
                                    xbmcgui.ListItem(label='Manual catalog'), True)
@@ -317,11 +362,7 @@ def run(params):
                     target = route(action='meta', kind='series', id=saved['_id'])
             else:
                 target = route(action='meta', kind=saved['type'], id=saved['_id'])
-            # Use the same season/episode browser as Bingie catalog titles.
-            # Exact IMDb lookup only: never guess another show from its title.
-            if saved['type'] == 'series' and re.fullmatch(r'tt[0-9]+', saved['_id']):
-                target = 'plugin://plugin.video.tmdb.bingie.helper/?' + urlencode({
-                    'info': 'seasons', 'tmdb_type': 'tv', 'imdb_id': saved['_id']})
+            # Series stay inside the StremioELEC meta/season browser.
             xbmcplugin.addDirectoryItem(HANDLE, target, entry, True)
     elif action == 'provider':
         manifest = descriptor['manifest'] if descriptor else fetch(manifest_url)
