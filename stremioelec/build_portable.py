@@ -135,7 +135,7 @@ def repository_addon(output):
     (source / 'addon.xml').write_text(
         '<?xml version="1.0" encoding="UTF-8"?>\n'
         '<addon id="repository.stremioelec.test" name="StremioELEC Test Repository" '
-        'version="0.1.0" provider-name="0eroiQ">\n'
+        'version="0.2.0" provider-name="0eroiQ">\n'
         '  <extension point="xbmc.addon.repository" name="StremioELEC Test">\n'
         '    <dir>\n'
         '      <info compressed="false">' + TEST_BASE + 'addons.xml</info>\n'
