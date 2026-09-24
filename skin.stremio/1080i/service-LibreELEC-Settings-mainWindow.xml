@@ -10,7 +10,7 @@
 			<animation effect="fade" time="250" start="100" end="0" reversible="false">WindowClose</animation>
         </control>
 		
-        <!--Dialog OpenElec Settings-->
+        <!-- StremioELEC System shell powered by LibreELEC settings -->
         <control type="group">
              <visible>!Window.IsVisible(yesnodialog) + !Window.IsActive(filebrowser)</visible>
 			<animation type="WindowOpen">
@@ -37,7 +37,7 @@
 				<right>-10</right>
                 <posy>10</posy>
                 <aspectratio align="right" aligny="top">keep</aspectratio>
-                <texture>special://skin/extras/openelec/openelec_logo.png</texture>
+                <texture>special://skin/resources/icon.png</texture>
             </control>
 			
            <!--Header-->
@@ -50,7 +50,7 @@
 				<textcolor>$INFO[Skin.String(GeneralTextColor)]</textcolor>
                 <align>left</align>
 				<height>100</height>
-				<label>$ADDON[service.openelec.settings 600]</label>
+				<label>StremioELEC System</label>
             </control>
 
 						
