@@ -114,7 +114,7 @@ class SettingsTests(unittest.TestCase):
         addons = (skin / 'Custom_1196_StremioAddons.xml').read_text()
         for text in ('My Addons', 'Install from URL', 'Sync from Stremio account', 'Community Addons'):
             self.assertIn(text, addons)
-        self.assertIn('addons_ui.py,community', addons)
+        self.assertIn('ActivateWindow(1194)', addons)
         configure = (skin / 'Custom_1195_StremioAddonConfigure.xml').read_text()
         self.assertIn('StremioAddonConfig.QR', configure)
         self.assertIn('Install from URL', configure)
