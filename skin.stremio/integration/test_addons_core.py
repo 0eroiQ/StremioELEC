@@ -134,6 +134,14 @@ class AddonsCoreTests(unittest.TestCase):
         self.assertEqual(item['manifest']['name'], 'Catalog Item')
         self.assertFalse(item['account'])
 
+
+    def test_visual_browser_uses_cache_key_not_transport_url(self):
+        default_py = (ADDON / 'default.py').read_text()
+        self.assertIn("route(action='community_action', key=key)", default_py)
+        self.assertNotIn("route(action='community_action', transport=", default_py)
+        self.assertIn("saved.get('visible', [])", default_py)
+        self.assertIn("saved.get('catalog')", default_py)
+
     def test_rejects_non_https_manifest(self):
         with self.assertRaises(ValueError):
             install_local({}, 'http://example.com/manifest.json',
