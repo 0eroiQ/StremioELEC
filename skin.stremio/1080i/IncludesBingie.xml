@@ -1356,8 +1356,8 @@
 	
 	<variable name="ScreensaverWidget">
         <value condition="!String.IsEmpty(Skin.String(screensaver.bingie.path))">$INFO[Skin.String(screensaver.bingie.path)]</value>
-        <value condition="Library.HasContent(Movies) | Library.HasContent(TVShows)">plugin://script.bingie.widgets/?action=random&amp;mediatype=media&amp;reload=$INFO[Window(Home).Property(widgetreload)]</value>
-		<value condition="!Library.HasContent(Movies) + !Library.HasContent(TVShows)">plugin://plugin.video.tmdb.bingie.helper/?info=random_popular&amp;tmdb_type=both&amp;widget=true&amp;reload=$INFO[Window(Home).Property(TMDbBingieHelper.Widgets.Reload)]</value>
+        <value condition="Library.HasContent(Movies) | Library.HasContent(TVShows)">plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=movie&amp;id=imdbRating</value>
+		<value condition="!Library.HasContent(Movies) + !Library.HasContent(TVShows)">plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=movie&amp;id=imdbRating</value>
     </variable>
 
     <!-- bingie home clearlogo -->
@@ -1536,7 +1536,7 @@
     <!-- 'SxxExx "episode_title"' format-->
     <variable name="BingieDialogEpisodeInfoLabel">
         <value condition="[String.IsEqual(ListItem.DBType,tvshow) | Container.Content(tvshows)] + !String.IsEmpty(Container(5050).ListItem.Title) + Skin.HasSetting(ShowEpisodePlotInfoDialog) + !String.IsEmpty(ListItem.DBID)">$INFO[Container(5050).ListItem.Title]</value>
-		<value condition="[String.IsEqual(ListItem.DBType,tvshow) | Container.Content(tvshows)] + !String.IsEmpty(Container(1234).ListItem.Title) + Skin.HasSetting(ShowEpisodePlotInfoDialog) + Control.IsVisible(1234) + String.IsEqual(ListItem.Path,plugin://plugin.video.tmdb.bingie.helper/) + !Container(1234).IsUpdating + !Integer.IsEqual(Container(1234).NumItems,0)">$INFO[Container(1234).ListItem.Title]</value>
+		<value condition="[String.IsEqual(ListItem.DBType,tvshow) | Container.Content(tvshows)] + !String.IsEmpty(Container(1234).ListItem.Title) + Skin.HasSetting(ShowEpisodePlotInfoDialog) + Control.IsVisible(1234) + String.IsEqual(ListItem.Path,plugin://plugin.video.stremioelec/) + !Container(1234).IsUpdating + !Integer.IsEqual(Container(1234).NumItems,0)">$INFO[Container(1234).ListItem.Title]</value>
 		<value condition="[String.IsEqual(ListItem.DBType,episode) | Container.Content(episodes)] + !String.IsEmpty(ListItem.Title)">$INFO[ListItem.Title]</value>
     </variable>
 
@@ -1569,8 +1569,8 @@
         <value condition="![String.IsEqual(ListItem.DBType,tvshow) | Container.Content(tvshows)] + !String.IsEmpty(ListItem.Property(Plot))">$INFO[ListItem.Property(Plot)]</value>
 		<value condition="[String.IsEqual(ListItem.DBType,tvshow) | Container.Content(tvshows)] + !String.IsEmpty(Container(5050).ListItem.Plot) + Skin.HasSetting(ShowEpisodePlotInfoDialog) + Control.IsVisible(5050)">$INFO[Container(5050).ListItem.Plot]</value>
         <value condition="[String.IsEqual(ListItem.DBType,tvshow) | Container.Content(tvshows)] + !String.IsEmpty(Container(5050).ListItem.Property(Plot)) + Skin.HasSetting(ShowEpisodePlotInfoDialog) + Control.IsVisible(5050)">$INFO[Container(5050).ListItem.Property(Plot)]</value>
-		<value condition="[String.IsEqual(ListItem.DBType,tvshow) | Container.Content(tvshows)] + !String.IsEmpty(Container(1234).ListItem.Plot) + Skin.HasSetting(ShowEpisodePlotInfoDialog) + Control.IsVisible(1234) + String.IsEqual(ListItem.Path,plugin://plugin.video.tmdb.bingie.helper/) + !Container(1234).IsUpdating + !Integer.IsEqual(Container(1234).NumItems,0)">$INFO[Container(1234).ListItem.Plot]</value>
-        <value condition="[String.IsEqual(ListItem.DBType,tvshow) | Container.Content(tvshows)] + !String.IsEmpty(Container(1234).ListItem.Property(Plot)) + Skin.HasSetting(ShowEpisodePlotInfoDialog) + Control.IsVisible(1234) + String.IsEqual(ListItem.Path,plugin://plugin.video.tmdb.bingie.helper/) + !Container(1234).IsUpdating + !Integer.IsEqual(Container(1234).NumItems,0)">$INFO[Container(1234).ListItem.Property(Plot)]</value>
+		<value condition="[String.IsEqual(ListItem.DBType,tvshow) | Container.Content(tvshows)] + !String.IsEmpty(Container(1234).ListItem.Plot) + Skin.HasSetting(ShowEpisodePlotInfoDialog) + Control.IsVisible(1234) + String.IsEqual(ListItem.Path,plugin://plugin.video.stremioelec/) + !Container(1234).IsUpdating + !Integer.IsEqual(Container(1234).NumItems,0)">$INFO[Container(1234).ListItem.Plot]</value>
+        <value condition="[String.IsEqual(ListItem.DBType,tvshow) | Container.Content(tvshows)] + !String.IsEmpty(Container(1234).ListItem.Property(Plot)) + Skin.HasSetting(ShowEpisodePlotInfoDialog) + Control.IsVisible(1234) + String.IsEqual(ListItem.Path,plugin://plugin.video.stremioelec/) + !Container(1234).IsUpdating + !Integer.IsEqual(Container(1234).NumItems,0)">$INFO[Container(1234).ListItem.Property(Plot)]</value>
 		<value condition="[String.IsEqual(ListItem.DBType,tvshow) | Container.Content(tvshows)] + !String.IsEmpty(ListItem.Plot)">$INFO[ListItem.Plot]</value>
         <value condition="[String.IsEqual(ListItem.DBType,tvshow) | Container.Content(tvshows)] + !String.IsEmpty(ListItem.Property(Plot))">$INFO[ListItem.Property(Plot)]</value>
         <value condition="!String.IsEmpty(ListItem.Property(Album_Description))">$INFO[ListItem.Property(Album_Description)]</value>
@@ -2946,7 +2946,7 @@
     <!-- Content header -->
     <variable name="BingieMainContentHeader">
 		<value condition="!String.IsEmpty(Container.PluginCategory)">$INFO[Container.PluginCategory]</value>
-        <value condition="!String.IsEmpty(Container.FolderName) + !String.IsEqual(ListItem.Path,plugin://plugin.video.tmdb.bingie.helper/)">$INFO[Container.FolderName]</value>
+        <value condition="!String.IsEmpty(Container.FolderName) + !String.IsEqual(ListItem.Path,plugin://plugin.video.stremioelec/)">$INFO[Container.FolderName]</value>
     </variable>
 
     <!-- season/episode sublabel -->

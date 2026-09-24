@@ -10,10 +10,7 @@
     
 	<!-- BINGIE -->
     <onload condition="!String.IsEmpty(Skin.String(CustomSearchTerm))">Skin.Reset(CustomSearchTerm)</onload>
-    <onload>Skin.SetString(TMDbBingieHelper.MonitorContainer,17195)</onload>
-	<onload condition="!Skin.HasSetting(EnableRatings)">Skin.SetBool(TMDbBingieHelper.DisableRatings)</onload>
-    <onload condition="Skin.HasSetting(EnableRatings)">Skin.Reset(TMDbBingieHelper.DisableRatings)</onload>
-    <!-- StremioELEC menu and rows are built into this skin; no external menu generator. -->
+<!-- StremioELEC menu and rows are built into this skin; no external menu generator. -->
     <onload condition="String.IsEmpty(Window(Home).Property(widgetstyle))">SetProperty(widgetstyle,$INFO[Skin.String(widgetstyle)])</onload>
 	<onload>Skin.TimerStart(spotlightanimation)</onload>
 
@@ -26,8 +23,7 @@
     <include>BingieViews_WindowOpen_Fade</include>
 
 	<controls>
-		<include>Defs_TMDbBingieHelper_Loader</include>
-		<!-- Global Background -->
+<!-- Global Background -->
         <include>GlobalBackground</include>     
         <control type="button" id="1000">
             <include>HiddenObject</include>

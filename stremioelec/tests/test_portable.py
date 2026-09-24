@@ -50,6 +50,13 @@ class PortableKodiTests(unittest.TestCase):
                    if item.get('addon') == 'resource.images.studios.coloured')
         self.assertEqual(dep.get('optional'), 'true')
 
+    def test_skin_runtime_depends_only_on_our_core(self):
+        node = ET.parse(ROOT / 'skin.stremio/addon.xml').getroot()
+        deps = [item.get('addon') for item in node.findall('requires/import')
+                if not item.get('addon', '').startswith('xbmc.')]
+        self.assertEqual(deps, ['plugin.video.stremioelec'])
+        self.assertEqual(node.get('version'), '3.1.0')
+
     def test_skin_xml_declaration_is_standard(self):
         first = (ROOT / 'skin.stremio/addon.xml').read_text().splitlines()[0]
         self.assertEqual(first, '<?xml version="1.0" encoding="utf-8"?>')

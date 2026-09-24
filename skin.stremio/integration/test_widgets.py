@@ -41,5 +41,22 @@ class WidgetRoutesTest(unittest.TestCase):
             entry.STORE.save.assert_not_called()
 
 
+    def test_builtin_home_uses_only_stremioelec_routes(self):
+        skin = ADDON.parent.parent / '1080i'
+        core = (skin / 'IncludesStremioCore.xml').read_text()
+        self.assertIn('StremioHomeWidgets', core)
+        self.assertEqual(core.count('plugin://plugin.video.stremioelec/?action=home_catalog'), 12)
+        for external in ('plugin.video.tmdb.bingie.helper', 'script.bingie.widgets',
+                         'script.skinshortcuts', 'plugin.program.autocompletion'):
+            self.assertNotIn(external, core)
+        home = (skin / 'Home.xml').read_text()
+        self.assertNotIn('TMDbBingieHelper.MonitorContainer', home)
+
+    def test_legacy_search_window_is_our_wrapper(self):
+        source = (ADDON.parent.parent / '1080i/Custom_1109_BingieSearch.xml').read_text()
+        self.assertIn('search_ui.py', source)
+        self.assertNotIn('plugin.program.autocompletion', source)
+        self.assertNotIn('skinshortcuts-template', source)
+
 if __name__ == '__main__':
     unittest.main()

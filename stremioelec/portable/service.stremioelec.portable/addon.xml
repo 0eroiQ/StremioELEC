@@ -3,7 +3,7 @@
   <requires>
     <import addon="xbmc.python" version="3.0.0" />
     <import addon="plugin.video.stremioelec" version="0.9.0" />
-    <import addon="skin.stremio" version="3.0.0" />
+    <import addon="skin.stremio" version="3.1.0" />
   </requires>
   <extension point="xbmc.service" library="service.py" />
   <extension point="xbmc.python.script" library="control.py">
