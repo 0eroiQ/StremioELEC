@@ -63,7 +63,7 @@ def main():
         if progress is not None:
             progress.close()
             progress = None
-        xbmcgui.Dialog().ok('StremioELEC trailers', 'Unable to open trailer. Check that SlyGuy Trailers and its dependencies are installed and enabled.')
+        xbmcgui.Dialog().ok('StremioELEC trailers', 'Unable to open trailer. The built-in trailer playback component is unavailable; install a verified StremioELEC system update.')
     finally:
         window.clearProperty('StremioTrailerBusy')
         if progress is not None:
