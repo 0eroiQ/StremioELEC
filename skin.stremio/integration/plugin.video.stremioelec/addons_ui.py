@@ -12,8 +12,10 @@ from addons_core import (active_addons, configure_url, configuration_state,
                          install_local, push_account, remove_local, set_enabled)
 
 WINDOW_ID = 1196
+CONFIG_WINDOW_ID = 1195
 ADDON = xbmcaddon.Addon('plugin.video.stremioelec')
-STORE = Store(Path(xbmcvfs.translatePath(ADDON.getAddonInfo('profile'))))
+PROFILE = Path(xbmcvfs.translatePath(ADDON.getAddonInfo('profile')))
+STORE = Store(PROFILE)
 
 
 def publish(status=None):
@@ -25,6 +27,24 @@ def publish(status=None):
     window.setProperty('StremioAddons.Enabled', str(enabled))
     window.setProperty('StremioAddons.Status', status or
                        ('Connected to Stremio account' if state.get('token') else 'Local device only'))
+
+
+
+def show_config(manifest, transport_url, dialog):
+    url = configure_url(transport_url)
+    try:
+        import qrcode
+        PROFILE.mkdir(parents=True, exist_ok=True)
+        path = PROFILE / 'addon-configure-qr.png'
+        qrcode.make(url).save(str(path))
+        window = xbmcgui.Window(CONFIG_WINDOW_ID)
+        window.setProperty('StremioAddonConfig.Name', manifest.get('name', 'Stremio addon'))
+        window.setProperty('StremioAddonConfig.URL', url)
+        window.setProperty('StremioAddonConfig.QR', str(path))
+        xbmc.executebuiltin('ActivateWindow(' + str(CONFIG_WINDOW_ID) + ')')
+    except Exception:
+        dialog.ok('Configure ' + manifest.get('name', 'addon'),
+                  'Open this address on your phone/computer, finish setup, then install the configured manifest URL:\n\n' + url)
 
 
 def sync_account(dialog):
@@ -54,9 +74,7 @@ def install_url(dialog):
     manifest = descriptor['manifest']
     config = configuration_state(manifest)
     if config['required']:
-        dialog.ok('Configure ' + manifest.get('name', 'addon'),
-                  'This addon requires configuration first. Open this address on your phone/computer, finish setup, then install the configured manifest URL:\n\n' +
-                  configure_url(descriptor['transportUrl']))
+        show_config(manifest, descriptor['transportUrl'], dialog)
         return
     if not dialog.yesno('Install Stremio addon?',
             manifest.get('name', 'Stremio addon') + '\n\n' +
@@ -108,9 +126,7 @@ def addon_actions(dialog):
         STORE.save(state)
         publish(('Enabled ' if action == 'enable' else 'Disabled ') + manifest.get('name', 'addon'))
     elif action == 'configure':
-        dialog.ok('Configure ' + manifest.get('name', 'addon'),
-                  'Open this address on your phone/computer. After configuration, install the resulting manifest URL in StremioELEC:\n\n' +
-                  configure_url(item['transportUrl']))
+        show_config(manifest, item['transportUrl'], dialog)
     elif action == 'remove_local':
         if dialog.yesno('Remove from this device?',
                 'This does not change your Stremio account or other devices.'):
