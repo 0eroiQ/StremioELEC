@@ -13,7 +13,9 @@ def main():
     if len(sys.argv) < 2 or sys.argv[1] not in SCRIPTS:
         raise ValueError('Unknown Stremio action')
     addon = xbmcaddon.Addon('plugin.video.stremioelec')
-    directory = Path(xbmcvfs.translatePath(addon.getAddonInfo('path')))
+    system_core = Path('/usr/lib/stremioelec/plugin.video.stremioelec')
+    addon_path = Path(xbmcvfs.translatePath(addon.getAddonInfo('path')))
+    directory = system_core if system_core.is_dir() else addon_path
     script = directory / sys.argv[1]
     if not script.is_file():
         xbmcgui.Dialog().ok('StremioELEC', 'The Stremio component is incomplete. Please install a verified update.')
