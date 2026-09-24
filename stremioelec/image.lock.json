@@ -1,9 +1,9 @@
 {
   "schema": 1,
-  "version": "0.2.0-test.1",
+  "version": "0.2.0-test.2",
   "update_schema": 1,
-  "sequence": 4,
-  "addons_sequence": 3,
+  "sequence": 5,
+  "addons_sequence": 4,
   "kodi_major": 21,
   "libreelec_major": 12,
   "target": "Generic.x86_64",
