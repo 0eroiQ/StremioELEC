@@ -16,7 +16,7 @@ from protocol import base_url, catalogs, fetch, resource_url
 from account import AccountError, Store, create_link, read_link, pull_addons, pull_library, library_rows
 from sources import collect, direct_url
 from continue_playback import button_label, resume_seconds
-from addons_core import active_addons, community_catalog, configuration_state, filter_community, merge_account
+from addons_core import active_addons, community_catalog, configuration_state, descriptor_id, filter_community, merge_account
 
 HANDLE = int(sys.argv[1])
 BASE = sys.argv[0]
@@ -161,6 +161,7 @@ def run(params):
         rows = filter_community(rows, category, query)
         installed_ids = {item.get('manifest', {}).get('id')
                          for item in STORE.load().get('addons', [])}
+        cache.save({'created': time.time(), 'rows': rows})
         window.setProperty('StremioCommunity.Status',
                            '{} addons{}'.format(len(rows),
                            ' · Search: ' + query if query else ''))
@@ -179,14 +180,14 @@ def run(params):
             entry.setProperty('StremioVersion', str(manifest.get('version', '')))
             entry.setProperty('StremioTypes', ', '.join(str(v) for v in manifest.get('types', []) if isinstance(v, str)))
             entry.setProperty('StremioResources', ', '.join(resource_names(manifest)))
-            entry.setProperty('StremioTransportUrl', row['transportUrl'])
+            key = descriptor_id(row['transportUrl'])
             entry.setProperty('StremioInstalled', 'Installed' if installed else 'Community addon')
             entry.setProperty('StremioActionLabel',
                               'Press OK · Manage installed addon' if installed else
                               ('Press OK · Configure' if config['required'] else 'Press OK · Install'))
             xbmcplugin.addDirectoryItem(
                 HANDLE,
-                route(action='community_action', transport=row['transportUrl']),
+                route(action='community_action', key=key),
                 entry,
                 False)
         xbmcplugin.endOfDirectory(HANDLE)
@@ -194,7 +195,14 @@ def run(params):
 
     if action == 'community_action':
         from addons_ui import community_selected
-        community_selected(params.get('transport', ''), xbmcgui.Dialog())
+        key = params.get('key', '')
+        saved = Store(STORE.directory / 'community').load()
+        row = next((item for item in saved.get('rows', [])
+                    if descriptor_id(item.get('transportUrl', '')) == key), None)
+        if not row or time.time() - saved.get('created', 0) > 900:
+            xbmcgui.Dialog().notification('Community Addons', 'Catalog item expired. Reopen Community Addons.')
+        else:
+            community_selected(row, xbmcgui.Dialog())
         xbmcplugin.endOfDirectory(HANDLE, succeeded=False)
         return
 
