@@ -22,7 +22,7 @@
         <content>
           <item id="90"><label>StremioELEC</label><label2>Account, Home, catalogs, subtitles, weather and StremioELEC preferences.</label2><onclick>ActivateWindow(1198)</onclick><icon>special://skin/extras/media/backgrounds/settings_bingie.jpg</icon><thumb>addonskin.png</thumb></item>
           <item id="91"><label>System</label><label2>Network, Bluetooth, services, backups and StremioELEC system updates.</label2><onclick condition="System.HasAddon(service.libreelec.settings)">RunScript(special://xbmc/addons/service.libreelec.settings/default.py)</onclick><onclick condition="!System.HasAddon(service.libreelec.settings)">RunScript(special://skin/extras/stremio_dispatch.py,settings_ui.py,system)</onclick><icon>special://skin/extras/media/backgrounds/settings_system.jpg</icon><thumb>settings.png</thumb></item>
-          <item id="92"><label>Kodi Settings</label><label2>Advanced native Kodi settings for player, media, services, interface and system.</label2><onclick>ActivateWindow(1199)</onclick><icon>special://skin/extras/media/backgrounds/settings_player_settings.jpg</icon><thumb>player.png</thumb></item>
+          <item id="92"><label>Advanced</label><label2>Native Kodi settings for player, media, services, interface and system.</label2><onclick>ActivateWindow(1199)</onclick><icon>special://skin/extras/media/backgrounds/settings_player_settings.jpg</icon><thumb>player.png</thumb></item>
         </content>
       </control>
     </control>
