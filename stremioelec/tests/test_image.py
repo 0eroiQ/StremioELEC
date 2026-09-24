@@ -163,6 +163,12 @@ class ImageTests(unittest.TestCase):
         python = kodi / 'addons/xbmc.python'
         python.mkdir()
         (python / 'addon.xml').write_text('<addon id="xbmc.python" version="3.0.0"/>')
+        trailers = kodi / 'addons/slyguy.trailers'
+        trailers.mkdir()
+        (trailers / 'addon.xml').write_text('<addon id="slyguy.trailers" version="0.2.0"/>')
+        adaptive = kodi / 'addons/inputstream.adaptive'
+        adaptive.mkdir()
+        (adaptive / 'addon.xml').write_text('<addon id="inputstream.adaptive" version="21.5.24.1"/>')
         result = build.patch_kodi(root, source, {'addons': []}, self.root)
         self.assertEqual(set(result['dependency_closure']), set(build.IMAGE_IDS) | {'xbmc.python'})
         self.assertFalse((kodi / 'addons/skin.estuary').exists())

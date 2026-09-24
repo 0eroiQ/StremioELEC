@@ -18,7 +18,7 @@ import zipfile
 
 HERE = Path(__file__).resolve().parent
 OWN_IDS = ('skin.stremio', 'plugin.video.stremioelec', 'repository.stremioelec')
-IMAGE_IDS = OWN_IDS + ('service.stremioelec.updates',)
+IMAGE_IDS = OWN_IDS + ('service.stremioelec.updates', 'slyguy.trailers', 'inputstream.adaptive')
 
 
 def digest(path, algorithm='sha256'):
