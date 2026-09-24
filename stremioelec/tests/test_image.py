@@ -170,6 +170,11 @@ class ImageTests(unittest.TestCase):
         adaptive = kodi / 'addons/inputstream.adaptive'
         adaptive.mkdir()
         (adaptive / 'addon.xml').write_text('<addon id="inputstream.adaptive" version="21.5.24.1"/>')
+        le_modules = kodi / 'addons/service.libreelec.settings/resources/lib/modules'
+        le_modules.mkdir(parents=True)
+        (kodi / 'addons/service.libreelec.settings/addon.xml').write_text(
+            '<addon id="service.libreelec.settings" version="12.2.1" name="LibreELEC Configuration"/>')
+        (le_modules / 'updates.py').write_text('stock updater fixture')
         result = build.patch_kodi(root, source, {'addons': []}, self.root)
         self.assertEqual(set(result['dependency_closure']), set(build.IMAGE_IDS) | {'xbmc.python'})
         self.assertFalse((kodi / 'addons/skin.estuary').exists())
@@ -178,6 +183,12 @@ class ImageTests(unittest.TestCase):
         self.assertEqual(config.find("setting[@id='general.addonupdates']").text, '2')
         self.assertEqual(config.find("setting[@id='test.preserved']").text, 'yes')
         self.assertTrue((root / 'usr/lib/systemd/system/kodi.service.d/stremioelec.conf').is_file())
+        self.assertEqual(
+            (kodi / 'addons/service.libreelec.settings/resources/lib/modules/updates.py').read_text(),
+            (BASE / 'libreelec_updates.py').read_text())
+        self.assertEqual(
+            ET.parse(kodi / 'addons/service.libreelec.settings/addon.xml').getroot().get('name'),
+            'StremioELEC System')
 
 
 if __name__ == '__main__':
