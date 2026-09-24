@@ -233,7 +233,7 @@ def weather_menu():
         if index < 0:
             return
         if index == 1:
-            refresh()
+            refresh(force=True)
             continue
         query = DIALOG.input('Search city or postcode', defaultt=location,
                              type=xbmcgui.INPUT_ALPHANUM)
@@ -254,7 +254,7 @@ def weather_menu():
         ADDON.setSetting('weather_location', row['label'])
         ADDON.setSetting('weather_lat', str(row['latitude']))
         ADDON.setSetting('weather_lon', str(row['longitude']))
-        refresh()
+        refresh(force=True)
 
 
 def home_menu():
