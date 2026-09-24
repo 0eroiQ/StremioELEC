@@ -117,10 +117,11 @@ class SettingsTests(unittest.TestCase):
         self.assertNotIn('settings_ui.py,video', stremio)
 
         kodi = (skin / 'Custom_1199_KodiSettings.xml').read_text().lower()
-        for window in ('playersettings', 'mediasettings', 'pvrsettings', 'servicesettings',
-                       'interfacesettings', 'systemsettings', 'skinsettings',
-                       'addonbrowser', 'filemanager'):
+        for window in ('playersettings', 'pvrsettings', 'servicesettings', 'systemsettings'):
             self.assertIn(window, kodi)
+        for blocked in ('addonbrowser', 'filemanager', 'skinsettings',
+                        'interfacesettings', 'mediasettings'):
+            self.assertNotIn(blocked, kodi)
 
         system = (skin / 'service-LibreELEC-Settings-mainWindow.xml').read_text()
         self.assertIn('StremioELEC System', system)
@@ -135,6 +136,24 @@ class SettingsTests(unittest.TestCase):
         self.assertIn('service.stremioelec.updates/ui.py,check', updates)
         self.assertIn('<label>Advanced</label>', (skin / 'Settings.xml').read_text())
 
+
+    def test_appliance_navigation_blocks_kodi_management_routes(self):
+        skin_root = ADDON.parent.parent
+        skin = skin_root / '1080i'
+        for name in ('AddonBrowser.xml', 'FileManager.xml', 'SettingsProfile.xml'):
+            self.assertIn('ReplaceWindow(Settings)', (skin / name).read_text())
+        for name in ('SkinSettings.xml', 'Custom_1105_SkinSettings.xml',
+                     'Custom_1106_SkinShortcut.xml'):
+            self.assertIn('ReplaceWindow(1198)', (skin / name).read_text())
+        for name in ('MyPrograms.xml', 'MyGames.xml'):
+            self.assertIn('ReplaceWindow(Home)', (skin / name).read_text())
+
+        overrides = (skin_root / 'shortcuts/overrides.xml').read_text().lower()
+        for blocked in ('activatewindow(videos,addons', 'activatewindow(musiclibrary,addons',
+                        'activatewindow(pictures,addons', 'activatewindow(games',
+                        'activatewindow(programs', 'favouritesbrowser',
+                        'activatewindow(skinsettings)', 'addons://sources/executable'):
+            self.assertNotIn(blocked, overrides)
 
     def test_rejected_setting_is_not_reported_success(self):
         with patch.object(self.module, 'rpc', side_effect=[{'settings': [
