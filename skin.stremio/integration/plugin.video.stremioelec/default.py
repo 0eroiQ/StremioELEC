@@ -115,6 +115,54 @@ def item(meta):
     return entry
 
 
+def episode_item(video, series_meta=None):
+    series_meta = series_meta or {}
+    season = video.get('season')
+    episode = video.get('episode')
+    title = video.get('title') or video.get('name') or (
+        'Episode {}'.format(episode) if episode not in (None, '') else 'Episode')
+    prefix = ''
+    if season not in (None, '') or episode not in (None, ''):
+        prefix = 'S{} E{} · '.format(
+            season if season not in (None, '') else '?',
+            episode if episode not in (None, '') else '?')
+    entry = xbmcgui.ListItem(label=prefix + title)
+    info = entry.getVideoInfoTag()
+    info.setMediaType('episode')
+    info.setTitle(title)
+    if isinstance(season, int) or str(season).isdigit():
+        info.setSeason(int(season))
+    if isinstance(episode, int) or str(episode).isdigit():
+        info.setEpisode(int(episode))
+    show_title = series_meta.get('name') or series_meta.get('title')
+    if isinstance(show_title, str) and show_title:
+        info.setTvShowTitle(show_title)
+    plot = video.get('overview') or video.get('description') or ''
+    if isinstance(plot, str) and plot:
+        info.setPlot(plot)
+    released = video.get('released')
+    if isinstance(released, str) and released:
+        first_aired = released[:10]
+        info.setFirstAired(first_aired)
+        if first_aired[:4].isdigit():
+            info.setYear(int(first_aired[:4]))
+    identity = str(video.get('id') or '')
+    if re.fullmatch(r'tt[0-9]+', identity):
+        info.setUniqueIDs({'imdb': identity}, 'imdb')
+    thumb = (video.get('thumbnail') or video.get('poster') or video.get('background')
+             or series_meta.get('landscape') or series_meta.get('background')
+             or series_meta.get('poster'))
+    fanart = video.get('background') or series_meta.get('background') or thumb
+    art = {}
+    if isinstance(thumb, str) and thumb:
+        art.update({'thumb': thumb, 'landscape': thumb, 'poster': thumb})
+    if isinstance(fanart, str) and fanart:
+        art['fanart'] = fanart
+    if art:
+        entry.setArt(art)
+    return entry
+
+
 def run(params):
     action = params.get('action', 'root')
     # Kodi may dispatch the subtitle extension through the addon's primary
@@ -391,9 +439,7 @@ def run(params):
             for video in videos:
                 if not video.get('id'):
                     continue
-                entry = xbmcgui.ListItem(label='S{} E{} · {}'.format(
-                    video.get('season', '?'), video.get('episode', '?'), video.get('title', '')))
-                entry.getVideoInfoTag().setMediaType('episode')
+                entry = episode_item(video, meta)
                 xbmcplugin.addDirectoryItem(HANDLE, provider_route(action='streams', kind=kind,
                     id=video['id']), entry, True)
         else:
