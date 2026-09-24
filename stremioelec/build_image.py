@@ -153,14 +153,15 @@ def patch_kodi(root, skin, lock, scratch):
     # Keep LibreELEC's proven network/Bluetooth/services/backup UI, but replace
     # its stock updater with the fixed-origin StremioELEC update transport.
     le_settings = addons / 'service.libreelec.settings'
-    le_updates = le_settings / 'resources/lib/modules/updates.py'
-    if not le_updates.is_file() or not (le_settings / 'addon.xml').is_file():
+    le_modules = le_settings / 'resources/lib/modules'
+    le_updates = le_modules / 'updates.py'
+    if not le_modules.is_dir() or not (le_settings / 'addon.xml').is_file():
         raise ValueError('LibreELEC system settings layout changed')
+    # Official images may ship compiled Python without the source .py. Remove
+    # every stock compiled updater first, then install our source module.
+    for compiled in le_modules.rglob('updates*.pyc'):
+        compiled.unlink()
     shutil.copy2(HERE / 'libreelec_updates.py', le_updates)
-    cache = le_settings / 'resources/lib/modules/__pycache__'
-    if cache.is_dir():
-        for compiled in cache.glob('updates*.pyc'):
-            compiled.unlink()
     le_manifest = ET.parse(le_settings / 'addon.xml')
     le_manifest.getroot().set('name', 'StremioELEC System')
     le_manifest.write(le_settings / 'addon.xml', encoding='utf-8', xml_declaration=True)
