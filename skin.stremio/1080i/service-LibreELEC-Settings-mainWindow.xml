@@ -1394,23 +1394,6 @@
                 </focusedlayout>
             </control>
 
-            <!-- StremioELEC owns OS update policy. Keep LibreELEC's network,
-                 Bluetooth and service controls, but route updates exclusively
-                 through our verified StremioELEC feed. -->
-            <control type="button" id="1999">
-                <posx>1560</posx>
-                <posy>990</posy>
-                <width>320</width>
-                <height>80</height>
-                <font>Reg24</font>
-                <align>center</align>
-                <label>System Updates</label>
-                <include>DialogButtonOther</include>
-                <onleft>1000</onleft>
-                <onright>1000</onright>
-                <onup>1100</onup>
-                <onclick>RunScript(special://xbmc/addons/service.stremioelec.updates/ui.py)</onclick>
-            </control>
         </control>
     </controls>
 </window>
