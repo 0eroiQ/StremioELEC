@@ -1,4 +1,6 @@
 """TV-friendly Stremio addon manager. Kodi addons remain internal."""
+import html
+import re
 import sys
 from pathlib import Path
 
@@ -8,7 +10,8 @@ import xbmcgui
 import xbmcvfs
 
 from account import Store, pull_addons
-from addons_core import (account_addons, active_addons, configure_url, configuration_state,
+from addons_core import (account_addons, active_addons, community_catalog, configure_url,
+                         configuration_state, filter_community, install_descriptor_local,
                          install_local, mark_account, merge_account, push_account,
                          remove_local, set_enabled)
 
@@ -29,6 +32,120 @@ def publish(status=None):
     window.setProperty('StremioAddons.Status', status or
                        ('Connected to Stremio account' if state.get('token') else 'Local device only'))
 
+
+
+
+def plain(value, limit=900):
+    value = re.sub(r'<[^>]*>', ' ', str(value or ''))
+    value = html.unescape(value)
+    return re.sub(r'\s+', ' ', value).strip()[:limit]
+
+
+def finish_install(state, descriptor, dialog):
+    manifest = descriptor['manifest']
+    config = configuration_state(manifest)
+    if config['required']:
+        show_config(manifest, descriptor['transportUrl'], dialog)
+        return False
+    if not dialog.yesno('Install Stremio addon?',
+            manifest.get('name', 'Stremio addon') + '\n\n' +
+            plain(manifest.get('description', ''), 500) +
+            '\n\nInstall on this StremioELEC device?'):
+        return False
+    STORE.save(state)
+    if state.get('token') and dialog.yesno('Sync to Stremio account?',
+            'Also install this addon in your Stremio account so it appears on your other Stremio devices?'):
+        try:
+            remote = account_addons(state) + [descriptor]
+            push_account(state['token'], remote)
+            mark_account(state, descriptor['id'], True)
+            STORE.save(state)
+        except Exception:
+            dialog.ok('Stremio Addons', 'Installed on this device, but the Stremio account update failed.')
+    publish('Installed ' + manifest.get('name', 'addon'))
+    return True
+
+
+def community_addons(dialog):
+    choices = [
+        ('all', 'Browse all'),
+        ('search', 'Search'),
+        ('movies', 'Movies & Series'),
+        ('streams', 'Streams'),
+        ('subtitles', 'Subtitles'),
+        ('catalogs', 'Catalogs'),
+        ('live', 'Live TV & Channels'),
+    ]
+    selection = dialog.select('Community Addons', [label for _, label in choices])
+    if selection < 0:
+        return
+    category = choices[selection][0]
+    query = ''
+    if category == 'search':
+        query = dialog.input('Search Community Addons', type=xbmcgui.INPUT_ALPHANUM).strip()
+        if not query:
+            return
+        category = 'all'
+    progress = xbmcgui.DialogProgress()
+    progress.create('Community Addons', 'Loading the Stremio Community catalog…')
+    try:
+        rows = filter_community(community_catalog(), category, query)
+    except Exception:
+        dialog.ok('Community Addons', 'The Stremio Community catalog is unavailable. Try again later.')
+        return
+    finally:
+        progress.close()
+    if not rows:
+        dialog.ok('Community Addons', 'No addons match this filter.')
+        return
+
+    state = STORE.load()
+    installed_ids = {item.get('manifest', {}).get('id') for item in state.get('addons', [])}
+    selected = dialog.select('Community Addons', [
+        ('Installed · ' if row['manifest'].get('id') in installed_ids else '') +
+        row['manifest'].get('name', 'Stremio addon')
+        for row in rows
+    ])
+    if selected < 0:
+        return
+    row = rows[selected]
+    manifest = row['manifest']
+    config = configuration_state(manifest)
+    resources = []
+    for resource in manifest.get('resources', []):
+        name = resource.get('name') if isinstance(resource, dict) else resource
+        if isinstance(name, str) and name not in resources:
+            resources.append(name)
+    installed = manifest.get('id') in installed_ids
+
+    actions = []
+    if config['required']:
+        actions.append(('configure', 'Configure'))
+    else:
+        actions.append(('install', 'Replace / install' if installed else 'Install'))
+        if config['configurable']:
+            actions.append(('configure', 'Configure'))
+    actions.append(('info', 'Addon information'))
+    action = dialog.select(manifest.get('name', 'Stremio addon'), [label for _, label in actions])
+    if action < 0:
+        return
+    action = actions[action][0]
+    if action == 'configure':
+        show_config(manifest, row['transportUrl'], dialog)
+        return
+    if action == 'info':
+        dialog.ok(manifest.get('name', 'Stremio addon'),
+                  'Version: ' + str(manifest.get('version', '')) +
+                  '\nTypes: ' + ', '.join(str(v) for v in manifest.get('types', [])) +
+                  '\nResources: ' + ', '.join(resources) +
+                  '\n\n' + plain(manifest.get('description', '')))
+        return
+    try:
+        descriptor = install_descriptor_local(state, row['transportUrl'], manifest)
+    except Exception:
+        dialog.ok('Community Addons', 'This catalog entry is not a supported Stremio addon.')
+        return
+    finish_install(state, descriptor, dialog)
 
 
 def show_config(manifest, transport_url, dialog):
@@ -72,27 +189,7 @@ def install_url(dialog):
     except Exception:
         dialog.ok('Stremio Addons', 'Unable to read this manifest. Use an HTTPS URL ending in /manifest.json.')
         return
-    manifest = descriptor['manifest']
-    config = configuration_state(manifest)
-    if config['required']:
-        show_config(manifest, descriptor['transportUrl'], dialog)
-        return
-    if not dialog.yesno('Install Stremio addon?',
-            manifest.get('name', 'Stremio addon') + '\n\n' +
-            str(manifest.get('description', ''))[:500] +
-            '\n\nInstall on this StremioELEC device?'):
-        return
-    STORE.save(state)
-    if state.get('token') and dialog.yesno('Sync to Stremio account?',
-            'Also install this addon in your Stremio account so it appears on your other Stremio devices?'):
-        try:
-            remote = account_addons(state) + [descriptor]
-            push_account(state['token'], remote)
-            mark_account(state, descriptor['id'], True)
-            STORE.save(state)
-        except Exception:
-            dialog.ok('Stremio Addons', 'Installed on this device, but the Stremio account update failed.')
-    publish('Installed ' + manifest.get('name', 'addon'))
+    finish_install(state, descriptor, dialog)
 
 
 def addon_actions(dialog):
@@ -172,6 +269,9 @@ def main(action='open'):
         install_url(dialog)
     elif action == 'sync':
         sync_account(dialog)
+    elif action == 'community':
+        community_addons(dialog)
+        publish()
     else:
         dialog.ok('Stremio Addons', 'Unknown addon manager action.')
 
