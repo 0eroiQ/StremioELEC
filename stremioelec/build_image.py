@@ -149,6 +149,22 @@ def patch_kodi(root, skin, lock, scratch):
     shutil.copy2(skin / 'LICENSE', addons / 'repository.stremioelec/LICENSE')
     copy_source(HERE / 'service.stremioelec.updates', addons / 'service.stremioelec.updates')
     shutil.copy2(skin / 'LICENSE', addons / 'service.stremioelec.updates/LICENSE')
+
+    # Keep LibreELEC's proven network/Bluetooth/services/backup UI, but replace
+    # its stock updater with the fixed-origin StremioELEC update transport.
+    le_settings = addons / 'service.libreelec.settings'
+    le_updates = le_settings / 'resources/lib/modules/updates.py'
+    if not le_updates.is_file() or not (le_settings / 'addon.xml').is_file():
+        raise ValueError('LibreELEC system settings layout changed')
+    shutil.copy2(HERE / 'libreelec_updates.py', le_updates)
+    cache = le_settings / 'resources/lib/modules/__pycache__'
+    if cache.is_dir():
+        for compiled in cache.glob('updates*.pyc'):
+            compiled.unlink()
+    le_manifest = ET.parse(le_settings / 'addon.xml')
+    le_manifest.getroot().set('name', 'StremioELEC System')
+    le_manifest.write(le_settings / 'addon.xml', encoding='utf-8', xml_declaration=True)
+
     closure = validate_closure(addons, IMAGE_IDS)
 
     settings = kodi / 'system/settings/settings.xml'
