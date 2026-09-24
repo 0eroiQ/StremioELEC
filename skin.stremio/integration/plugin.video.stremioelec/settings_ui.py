@@ -323,14 +323,17 @@ def reset_account():
 
 
 def account_menu():
-    index = choose('Stremio account', ['Connect with QR code', 'Refresh addons', 'Refresh library', 'Connected addons'])
+    state = Store(PROFILE).load()
+    options = ['Connect / sign in', 'Refresh library']
+    if state.get('token'):
+        options.append('Disconnect this device')
+    index = choose('Stremio account', options)
     if index == 0:
         xbmc.executebuiltin('ActivateWindow(1102)')
-    elif index in (1, 2):
-        xbmc.executebuiltin('RunPlugin(plugin://plugin.video.stremioelec/?action=' + ['sync', 'sync_library'][index - 1] + ')')
-    elif index == 3:
-        providers = Store(PROFILE).load().get('addons', [])
-        DIALOG.ok('Connected Stremio addons', '\n'.join(p.get('manifest', {}).get('name', 'Stremio addon') for p in providers) or 'No addons imported.')
+    elif index == 1:
+        xbmc.executebuiltin('RunPlugin(plugin://plugin.video.stremioelec/?action=sync_library)')
+    elif index == 2 and state.get('token'):
+        xbmc.executebuiltin('RunPlugin(plugin://plugin.video.stremioelec/?action=disconnect)')
 
 
 def navigation_sounds_menu():
