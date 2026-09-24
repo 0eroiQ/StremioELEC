@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- BINGIE -->
 <window>
-    <onload condition="Window.IsActive(SystemSettings)">RunScript(special://skin/extras/stremio_dispatch.py,settings_guard.py)</onload>
+    <onload condition="Window.IsActive(SystemSettings) + !Skin.HasSetting(StremioDeveloperMode)">RunScript(special://skin/extras/stremio_dispatch.py,settings_guard.py)</onload>
     <!-- Only appliance-relevant native settings sections are exposed. -->
-    <onload condition="Window.IsActive(InterfaceSettings) | Window.IsActive(MediaSettings) | Window.IsActive(GameSettings)">ReplaceWindow(Settings)</onload>
+    <onload condition="!Skin.HasSetting(StremioDeveloperMode) + [Window.IsActive(InterfaceSettings) | Window.IsActive(MediaSettings) | Window.IsActive(GameSettings)]">ReplaceWindow(1198)</onload>
     <defaultcontrol always="true">3</defaultcontrol>
     <include>DefaultSkinSettings</include>
     <controls>

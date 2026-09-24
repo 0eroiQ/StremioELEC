@@ -1,24 +1,16 @@
-"""First-run prompt for StremioELEC portable mode."""
+"""Start the StremioELEC Welcome flow after portable installation."""
 import xbmc
 import xbmcgui
-from portable_mode import enable, load, save
+from portable_mode import begin_onboarding, load
 
 monitor = xbmc.Monitor()
 if not monitor.waitForAbort(2):
     state = load()
     if not state.get('initialized'):
-        dialog = xbmcgui.Dialog()
-        choice = dialog.yesno('StremioELEC for Kodi',
-            'Enable StremioELEC Mode now? Kodi remains the media engine underneath. '
-            'You can restore your previous Kodi skin later from StremioELEC Maintenance.')
-        state['initialized'] = True
-        save(state)
-        if choice:
-            try:
-                enable()
-            except Exception:
-                dialog.ok('StremioELEC for Kodi',
-                          'StremioELEC Mode could not be enabled. Your existing Kodi interface is unchanged.')
+        try:
+            begin_onboarding()
+        except Exception:
+            xbmcgui.Dialog().ok('StremioELEC', 'StremioELEC could not start. Your previous interface was kept where possible.')
 
 while not monitor.waitForAbort(10):
     pass

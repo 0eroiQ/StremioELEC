@@ -68,6 +68,22 @@ Cinemeta's Stremio addon_catalog resource; installing/configuring still requires
 explicit user action. Local-only addons are never silently pushed to the user's
 Stremio account.
 
+## Stremio-first interface boundary
+
+StremioELEC is a Stremio client above the Kodi playback engine, not a Kodi
+distribution presented to the user. Normal Settings are entirely StremioELEC:
+Account, Addons, Playback, Audio, Subtitles, Display, Remote & TV, Home &
+Appearance, Catalogs & Artwork, Weather, System & Updates, Advanced and About.
+Kodi setting IDs are read/written behind those screens. Native engine settings
+are gated behind explicit Developer Mode.
+
+Portable installation enters a StremioELEC Welcome flow, then offers Clean,
+Keep Existing or Advanced Setup. Clean resets only StremioELEC-owned account,
+addon/cache/Home state; existing host/Kodi data remains available as rollback
+but is not part of the normal StremioELEC experience. Advanced Playback exposes
+extra decoder compatibility controls in the StremioELEC UI. Developer Mode is
+the only supported route to the native playback-engine backend.
+
 ## First-image limitations and acceptance
 
 - N60 boot, network, HDMI, audio, remote input, QR login and playback remain tests.

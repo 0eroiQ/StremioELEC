@@ -319,7 +319,7 @@ def reset_account():
         Store(PROFILE / folder).forget()
     for flag in ('StremioOnboardingDone', 'StremioHomeDefaults', 'BingieFirstStartupDone', 'BingieSecondStartupDone'):
         xbmc.executebuiltin('Skin.Reset(' + flag + ')')
-    xbmc.executebuiltin('ReplaceWindow(1102)')
+    xbmc.executebuiltin('ReplaceWindow(1101)')
 
 
 def account_menu():
@@ -404,11 +404,164 @@ def remote_control_menu():
                       '\nUse the password you set here. Connect the phone to the same local network.')
 
 
+def developer_enabled():
+    return xbmc.getCondVisibility('Skin.HasSetting(StremioDeveloperMode)')
+
+
+def advanced_playback_enabled():
+    return developer_enabled() or xbmc.getCondVisibility('Skin.HasSetting(StremioAdvancedPlayback)')
+
+
+def playback_menu():
+    entries = [('videoplayer.usedisplayasclock', 'Sync playback to display')]
+    if advanced_playback_enabled():
+        entries += [
+            ('videoplayer.usevtb', 'VideoToolbox hardware decoding'),
+            ('videoplayer.usemediacodec', 'MediaCodec hardware decoding'),
+            ('videoplayer.usemediacodecsurface', 'MediaCodec surface'),
+            ('videoplayer.usevaapi', 'VAAPI hardware decoding'),
+            ('videoplayer.usedxva2', 'DXVA hardware decoding'),
+        ]
+    kodi_menu('Playback', entries)
+
+
+def audio_menu():
+    index = choose('Audio', ['Navigation sounds', 'Playback audio'])
+    if index == 0:
+        navigation_sounds_menu()
+    elif index == 1:
+        kodi_menu('Playback audio', [
+            ('audiooutput.audiodevice', 'Output device'), ('audiooutput.channels', 'Channels'),
+            ('locale.audiolanguage', 'Preferred language'), ('audiooutput.passthrough', 'Passthrough'),
+            ('audiooutput.passthroughdevice', 'Passthrough device'),
+            ('audiooutput.ac3passthrough', 'Dolby Digital capable receiver'),
+            ('audiooutput.eac3passthrough', 'Dolby Digital Plus capable receiver'),
+            ('audiooutput.dtspassthrough', 'DTS capable receiver'),
+            ('audiooutput.truehdpassthrough', 'TrueHD capable receiver'),
+            ('audiooutput.dtshdpassthrough', 'DTS-HD capable receiver'),
+        ])
+
+
+def display_menu():
+    kodi_menu('Display', [
+        ('videoscreen.resolution', 'Resolution'),
+        ('videoscreen.screenmode', 'Display mode'),
+        ('videoplayer.adjustrefreshrate', 'Match display refresh rate'),
+    ])
+
+
+def remote_tv_menu():
+    while True:
+        options = ['Remote control apps', 'Navigation sounds', 'HDMI-CEC / TV remote']
+        if developer_enabled():
+            options.append('CEC backend controls')
+        index = choose('Remote & TV', options)
+        if index < 0:
+            return
+        if index == 0:
+            remote_control_menu()
+        elif index == 1:
+            navigation_sounds_menu()
+        elif index == 2:
+            DIALOG.ok('HDMI-CEC / TV remote',
+                      'StremioELEC uses the playback engine and platform CEC support. TV-remote behavior is kept device-safe by default. Developer Mode can open backend peripheral controls when troubleshooting.')
+        elif index == 3 and developer_enabled():
+            xbmc.executebuiltin('ActivateWindow(peripherals)')
+
+
+def diagnostics_menu():
+    mode = xbmc.getInfoLabel('Skin.String(StremioSetupMode)') or 'standard'
+    runtime = 'Portable' if xbmc.getCondVisibility('System.HasAddon(service.stremioelec.portable)') else 'StremioELEC OS'
+    DIALOG.ok('Diagnostics', 'Runtime: ' + runtime + '\nSetup mode: ' + mode +
+              '\nPlayback engine: Kodi ' + xbmc.getInfoLabel('System.BuildVersion') +
+              '\nIP: ' + xbmc.getInfoLabel('Network.IPAddress'))
+
+
+def maintenance_menu():
+    options = ['Restore default Home', 'Reset StremioELEC / return to Welcome']
+    portable = xbmc.getCondVisibility('System.HasAddon(service.stremioelec.portable)')
+    if portable:
+        options.append('Restore previous interface')
+    index = choose('Maintenance & Reset', options)
+    if index == 0 and DIALOG.yesno('Restore Home', 'Replace your Home rows with the default StremioELEC rows?'):
+        prepare(PROFILE, xbmcvfs.translatePath(ADDON.getAddonInfo('path')), force_home=True)
+        xbmc.executebuiltin('ReloadSkin()')
+    elif index == 1:
+        reset_account()
+    elif portable and index == 2:
+        xbmc.executebuiltin('RunScript(special://home/addons/service.stremioelec.portable/control.py,restore)')
+
+
+def system_updates_menu():
+    portable = xbmc.getCondVisibility('System.HasAddon(service.stremioelec.portable)')
+    os_settings = xbmc.getCondVisibility('System.HasAddon(service.libreelec.settings)')
+    os_updater = xbmc.getCondVisibility('System.HasAddon(service.stremioelec.updates)')
+    actions = [('info', 'System information')]
+    actions.append(('os_updates', 'System Updates') if os_updater else ('component_updates', 'Component Updates'))
+    if os_settings:
+        actions.append(('network', 'Network & Bluetooth'))
+    actions.append(('restart', 'Restart StremioELEC'))
+    actions.append(('restore', 'Restore previous interface') if portable else ('power', 'Power off device'))
+    index = choose('System & Updates', [label for _, label in actions])
+    if index < 0:
+        return
+    action = actions[index][0]
+    if action == 'info':
+        diagnostics_menu()
+    elif action == 'os_updates':
+        xbmc.executebuiltin('RunScript(special://xbmc/addons/service.stremioelec.updates/ui.py)')
+    elif action == 'component_updates':
+        xbmc.executebuiltin('UpdateAddonRepos')
+        xbmc.executebuiltin('UpdateLocalAddons')
+        DIALOG.notification('StremioELEC', 'Checking component updates')
+    elif action == 'network':
+        xbmc.executebuiltin('RunScript(special://xbmc/addons/service.libreelec.settings/default.py)')
+    elif action == 'restart' and DIALOG.yesno('Restart StremioELEC?', 'Stop playback and restart the application now?'):
+        xbmc.executebuiltin('RestartApp')
+    elif action == 'restore':
+        xbmc.executebuiltin('RunScript(special://home/addons/service.stremioelec.portable/control.py,restore)')
+    elif action == 'power' and DIALOG.yesno('Power off?', 'Power off this StremioELEC device?'):
+        xbmc.executebuiltin('Powerdown')
+
+
+def advanced_menu():
+    while True:
+        advanced = advanced_playback_enabled()
+        developer = developer_enabled()
+        options = ['Playback compatibility', 'Network services', 'Maintenance & Reset', 'Diagnostics',
+                   'Advanced playback controls: ' + display_value(advanced),
+                   'Developer Mode: ' + display_value(developer)]
+        if developer:
+            options.append('Open playback engine backend')
+        index = choose('Advanced', options)
+        if index < 0:
+            return
+        if index == 0:
+            playback_menu()
+        elif index == 1:
+            remote_control_menu()
+        elif index == 2:
+            maintenance_menu()
+        elif index == 3:
+            diagnostics_menu()
+        elif index == 4:
+            xbmc.executebuiltin(('Skin.Reset(' if advanced else 'Skin.SetBool(') + 'StremioAdvancedPlayback)')
+        elif index == 5:
+            if developer:
+                xbmc.executebuiltin('Skin.Reset(StremioDeveloperMode)')
+            elif DIALOG.yesno('Enable Developer Mode?',
+                    'Developer Mode exposes the native playback-engine backend and can bypass StremioELEC safeguards. Continue?'):
+                xbmc.executebuiltin('Skin.SetBool(StremioDeveloperMode)')
+                xbmc.executebuiltin('Skin.SetBool(StremioAdvancedPlayback)')
+        elif index == 6 and developer:
+            xbmc.executebuiltin('ActivateWindow(1199)')
+
+
 def run(section):
     if section == 'account':
         account_menu()
     elif section == 'home':
-        index = choose('Home and appearance', ['Choose and order Home rows', 'Appearance', 'Card layout: Posters / Landscapes'])
+        index = choose('Home & Appearance', ['Choose and order Home rows', 'Appearance', 'Card layout: Posters / Landscapes'])
         if index == 0:
             home_menu()
         elif index == 1:
@@ -419,49 +572,35 @@ def run(section):
         helper_menu()
     elif section == 'weather':
         weather_menu()
+    elif section == 'playback':
+        playback_menu()
     elif section == 'audio':
-        index = choose('Audio', ['Navigation sounds', 'Playback audio'])
-        if index == 0:
-            navigation_sounds_menu()
-            return
-        if index < 0:
-            return
-        kodi_menu('Audio', [('audiooutput.audiodevice', 'Output device'), ('audiooutput.channels', 'Channels'), ('locale.audiolanguage', 'Preferred language'), ('audiooutput.passthrough', 'Passthrough'), ('audiooutput.passthroughdevice', 'Passthrough device'), ('audiooutput.ac3passthrough', 'Dolby Digital capable receiver'), ('audiooutput.eac3passthrough', 'Dolby Digital Plus capable receiver'), ('audiooutput.dtspassthrough', 'DTS capable receiver'), ('audiooutput.truehdpassthrough', 'TrueHD capable receiver'), ('audiooutput.dtshdpassthrough', 'DTS-HD capable receiver')])
-    elif section == 'video':
-        kodi_menu('Video and display', [('videoscreen.resolution', 'Resolution'), ('videoscreen.screenmode', 'Display mode'), ('videoplayer.adjustrefreshrate', 'Match frame rate'), ('videoplayer.usedisplayasclock', 'Sync playback to display'), ('videoplayer.usevtb', 'VideoToolbox hardware decoding'), ('videoplayer.usemediacodec', 'MediaCodec hardware decoding'), ('videoplayer.usemediacodecsurface', 'MediaCodec surface'), ('videoplayer.usevaapi', 'VAAPI hardware decoding'), ('videoplayer.usedxva2', 'DXVA hardware decoding')])
+        audio_menu()
+    elif section == 'display':
+        display_menu()
+    elif section == 'remote':
+        remote_tv_menu()
     elif section == 'subtitles':
-        kodi_menu('Subtitles', [('locale.subtitlelanguage', 'Preferred language'), ('subtitles.languages', 'Download languages'), ('subtitles.downloadfirst', 'Automatically download first subtitle'), ('subtitles.fontsize', 'Text size'), ('subtitles.fontname', 'Font'), ('subtitles.style', 'Text style'), ('subtitles.colorpick', 'Subtitle color'), ('subtitles.align', 'Position'), ('subtitles.backgroundtype', 'Background style'), ('subtitles.bordercolorpick', 'Border color'), ('subtitles.bgcolorpick', 'Background color'), ('subtitles.shadowcolor', 'Shadow color'), ('subtitles.overridestyles', 'Override subtitle styles')])
+        kodi_menu('Subtitles', [
+            ('locale.subtitlelanguage', 'Preferred language'), ('subtitles.languages', 'Download languages'),
+            ('subtitles.downloadfirst', 'Automatically download first subtitle'),
+            ('subtitles.fontsize', 'Text size'), ('subtitles.fontname', 'Font'),
+            ('subtitles.style', 'Text style'), ('subtitles.colorpick', 'Subtitle color'),
+            ('subtitles.align', 'Position'), ('subtitles.backgroundtype', 'Background style'),
+            ('subtitles.bordercolorpick', 'Border color'), ('subtitles.bgcolorpick', 'Background color'),
+            ('subtitles.shadowcolor', 'Shadow color'), ('subtitles.overridestyles', 'Override subtitle styles'),
+        ])
     elif section == 'system':
-        index = choose('System', ['System information', 'Updates', 'Restart', 'Power off', 'HDMI-CEC / TV remote', 'Remote control / Kodi remote apps'])
-        if index == 0:
-            DIALOG.ok('StremioELEC', 'Kodi engine: ' + xbmc.getInfoLabel('System.BuildVersion') + '\nIP: ' + xbmc.getInfoLabel('Network.IPAddress'))
-        elif index == 1:
-            if xbmc.getCondVisibility('System.HasAddon(service.stremioelec.updates)'):
-                xbmc.executebuiltin('RunScript(special://xbmc/addons/service.stremioelec.updates/ui.py)')
-            else:
-                DIALOG.ok('StremioELEC updates', 'Updates are available on the StremioELEC OS image. This development runtime has no system updater.')
-        elif index == 5:
-            remote_control_menu()
-        elif index == 4:
-            DIALOG.ok('HDMI-CEC / TV remote', 'Select your CEC adapter, then set the HDMI port used on your TV. For a direct connection, HDMI 3 uses physical address 3000. Do not use this address if connected through an AV receiver.')
-            xbmc.executebuiltin('ActivateWindow(peripherals)')
-        elif index in (2, 3) and DIALOG.yesno('StremioELEC', 'This affects the whole device. Continue?'):
-            xbmc.executebuiltin('Reboot' if index == 2 else 'Powerdown')
+        system_updates_menu()
+    elif section == 'advanced':
+        advanced_menu()
     elif section == 'maintenance':
-        options = ['Restore default Home (10 rows)', 'Reset login and Home / return to welcome']
-        portable = xbmc.getCondVisibility('System.HasAddon(service.stremioelec.portable)')
-        if portable:
-            options.append('Portable Kodi mode / Restore Kodi UI')
-        index = choose('Maintenance', options)
-        if index == 0 and DIALOG.yesno('Restore Home', 'Replace your Home rows with the default ten rows?'):
-            prepare(PROFILE, xbmcvfs.translatePath(ADDON.getAddonInfo('path')), force_home=True)
-            xbmc.executebuiltin('ReloadSkin()')
-        elif index == 1:
-            reset_account()
-        elif portable and index == 2:
-            xbmc.executebuiltin('RunScript(special://home/addons/service.stremioelec.portable/control.py)')
+        maintenance_menu()
     elif section == 'about':
-        DIALOG.ok('About StremioELEC', 'StremioELEC test build\nPowered by Kodi, Bingie skin and TMDb Bingie Helper.\nOriginal component licences and credits remain included with their source.\nOS updates require our OS image. Music and Live TV integrations are not yet installed. Weather is provided by the StremioELEC core runtime.')
+        DIALOG.ok('About StremioELEC',
+                  'StremioELEC is a Stremio-first TV client.\nPlayback engine: Kodi ' +
+                  xbmc.getInfoLabel('System.BuildVersion') +
+                  '\nYour Stremio account, addons, library and interface are managed by StremioELEC.\nOriginal component licences and credits remain included with their source.')
 
 
 if __name__ == '__main__':

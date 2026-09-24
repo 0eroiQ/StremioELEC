@@ -3,7 +3,6 @@ import json
 import os
 from pathlib import Path
 import tempfile
-
 import xbmc
 import xbmcaddon
 import xbmcgui
@@ -20,7 +19,7 @@ def rpc(method, params=None):
         payload['params'] = params
     data = json.loads(xbmc.executeJSONRPC(json.dumps(payload)))
     if data.get('error'):
-        raise RuntimeError('Kodi rejected the settings change')
+        raise RuntimeError('Playback engine rejected the settings change')
     return data.get('result')
 
 
@@ -55,17 +54,29 @@ def current_skin():
 
 def set_skin(identity):
     if not xbmc.getCondVisibility('System.HasAddon(' + identity + ')'):
-        raise RuntimeError('Required skin is not installed: ' + identity)
+        raise RuntimeError('Required interface is not installed: ' + identity)
     result = rpc('Settings.SetSettingValue', {'setting': 'lookandfeel.skin', 'value': identity})
     if result not in ('OK', True, None):
-        raise RuntimeError('Kodi did not accept the skin change')
+        raise RuntimeError('Playback engine did not accept the interface change')
     xbmc.executebuiltin('ReloadSkin()')
+
+
+def begin_onboarding():
+    state = load()
+    active = current_skin()
+    previous = state.get('previous_skin')
+    if active != 'skin.stremio':
+        previous = active
+    state.update({'initialized': True, 'enabled': True, 'setup_started': True,
+                  'previous_skin': previous or 'skin.estuary'})
+    save(state)
+    set_skin('skin.stremio')
 
 
 def enable():
     state = load()
-    previous = state.get('previous_skin')
     active = current_skin()
+    previous = state.get('previous_skin')
     if active != 'skin.stremio':
         previous = active
     state.update({'initialized': True, 'enabled': True,
@@ -92,15 +103,11 @@ def status():
 
 
 def menu():
-    info = status()
     dialog = xbmcgui.Dialog()
-    options = ['Enable StremioELEC Mode', 'Restore Kodi UI']
-    choice = dialog.select('StremioELEC for Kodi', options)
+    choice = dialog.select('StremioELEC', ['Enable StremioELEC', 'Restore previous interface'])
     if choice == 0:
-        if dialog.yesno('Enable StremioELEC Mode?',
-                'StremioELEC will become the Kodi interface. Your current skin is remembered and can be restored later.'):
+        if dialog.yesno('Enable StremioELEC?', 'Switch back to the StremioELEC interface?'):
             enable()
     elif choice == 1:
-        if dialog.yesno('Restore Kodi UI?',
-                'Restore the skin that was active before StremioELEC Mode?'):
+        if dialog.yesno('Restore previous interface?', 'Return to the interface that was active before StremioELEC?'):
             restore()

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<window id="1192">
+  <defaultcontrol always="true">101</defaultcontrol>
+  <controls>
+    <control type="image"><left>0</left><top>0</top><width>1920</width><height>1080</height><texture colordiffuse="FF080808">white.png</texture></control>
+    <control type="label"><left>380</left><top>105</top><width>1160</width><height>80</height><font>Bold45</font><align>center</align><label>Advanced Setup</label><textcolor>white</textcolor></control>
+    <control type="label"><left>380</left><top>180</top><width>1160</width><height>50</height><font>Reg24</font><align>center</align><label>StremioELEC stays the interface in every mode.</label><textcolor>grey</textcolor></control>
+    <control type="grouplist" id="100"><left>380</left><top>285</top><width>1160</width><height>520</height><orientation>vertical</orientation><itemgap>18</itemgap>
+      <control type="button" id="101"><width>1160</width><height>100</height><font>Reg30</font><align>center</align><label>Standard StremioELEC</label><onclick>RunScript(special://skin/extras/stremio_dispatch.py,setup_mode.py,clean)</onclick><texturefocus border="15">diffuse/bgpanel.png</texturefocus><texturenofocus border="15" colordiffuse="FF202020">diffuse/bgpanel.png</texturenofocus></control>
+      <control type="button" id="102"><width>1160</width><height>100</height><font>Reg30</font><align>center</align><label>Advanced Playback</label><onclick>RunScript(special://skin/extras/stremio_dispatch.py,setup_mode.py,advanced)</onclick><texturefocus border="15">diffuse/bgpanel.png</texturefocus><texturenofocus border="15" colordiffuse="FF202020">diffuse/bgpanel.png</texturenofocus></control>
+      <control type="button" id="103"><width>1160</width><height>100</height><font>Reg30</font><align>center</align><label>Developer Mode</label><onclick>RunScript(special://skin/extras/stremio_dispatch.py,setup_mode.py,developer)</onclick><texturefocus border="15">diffuse/bgpanel.png</texturefocus><texturenofocus border="15" colordiffuse="FF202020">diffuse/bgpanel.png</texturenofocus></control>
+      <control type="button" id="104"><width>1160</width><height>80</height><font>Reg25</font><align>center</align><label>Back</label><onclick>ReplaceWindow(1102)</onclick><texturefocus border="15">diffuse/bgpanel.png</texturefocus><texturenofocus border="15" colordiffuse="FF202020">diffuse/bgpanel.png</texturenofocus></control>
+    </control>
+    <control type="textbox"><left>410</left><top>820</top><width>1100</width><height>120</height><font>Reg22</font><align>center</align><textcolor>grey</textcolor><label>Advanced Playback exposes additional decoder and compatibility controls inside StremioELEC Settings. Developer Mode additionally unlocks the native playback-engine backend for diagnostics.</label></control>
+  </controls>
+</window>

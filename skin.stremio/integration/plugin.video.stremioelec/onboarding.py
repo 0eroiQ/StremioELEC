@@ -5,6 +5,7 @@ import xbmcaddon
 import xbmcgui
 import xbmcvfs
 from account import AccountError, Store, create_link_details, read_link, pull_addons, pull_library, library_rows
+from addons_core import merge_account
 
 
 def run():
@@ -37,7 +38,8 @@ def run():
                 if cancelled():
                     return
                 if token:
-                    state = {'token': token, 'addons': []}
+                    state['token'] = token
+                    state.setdefault('addons', [])
                     store.save(state)
                     break
                 if monitor.waitForAbort(3):
@@ -48,7 +50,8 @@ def run():
         home.clearProperty('StremioOnboardingQR')
         home.clearProperty('StremioOnboardingLink')
         status('Connected. Importing your addons and library...')
-        state['addons'], skipped = pull_addons(state['token'])
+        account_addons, skipped = pull_addons(state['token'])
+        state['addons'] = merge_account(state, account_addons)
         if cancelled():
             return
         store.save(state)

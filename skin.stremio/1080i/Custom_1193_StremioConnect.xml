@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<window id="1193">
+  <defaultcontrol always="true">102</defaultcontrol>
+  <onload>RunScript(special://skin/extras/stremio_dispatch.py,onboarding.py)</onload>
+  <onunload>SetProperty(StremioOnboardingCancel,1,Home)</onunload>
+  <controls>
+    <control type="image"><include>FullscreenDimensions</include><texture colordiffuse="ff000000">colors/color_white.png</texture></control>
+    <control type="label"><left>400</left><top>120</top><width>1120</width><height>90</height><font>Bold50</font><align>center</align><textcolor>ff9b7cff</textcolor><label>Connect Stremio</label></control>
+    <control type="label"><left>420</left><top>255</top><width>1080</width><height>55</height><font>Bold34</font><label>Scan the QR code with your phone</label></control>
+    <control type="image"><left>420</left><top>350</top><width>320</width><height>320</height><aspectratio>keep</aspectratio><texture>$INFO[Window(Home).Property(StremioOnboardingQR)]</texture><visible>!String.IsEmpty(Window(Home).Property(StremioOnboardingQR))</visible></control>
+    <control type="textbox"><left>790</left><top>345</top><width>720</width><height>220</height><font>Reg27</font><label>$INFO[Window(Home).Property(StremioOnboardingStatus)]</label></control>
+    <control type="textbox"><left>790</left><top>585</top><width>720</width><height>95</height><font>Reg22</font><label>$INFO[Window(Home).Property(StremioOnboardingLink)]</label></control>
+    <control type="textbox"><left>420</left><top>705</top><width>1090</width><height>90</height><font>Reg22</font><textcolor>grey</textcolor><label>Your password is entered only on the official Stremio page. This device stores the resulting session token locally.</label></control>
+    <control type="button" id="101"><left>450</left><top>835</top><width>420</width><height>68</height><font>Reg24</font><align>center</align><label>Open Home</label><enable>!String.IsEmpty(Window(Home).Property(StremioOnboardingReady))</enable><onclick>ReplaceWindow(Home)</onclick><texturefocus border="10" colordiffuse="white">bingie/border/default_button_focus.png</texturefocus><texturenofocus colordiffuse="ff202020">colors/color_white.png</texturenofocus></control>
+    <control type="button" id="102"><left>900</left><top>835</top><width>420</width><height>68</height><font>Reg24</font><align>center</align><label>Back</label><onleft>101</onleft><onclick>ReplaceWindow(1102)</onclick><texturefocus border="10" colordiffuse="white">bingie/border/default_button_focus.png</texturefocus><texturenofocus colordiffuse="ff202020">colors/color_white.png</texturenofocus></control>
+  </controls>
+</window>

@@ -49,10 +49,12 @@ class SettingsTests(unittest.TestCase):
             prepare.assert_not_called()
             store.assert_not_called()
 
-    def test_cec_opens_device_settings_without_restarting(self):
-        with patch.object(self.module, 'choose', return_value=4):
-            self.module.run('system')
-        self.xbmc.executebuiltin.assert_called_once_with('ActivateWindow(peripherals)')
+    def test_cec_does_not_open_native_backend_without_developer_mode(self):
+        self.xbmc.getCondVisibility.return_value = False
+        with patch.object(self.module, 'choose', side_effect=[2, -1]):
+            self.module.remote_tv_menu()
+        self.assertNotIn('ActivateWindow(peripherals)',
+                         [call.args[0] for call in self.xbmc.executebuiltin.call_args_list])
 
     def test_navigation_sounds_toggle(self):
         for current, expected in ((0, 1), (1, 0), (2, 0)):
@@ -66,16 +68,19 @@ class SettingsTests(unittest.TestCase):
             rpc.assert_not_called()
 
     def test_updates_open_only_our_updater(self):
+        def visibility(expr):
+            return expr == 'System.HasAddon(service.stremioelec.updates)'
+        self.xbmc.getCondVisibility.side_effect = visibility
         with patch.object(self.module, 'choose', return_value=1):
-            self.xbmc.getCondVisibility.return_value = True
             self.module.run('system')
-            self.xbmc.executebuiltin.assert_called_once_with('RunScript(special://xbmc/addons/service.stremioelec.updates/ui.py)')
+        self.xbmc.executebuiltin.assert_called_once_with('RunScript(special://xbmc/addons/service.stremioelec.updates/ui.py)')
 
-    def test_missing_updater_does_not_install_or_restart(self):
+    def test_portable_component_update_uses_hidden_engine_builtins(self):
+        self.xbmc.getCondVisibility.return_value = False
         with patch.object(self.module, 'choose', return_value=1):
-            self.xbmc.getCondVisibility.return_value = False
             self.module.run('system')
-            self.xbmc.executebuiltin.assert_not_called()
+        calls = [call.args[0] for call in self.xbmc.executebuiltin.call_args_list]
+        self.assertEqual(calls, ['UpdateAddonRepos', 'UpdateLocalAddons'])
 
     def test_reset_blocked_during_playback(self):
         self.xbmc.Player.return_value.isPlaying.return_value = True
@@ -99,65 +104,41 @@ class SettingsTests(unittest.TestCase):
                              ['.', 'streams', 'playback', 'subtitle-results', 'setup'])
             self.xbmc.executebuiltin.assert_called_with('ReplaceWindow(1102)')
 
-    def test_three_layer_settings_architecture(self):
+    def test_stremio_first_settings_architecture(self):
         skin = ADDON.parent.parent / '1080i'
-        top = ET.parse(skin / 'Settings.xml')
-        actions = [(n.text or '') for n in top.findall('.//onclick')]
-        joined = '\n'.join(actions).lower()
-        self.assertIn('activatewindow(1198)', joined)
-        self.assertIn('service.libreelec.settings/default.py', joined)
-        self.assertIn('activatewindow(1199)', joined)
-        self.assertEqual(len(top.findall('.//content/item')), 3)
+        top = (skin / 'Settings.xml').read_text()
+        self.assertIn('ReplaceWindow(1198)', top)
+        self.assertNotIn('service.libreelec.settings', top)
+        self.assertNotIn('ActivateWindow(1199)', top)
 
         stremio = (skin / 'Custom_1198_StremioSettings.xml').read_text()
-        self.assertIn('ActivateWindow(1196)', stremio)
-        addons = (skin / 'Custom_1196_StremioAddons.xml').read_text()
-        for text in ('My Addons', 'Install from URL', 'Sync from Stremio account', 'Community Addons'):
-            self.assertIn(text, addons)
-        self.assertIn('ActivateWindow(1194)', addons)
-        configure = (skin / 'Custom_1195_StremioAddonConfigure.xml').read_text()
-        self.assertIn('StremioAddonConfig.QR', configure)
-        self.assertIn('Install from URL', configure)
-        community = (skin / 'Custom_1194_StremioCommunityAddons.xml').read_text()
-        self.assertIn('plugin://plugin.video.stremioelec/?action=community_catalog', community)
-        for label in ('Movies &amp; Series', 'Streams', 'Subtitles', 'Catalogs', 'Live TV', 'Search'):
-            self.assertIn(label, community)
-        self.assertIn('StremioDescription', community)
-        self.assertIn('StremioResources', community)
-        community = (skin / 'Custom_1194_CommunityAddons.xml').read_text()
-        self.assertIn('plugin://plugin.video.stremioelec/?action=community_catalog', community)
-        skin_manifest = ET.parse(skin.parent / 'addon.xml').getroot()
-        self.assertEqual(skin_manifest.get('id'), 'skin.stremio')
-        self.assertEqual(skin_manifest.get('version'), '2.2.0')
-        self.assertIn('addons_ui.py,community_search', community)
-        for category in ('all', 'movies', 'streams', 'subtitles', 'catalogs', 'live'):
-            self.assertIn('addons_ui.py,community_filter,' + category, community)
-        self.assertIn('StremioDescription', community)
-        for section in ('account', 'home', 'catalogs', 'subtitles', 'weather', 'maintenance', 'about'):
+        for label in ('Account', 'Stremio Addons', 'Playback', 'Audio', 'Subtitles',
+                      'Display', 'Remote &amp; TV', 'Home &amp; Appearance',
+                      'Catalogs &amp; Artwork', 'Weather', 'System &amp; Updates',
+                      'Advanced', 'About'):
+            self.assertIn(label, stremio)
+        for section in ('account', 'playback', 'audio', 'subtitles', 'display',
+                        'remote', 'home', 'catalogs', 'weather', 'system',
+                        'advanced', 'about'):
             self.assertIn('settings_ui.py,' + section, stremio)
-        self.assertNotIn('settings_ui.py,system', stremio)
-        self.assertNotIn('settings_ui.py,audio', stremio)
-        self.assertNotIn('settings_ui.py,video', stremio)
+        self.assertIn('ActivateWindow(1196)', stremio)
+        self.assertNotIn('Kodi Settings', stremio)
 
-        kodi = (skin / 'Custom_1199_KodiSettings.xml').read_text().lower()
-        for window in ('playersettings', 'pvrsettings', 'servicesettings', 'systemsettings'):
-            self.assertIn(window, kodi)
-        for blocked in ('addonbrowser', 'filemanager', 'skinsettings',
-                        'interfacesettings', 'mediasettings'):
-            self.assertNotIn(blocked, kodi)
+        backend = (skin / 'Custom_1199_KodiSettings.xml').read_text()
+        self.assertIn('!Skin.HasSetting(StremioDeveloperMode)', backend)
+        self.assertIn('ReplaceWindow(1198)', backend)
+        self.assertIn('Playback Engine Backend', backend)
 
-        system = (skin / 'service-LibreELEC-Settings-mainWindow.xml').read_text()
-        self.assertIn('StremioELEC System', system)
-        self.assertIn('System Updates', system)
-        self.assertIn('ActivateWindow(1197)', system)
-        self.assertNotIn('openelec_logo.png', system)
-        updates = (skin / 'Custom_1197_StremioUpdates.xml').read_text()
-        self.assertIn('Current version', updates)
-        self.assertIn('Update channel', updates)
-        self.assertIn('Automatic system downloads', updates)
-        self.assertIn('Install downloaded update &amp; restart', updates)
-        self.assertIn('service.stremioelec.updates/ui.py,check', updates)
-        self.assertIn('<label>Advanced</label>', (skin / 'Settings.xml').read_text())
+        setup = (skin / 'Custom_1102_StartUp2.xml').read_text()
+        self.assertIn('Clean StremioELEC Setup', setup)
+        self.assertIn('Keep Existing Setup', setup)
+        self.assertIn('Advanced Setup', setup)
+        advanced = (skin / 'Custom_1192_StremioAdvancedSetup.xml').read_text()
+        for label in ('Standard StremioELEC', 'Advanced Playback', 'Developer Mode'):
+            self.assertIn(label, advanced)
+        connect = (skin / 'Custom_1193_StremioConnect.xml').read_text()
+        self.assertIn('onboarding.py', connect)
+        self.assertIn('StremioOnboardingQR', connect)
 
 
     def test_appliance_navigation_blocks_kodi_management_routes(self):
@@ -260,7 +241,7 @@ class SettingsTests(unittest.TestCase):
 
     def test_original_categories_redirect_to_our_settings(self):
         tree = ET.parse(ADDON.parent.parent / '1080i/SettingsCategory.xml')
-        self.assertIn('ReplaceWindow(Settings)', [n.text for n in tree.findall('onload')])
+        self.assertIn('ReplaceWindow(1198)', [n.text for n in tree.findall('onload')])
 
 
 if __name__ == '__main__':

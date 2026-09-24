@@ -27,6 +27,7 @@ class PortableKodiTests(unittest.TestCase):
     def test_portable_mode_is_reversible(self):
         source = (HERE / 'portable/service.stremioelec.portable/portable_mode.py').read_text()
         self.assertIn('previous_skin', source)
+        self.assertIn("def begin_onboarding():", source)
         self.assertIn("def restore():", source)
         self.assertIn("skin.estuary", source)
         self.assertIn("lookandfeel.skin", source)
@@ -52,6 +53,11 @@ class PortableKodiTests(unittest.TestCase):
         self.assertIn('System.HasAddon(service.stremioelec.portable)', source)
         self.assertIn('Portable Kodi mode / Restore Kodi UI', source)
         self.assertIn('service.stremioelec.portable/control.py', source)
+
+    def test_portable_service_enters_welcome_flow_without_native_prompt(self):
+        source = (HERE / 'portable/service.stremioelec.portable/service.py').read_text()
+        self.assertIn('begin_onboarding()', source)
+        self.assertNotIn("yesno('StremioELEC for Kodi'", source)
 
 
 if __name__ == '__main__':
