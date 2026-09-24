@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <addon id="plugin.video.stremioelec" name="StremioELEC internal bridge" version="0.6.0" provider-name="0eroiQ">
-  <requires><import addon="xbmc.python" version="3.0.0" /></requires>
+  <requires>
+    <import addon="xbmc.python" version="3.0.0" />
+    <import addon="script.module.qrcode" version="6.1.0+matrix.3" />
+  </requires>
   <extension point="xbmc.python.pluginsource" library="default.py"><provides>video</provides></extension>
   <extension point="xbmc.subtitle.module" library="subtitle_service.py" />
   <extension point="xbmc.addon.metadata">
