@@ -116,7 +116,7 @@ jobs:
             "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" publish
           find publish -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
           cp -a portable-output/repository/. publish/
-          cp portable-output/repository.stremioelec.test-0.1.0.zip publish/
+          cp portable-output/repository.stremioelec.test-0.2.0.zip publish/
           cp portable-output/portable-manifest.json publish/
           cd publish
           git config user.name "github-actions[bot]"
