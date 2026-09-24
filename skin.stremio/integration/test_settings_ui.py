@@ -124,7 +124,15 @@ class SettingsTests(unittest.TestCase):
 
         system = (skin / 'service-LibreELEC-Settings-mainWindow.xml').read_text()
         self.assertIn('StremioELEC System', system)
+        self.assertIn('System Updates', system)
+        self.assertIn('ActivateWindow(1197)', system)
         self.assertNotIn('openelec_logo.png', system)
+        updates = (skin / 'Custom_1197_StremioUpdates.xml').read_text()
+        self.assertIn('Current version', updates)
+        self.assertIn('Update channel', updates)
+        self.assertIn('Automatic system downloads', updates)
+        self.assertIn('Install downloaded update &amp; restart', updates)
+        self.assertIn('service.stremioelec.updates/ui.py,check', updates)
         self.assertIn('<label>Advanced</label>', (skin / 'Settings.xml').read_text())
 
 
