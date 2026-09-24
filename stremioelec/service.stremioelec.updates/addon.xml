@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<addon id="service.stremioelec.updates" version="0.1.0" name="StremioELEC updates" provider-name="0eroiQ">
+<addon id="service.stremioelec.updates" version="0.2.0" name="StremioELEC updates" provider-name="0eroiQ">
   <requires><import addon="xbmc.python" version="3.0.0"/></requires>
   <extension point="xbmc.service" library="service.py"/>
   <extension point="xbmc.addon.metadata">
