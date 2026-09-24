@@ -229,15 +229,13 @@ class SettingsTests(unittest.TestCase):
             self.module.edit_kodi('audiooutput.passthrough', 'Passthrough')
             self.assertEqual(rpc.call_count, 1)
 
-    def test_home_cancel_at_order_stage_does_not_write(self):
-        target = Path(self.temp.name) / 'home.xml'
-        target.write_text('<shortcuts><shortcut><label>Existing</label><action>plugin://existing</action></shortcut></shortcuts>')
-        self.module.HOME = str(target)
-        self.dialog.multiselect.return_value = [0]
-        self.dialog.select.side_effect = [1, -1]
-        with patch.object(self.module, 'replace_backed_up') as write:
+    def test_home_card_layout_cancel_does_not_change_skin(self):
+        self.xbmc.getInfoLabel.return_value = 'poster'
+        with patch.object(self.module, 'choose', side_effect=[1, -1, -1]):
             self.module.home_menu()
-            write.assert_not_called()
+        calls = [call.args[0] for call in self.xbmc.executebuiltin.call_args_list]
+        self.assertFalse(any(call.startswith('Skin.SetString(widgetstyle,') for call in calls))
+        self.assertNotIn('ReloadSkin()', calls)
 
     def test_original_categories_redirect_to_our_settings(self):
         tree = ET.parse(ADDON.parent.parent / '1080i/SettingsCategory.xml')
