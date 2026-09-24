@@ -15,6 +15,7 @@ from protocol import base_url, catalogs, fetch, resource_url
 from account import AccountError, Store, create_link, read_link, pull_addons, pull_library, library_rows
 from sources import collect, direct_url
 from continue_playback import button_label, resume_seconds
+from addons_core import active_addons
 
 HANDLE = int(sys.argv[1])
 BASE = sys.argv[0]
@@ -92,13 +93,13 @@ def run(params):
     if action == 'helper_play':
         from helper_player import resolve
         from subtitles import prepare_selected
-        providers = STORE.load().get('addons', [])
+        providers = active_addons(STORE.load())
         return resolve(params, providers, collect,
                        xbmcgui.Dialog(), xbmcplugin, xbmcgui, HANDLE,
                        lambda kind, identity, stream, item: prepare_selected(STORE.directory, kind, identity, stream, providers, item))
     if action == 'subtitles':
         from subtitles import manual_selection
-        manual_selection(STORE.directory, STORE.load().get('addons', []))
+        manual_selection(STORE.directory, active_addons(STORE.load()))
         return
     if action == 'setup_home':
         if xbmcgui.Dialog().yesno('StremioELEC setup', 'Replace Home with Continue Watching and nine Bingie catalogs? Existing Home will be backed up. Kodi language choices are kept.'):
@@ -107,7 +108,7 @@ def run(params):
             xbmc.executebuiltin('ReloadSkin()')
         return
     if action == 'first_catalog':
-        for addon in STORE.load().get('addons', []):
+        for addon in active_addons(STORE.load()):
             available = catalogs(addon['manifest'])
             if available:
                 return run({'action': 'catalog', 'provider': addon['id'],
@@ -145,7 +146,7 @@ def run(params):
     manifest_url = MANIFEST
     descriptor = None
     if provider:
-        descriptor = next((entry for entry in STORE.load().get('addons', [])
+        descriptor = next((entry for entry in active_addons(STORE.load())
                            if entry.get('id') == provider), None)
         if descriptor is None:
             raise AccountError('Addon no longer in local account collection. Refresh the list.')
@@ -161,7 +162,7 @@ def run(params):
         # Widget picker has no login/logout actions and excludes stream-only addons.
         xbmcplugin.addDirectoryItem(HANDLE, route(action='provider'),
                                    xbmcgui.ListItem(label='Manual catalog'), True)
-        for addon in STORE.load().get('addons', []):
+        for addon in active_addons(STORE.load()):
             if not catalogs(addon['manifest']):
                 continue
             label = addon['manifest'].get('name') or 'Stremio addon'
@@ -179,7 +180,7 @@ def run(params):
             xbmcplugin.addDirectoryItem(HANDLE, route(action=target), xbmcgui.ListItem(label=label), False)
         xbmcplugin.addDirectoryItem(HANDLE, route(action='provider'),
                                    xbmcgui.ListItem(label='Manual catalog'), True)
-        for addon in state.get('addons', []):
+        for addon in active_addons(state):
             label = addon['manifest'].get('name') or 'Stremio addon'
             xbmcplugin.addDirectoryItem(HANDLE, route(action='provider', provider=addon['id']),
                                        xbmcgui.ListItem(label=label), True)
@@ -264,7 +265,7 @@ def run(params):
             xbmcplugin.addDirectoryItem(HANDLE, provider_route(action='streams', kind=kind,
                 id=identity), item(meta), True)
     elif action == 'streams':
-        providers = list(STORE.load().get('addons', []))
+        providers = list(active_addons(STORE.load()))
         if not provider:
             try:
                 providers.append({'transportUrl': manifest_url, 'manifest': fetch(manifest_url)})
@@ -303,7 +304,7 @@ def run(params):
             from subtitles import prepare_selected
             try:
                 prepare_selected(STORE.directory, stream['kind'], stream['id'], stream,
-                                 STORE.load().get('addons', []), entry)
+                                 active_addons(STORE.load()), entry)
             except Exception:
                 xbmcgui.Dialog().notification('Stremio subtitles', 'Subtitles unavailable; video will still start.')
         xbmcplugin.setResolvedUrl(HANDLE, True, entry)
