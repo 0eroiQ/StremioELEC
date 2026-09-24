@@ -3,7 +3,7 @@
   "kodi_major": 21,
   "mode": "portable",
   "repository_branch": "portable-repository-test",
-  "install_first": "repository.stremioelec.test-0.1.0.zip",
+  "install_first": "repository.stremioelec.test-0.2.0.zip",
   "addons": {
     "plugin.video.stremioelec": "0.9.0",
     "skin.stremio": "3.1.0",
