@@ -90,7 +90,7 @@ def pull_addons(token):
             continue
         seen.add(url)
         item = {'id': hashlib.sha256(url.encode()).hexdigest(),
-                'transportUrl': url, 'manifest': manifest}
+                'transportUrl': url, 'manifest': manifest, 'account': True}
         if isinstance(descriptor.get('flags'), dict):
             item['flags'] = descriptor['flags']
         addons.append(item)
