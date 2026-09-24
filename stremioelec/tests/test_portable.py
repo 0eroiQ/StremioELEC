@@ -28,6 +28,7 @@ class PortableKodiTests(unittest.TestCase):
         source = (HERE / 'portable/service.stremioelec.portable/portable_mode.py').read_text()
         self.assertIn('previous_skin', source)
         self.assertIn("def begin_onboarding():", source)
+        self.assertIn("AlarmClock(StremioWelcome,ReplaceWindow(1101)", source)
         self.assertIn("def restore():", source)
         self.assertIn("skin.estuary", source)
         self.assertIn("lookandfeel.skin", source)
