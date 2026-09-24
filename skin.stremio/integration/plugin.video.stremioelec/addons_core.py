@@ -12,7 +12,7 @@ def normalize_manifest_url(value):
         value = 'https://' + value[len('stremio://'):]
     parsed = urlsplit(value)
     if (parsed.scheme != 'https' or not parsed.netloc or parsed.username or parsed.password
-            or parsed.fragment or not parsed.path.endswith('/manifest.json')):
+            or parsed.query or parsed.fragment or not parsed.path.endswith('/manifest.json')):
         raise ValueError('Use an HTTPS Stremio manifest URL ending in /manifest.json')
     return urlunsplit((parsed.scheme, parsed.netloc, parsed.path, parsed.query, ''))
 
@@ -47,6 +47,7 @@ def install_local(state, url, fetcher=fetch):
     url = normalize_manifest_url(url)
     manifest = validate_manifest(fetcher(url))
     descriptor = make_descriptor(url, manifest)
+    descriptor['account'] = False
     addons = list(state.get('addons', []))
     # A configured URL for the same addon replaces the old configuration.
     same_id = manifest.get('id')
@@ -78,6 +79,27 @@ def set_enabled(state, identity, enabled):
 def active_addons(state):
     disabled = set(state.get('disabledAddons', []))
     return [item for item in state.get('addons', []) if item.get('id') not in disabled]
+
+
+
+def account_addons(state):
+    return [item for item in state.get('addons', []) if item.get('account') is True]
+
+
+def merge_account(state, remote):
+    """Replace account-owned entries while preserving local-only installs."""
+    local = [item for item in state.get('addons', []) if item.get('account') is not True]
+    remote_ids = {item.get('manifest', {}).get('id') for item in remote}
+    local = [item for item in local if item.get('manifest', {}).get('id') not in remote_ids]
+    return local + remote
+
+
+def mark_account(state, identity, value=True):
+    for item in state.get('addons', []):
+        if item.get('id') == identity:
+            item['account'] = bool(value)
+            return
+    raise ValueError('Unknown addon')
 
 
 def account_descriptors(addons):
