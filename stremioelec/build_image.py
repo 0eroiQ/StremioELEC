@@ -109,7 +109,7 @@ def validate_closure(addons, roots):
 
 
 def copy_source(source, target, skin=False):
-    target.mkdir()
+    target.mkdir(parents=True)
     allowed = {'1080i', 'colors', 'extras', 'fonts', 'language', 'media', 'resources', 'shortcuts', 'addon.xml', 'LICENSE'}
     for path in sorted(source.rglob('*')):
         relative = path.relative_to(source)
@@ -135,8 +135,16 @@ def patch_kodi(root, skin, lock, scratch):
         download(record['url'], dest, record['sha256'])
         extract_addon(dest, addons, record['id'], record['version'])
     copy_source(skin, addons / 'skin.stremio', skin=True)
-    copy_source(skin / 'integration/plugin.video.stremioelec', addons / 'plugin.video.stremioelec')
+
+    # StremioELEC runtime is part of SYSTEM, not a user-installed Kodi addon.
+    # Kodi keeps only a tiny internal plugin/subtitle bridge so plugin:// routes
+    # and standard subtitle dialogs continue to use Kodi extension points.
+    core = root / 'usr/lib/stremioelec/plugin.video.stremioelec'
+    copy_source(skin / 'integration/plugin.video.stremioelec', core)
+    shutil.copy2(skin / 'LICENSE', core / 'LICENSE')
+    copy_source(HERE / 'plugin.video.stremioelec.bridge', addons / 'plugin.video.stremioelec')
     shutil.copy2(skin / 'LICENSE', addons / 'plugin.video.stremioelec/LICENSE')
+
     shutil.copytree(HERE / 'repository.stremioelec', addons / 'repository.stremioelec')
     shutil.copy2(skin / 'LICENSE', addons / 'repository.stremioelec/LICENSE')
     copy_source(HERE / 'service.stremioelec.updates', addons / 'service.stremioelec.updates')
@@ -179,7 +187,7 @@ def patch_kodi(root, skin, lock, scratch):
     defaults.write(config, encoding='utf-8', xml_declaration=True)
 
     script_dir = root / 'usr/lib/stremioelec'
-    script_dir.mkdir(parents=True)
+    script_dir.mkdir(parents=True, exist_ok=True)
     shutil.copy2(HERE / 'bootstrap.py', script_dir / 'bootstrap.py')
     unit = root / 'usr/lib/systemd/system/kodi.service.d'
     unit.mkdir(parents=True, exist_ok=True)
