@@ -124,7 +124,10 @@ class SettingsTests(unittest.TestCase):
 
         system = (skin / 'service-LibreELEC-Settings-mainWindow.xml').read_text()
         self.assertIn('StremioELEC System', system)
+        self.assertIn('System Updates', system)
+        self.assertIn('service.stremioelec.updates/ui.py', system)
         self.assertNotIn('openelec_logo.png', system)
+        self.assertIn('<label>Advanced</label>', (skin / 'Settings.xml').read_text())
 
 
     def test_rejected_setting_is_not_reported_success(self):
