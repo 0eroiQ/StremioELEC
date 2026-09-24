@@ -174,7 +174,6 @@ class ImageTests(unittest.TestCase):
         le_modules.mkdir(parents=True)
         (kodi / 'addons/service.libreelec.settings/addon.xml').write_text(
             '<addon id="service.libreelec.settings" version="12.2.1" name="LibreELEC Configuration"/>')
-        (le_modules / 'updates.py').write_text('stock updater fixture')
         result = build.patch_kodi(root, source, {'addons': []}, self.root)
         self.assertEqual(set(result['dependency_closure']), set(build.IMAGE_IDS) | {'xbmc.python'})
         self.assertFalse((kodi / 'addons/skin.estuary').exists())
