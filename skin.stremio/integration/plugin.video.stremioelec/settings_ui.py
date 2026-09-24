@@ -15,8 +15,6 @@ from setup_profile import rpc, get_setting, prepare, replace_backed_up, home_xml
 ADDON = xbmcaddon.Addon('plugin.video.stremioelec')
 PROFILE = Path(xbmcvfs.translatePath(ADDON.getAddonInfo('profile')))
 DIALOG = xbmcgui.Dialog()
-HOME = 'special://profile/addon_data/script.skinshortcuts/skin.stremio-10000-1.DATA.xml'
-
 COLORS = [('White', 'FFFFFFFF'), ('Yellow', 'FFFFFF00'), ('Light gray', 'FFCCCCCC'),
           ('Black', 'FF000000'), ('Cyan', 'FF00FFFF'), ('Green', 'FF00FF00'),
           ('Red', 'FFFF0000'), ('Blue', 'FF0000FF'), ('Orange', 'FFFFA500'),
