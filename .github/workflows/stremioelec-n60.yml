@@ -67,6 +67,32 @@ jobs:
           echo '### N60 test image only' >> "$GITHUB_STEP_SUMMARY"
           echo 'Verified hashes, package dependency closure and image contents. Not yet boot-tested on N60; no USB or Android disk written. This build cannot publish/promote the independent approved update channel.' >> "$GITHUB_STEP_SUMMARY"
 
+
+  portable:
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/stremioelec/n60-image-pipeline'
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+          sparse-checkout: |
+            stremioelec
+            skin.stremio
+      - name: Build portable Kodi repository
+        run: python3 stremioelec/build_portable.py --output "$GITHUB_WORKSPACE/portable-output"
+      - name: Verify portable artifacts
+        working-directory: portable-output
+        run: sha256sum -c SHA256SUMS
+      - name: Upload portable Kodi test repository
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: StremioELEC-Kodi-test-${{ github.run_number }}
+          path: portable-output/
+          if-no-files-found: error
+          retention-days: 14
+          compression-level: 0
+
   prerelease:
     needs: image
     if: github.event_name == 'workflow_dispatch' && inputs.publish_prerelease && github.ref == 'refs/heads/stremioelec/n60-image-pipeline'
