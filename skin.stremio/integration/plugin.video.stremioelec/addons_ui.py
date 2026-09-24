@@ -8,8 +8,9 @@ import xbmcgui
 import xbmcvfs
 
 from account import Store, pull_addons
-from addons_core import (active_addons, configure_url, configuration_state,
-                         install_local, push_account, remove_local, set_enabled)
+from addons_core import (account_addons, active_addons, configure_url, configuration_state,
+                         install_local, mark_account, merge_account, push_account,
+                         remove_local, set_enabled)
 
 WINDOW_ID = 1196
 CONFIG_WINDOW_ID = 1195
@@ -54,8 +55,8 @@ def sync_account(dialog):
         dialog.ok('Stremio Addons', 'Connect your Stremio account first.')
         return
     addons, skipped = pull_addons(token)
-    state['addons'] = addons
-    # Disabled-on-this-device state intentionally survives account sync.
+    state['addons'] = merge_account(state, addons)
+    # Disabled-on-this-device state and local-only installs survive account sync.
     STORE.save(state)
     publish('Synced {} addons from Stremio'.format(len(addons)))
     dialog.notification('Stremio Addons', '{} addons synced; {} unsupported skipped.'.format(len(addons), skipped))
@@ -85,7 +86,10 @@ def install_url(dialog):
     if state.get('token') and dialog.yesno('Sync to Stremio account?',
             'Also install this addon in your Stremio account so it appears on your other Stremio devices?'):
         try:
-            push_account(state['token'], state['addons'])
+            remote = account_addons(state) + [descriptor]
+            push_account(state['token'], remote)
+            mark_account(state, descriptor['id'], True)
+            STORE.save(state)
         except Exception:
             dialog.ok('Stremio Addons', 'Installed on this device, but the Stremio account update failed.')
     publish('Installed ' + manifest.get('name', 'addon'))
@@ -114,7 +118,7 @@ def addon_actions(dialog):
     if config['configurable']:
         actions.append(('configure', 'Configure'))
     actions += [('remove_local', 'Remove from this device')]
-    if state.get('token'):
+    if state.get('token') and item.get('account') is True:
         actions.append(('remove_account', 'Remove from Stremio account'))
     actions.append(('info', 'Addon information'))
     choice = dialog.select(manifest.get('name', 'Stremio addon'), [label for _, label in actions])
@@ -137,7 +141,7 @@ def addon_actions(dialog):
         if not dialog.yesno('Remove from Stremio account?',
                 'This changes your Stremio addon collection and can affect your other Stremio devices. Continue?'):
             return
-        remote = [row for row in state.get('addons', []) if row.get('id') != identity]
+        remote = [row for row in account_addons(state) if row.get('id') != identity]
         try:
             push_account(state['token'], remote)
         except Exception:
