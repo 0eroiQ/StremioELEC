@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- BINGIE -->
 <window>
+    <onload>RunScript(special://skin/extras/stremio_dispatch.py,weather.py,refresh)</onload>
     <defaultcontrol always="true">1000</defaultcontrol>
     <menucontrol>900</menucontrol>
 
