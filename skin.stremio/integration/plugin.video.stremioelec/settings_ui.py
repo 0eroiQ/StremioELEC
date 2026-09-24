@@ -220,6 +220,43 @@ def ratings_menu():
                 helper.setSetting(key, '')
 
 
+
+def weather_menu():
+    """Configure the built-in StremioELEC weather provider."""
+    from weather import search, refresh
+    while True:
+        location = ADDON.getSetting('weather_location').strip()
+        index = choose('Weather', [
+            'Location: ' + (location or 'Not set'),
+            'Refresh weather now'
+        ])
+        if index < 0:
+            return
+        if index == 1:
+            refresh()
+            continue
+        query = DIALOG.input('Search city or postcode', defaultt=location,
+                             type=xbmcgui.INPUT_ALPHANUM)
+        if not query.strip():
+            continue
+        try:
+            rows = search(query.strip())
+        except Exception:
+            DIALOG.ok('Weather', 'Location search failed. Check the network connection and retry.')
+            continue
+        if not rows:
+            DIALOG.ok('Weather', 'No matching location was found.')
+            continue
+        selected = choose('Choose location', [row['label'] for row in rows])
+        if selected < 0:
+            continue
+        row = rows[selected]
+        ADDON.setSetting('weather_location', row['label'])
+        ADDON.setSetting('weather_lat', str(row['latitude']))
+        ADDON.setSetting('weather_lon', str(row['longitude']))
+        refresh()
+
+
 def home_menu():
     target = Path(xbmcvfs.translatePath(HOME))
     if not target.exists():
@@ -377,6 +414,8 @@ def run(section):
             xbmc.executebuiltin('RunScript(script.bingie.toolbox,action=setskinsetting,setting=widgetstyle,header=Card layout)')
     elif section == 'catalogs':
         helper_menu()
+    elif section == 'weather':
+        weather_menu()
     elif section == 'audio':
         index = choose('Audio', ['Navigation sounds', 'Playback audio'])
         if index == 0:
@@ -413,7 +452,7 @@ def run(section):
         elif index == 1:
             reset_account()
     elif section == 'about':
-        DIALOG.ok('About StremioELEC', 'StremioELEC test build\nPowered by Kodi, Bingie skin and TMDb Bingie Helper.\nOriginal component licences and credits remain included with their source.\nOS updates require our OS image. Music, Live TV and Weather integrations are not yet installed.')
+        DIALOG.ok('About StremioELEC', 'StremioELEC test build\nPowered by Kodi, Bingie skin and TMDb Bingie Helper.\nOriginal component licences and credits remain included with their source.\nOS updates require our OS image. Music and Live TV integrations are not yet installed. Weather is provided by the StremioELEC core runtime.')
 
 
 if __name__ == '__main__':
