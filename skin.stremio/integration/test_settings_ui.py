@@ -182,6 +182,13 @@ class SettingsTests(unittest.TestCase):
         for identity in ('12', '9', '10', '14', '8', '13', '7', '6'):
             self.assertNotIn('Control.IsEnabled(' + identity + ')', addon_info)
 
+
+    def test_visual_community_cache_keeps_full_catalog(self):
+        default_py = (ADDON / 'default.py').read_text()
+        self.assertIn("'rows': all_rows, 'visible': rows", default_py)
+        self.assertIn("saved.get('visible', [])", default_py)
+        self.assertNotIn("cache.save({'created': time.time(), 'rows': rows})", default_py)
+
     def test_rejected_setting_is_not_reported_success(self):
         with patch.object(self.module, 'rpc', side_effect=[{'settings': [
                 {'id': 'subtitles.downloadfirst', 'value': False}]}, False]):
