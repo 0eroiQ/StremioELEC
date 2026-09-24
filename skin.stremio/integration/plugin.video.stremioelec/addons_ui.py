@@ -17,6 +17,7 @@ from addons_core import (account_addons, active_addons, community_catalog, confi
 
 WINDOW_ID = 1196
 CONFIG_WINDOW_ID = 1195
+COMMUNITY_WINDOW_ID = 1194
 ADDON = xbmcaddon.Addon('plugin.video.stremioelec')
 PROFILE = Path(xbmcvfs.translatePath(ADDON.getAddonInfo('profile')))
 STORE = Store(PROFILE)
@@ -64,6 +65,83 @@ def finish_install(state, descriptor, dialog):
             dialog.ok('Stremio Addons', 'Installed on this device, but the Stremio account update failed.')
     publish('Installed ' + manifest.get('name', 'addon'))
     return True
+
+
+
+def refresh_community():
+    window = xbmcgui.Window(COMMUNITY_WINDOW_ID)
+    try:
+        window.setFocusId(50)
+    except Exception:
+        pass
+    xbmc.executebuiltin('Container.Refresh')
+
+
+def community_init():
+    window = xbmcgui.Window(COMMUNITY_WINDOW_ID)
+    if not window.getProperty('StremioCommunity.Category'):
+        window.setProperty('StremioCommunity.Category', 'all')
+    if window.getProperty('StremioCommunity.Query') is None:
+        window.setProperty('StremioCommunity.Query', '')
+    window.setProperty('StremioCommunity.Status', 'Loading Stremio Community Addons…')
+
+
+def community_filter(category):
+    allowed = {'all', 'movies', 'streams', 'subtitles', 'catalogs', 'live'}
+    if category not in allowed:
+        return
+    window = xbmcgui.Window(COMMUNITY_WINDOW_ID)
+    window.setProperty('StremioCommunity.Category', category)
+    window.setProperty('StremioCommunity.Query', '')
+    window.setProperty('StremioCommunity.Status', 'Loading ' + category + ' addons…')
+    refresh_community()
+
+
+def community_search(dialog):
+    window = xbmcgui.Window(COMMUNITY_WINDOW_ID)
+    query = dialog.input('Search Community Addons',
+                         defaultt=window.getProperty('StremioCommunity.Query'),
+                         type=xbmcgui.INPUT_ALPHANUM).strip()
+    if not query:
+        return
+    window.setProperty('StremioCommunity.Category', 'all')
+    window.setProperty('StremioCommunity.Query', query)
+    window.setProperty('StremioCommunity.Status', 'Searching for ' + query + '…')
+    refresh_community()
+
+
+def community_selected(transport_url, dialog):
+    if not transport_url:
+        return
+    progress = xbmcgui.DialogProgress()
+    progress.create('Community Addons', 'Loading addon details…')
+    try:
+        row = next((item for item in community_catalog()
+                    if item.get('transportUrl') == transport_url), None)
+    except Exception:
+        row = None
+    finally:
+        progress.close()
+    if not row:
+        dialog.ok('Community Addons', 'This addon is no longer available in the Community catalog.')
+        return
+    state = STORE.load()
+    manifest = row['manifest']
+    installed = next((item for item in state.get('addons', [])
+                      if item.get('manifest', {}).get('id') == manifest.get('id')), None)
+    if installed:
+        addon_actions(dialog, installed.get('id'))
+        return
+    if configuration_state(manifest)['required']:
+        show_config(manifest, row['transportUrl'], dialog)
+        return
+    try:
+        descriptor = install_descriptor_local(state, row['transportUrl'], manifest)
+    except Exception:
+        dialog.ok('Community Addons', 'This catalog entry is not a supported Stremio addon.')
+        return
+    finish_install(state, descriptor, dialog)
+    refresh_community()
 
 
 def community_addons(dialog):
@@ -192,7 +270,7 @@ def install_url(dialog):
     finish_install(state, descriptor, dialog)
 
 
-def addon_actions(dialog):
+def addon_actions(dialog, identity=None):
     state = STORE.load()
     addons = list(state.get('addons', []))
     if not addons:
@@ -203,10 +281,15 @@ def addon_actions(dialog):
     for item in addons:
         name = item.get('manifest', {}).get('name', 'Stremio addon')
         labels.append(('Disabled · ' if item.get('id') in disabled else '') + name)
-    selected = dialog.select('My Stremio Addons', labels)
-    if selected < 0:
-        return
-    item = addons[selected]
+    if identity is None:
+        selected = dialog.select('My Stremio Addons', labels)
+        if selected < 0:
+            return
+        item = addons[selected]
+    else:
+        item = next((row for row in addons if row.get('id') == identity), None)
+        if item is None:
+            return
     identity = item['id']
     manifest = item.get('manifest', {})
     enabled = identity not in disabled
@@ -256,7 +339,7 @@ def addon_actions(dialog):
                   '\n\n' + str(manifest.get('description', ''))[:900])
 
 
-def main(action='open'):
+def main(action='open', value=''):
     dialog = xbmcgui.Dialog()
     if action == 'open':
         xbmc.executebuiltin('ActivateWindow(' + str(WINDOW_ID) + ')')
@@ -270,11 +353,17 @@ def main(action='open'):
     elif action == 'sync':
         sync_account(dialog)
     elif action == 'community':
-        community_addons(dialog)
-        publish()
+        xbmc.executebuiltin('ActivateWindow(' + str(COMMUNITY_WINDOW_ID) + ')')
+    elif action == 'community_init':
+        community_init()
+    elif action == 'community_filter':
+        community_filter(value)
+    elif action == 'community_search':
+        community_search(dialog)
     else:
         dialog.ok('Stremio Addons', 'Unknown addon manager action.')
 
 
 if __name__ == '__main__':
-    main(sys.argv[1] if len(sys.argv) > 1 else 'open')
+    main(sys.argv[1] if len(sys.argv) > 1 else 'open',
+         sys.argv[2] if len(sys.argv) > 2 else '')
