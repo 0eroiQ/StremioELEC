@@ -152,16 +152,15 @@ def run(params):
         query = window.getProperty('StremioCommunity.Query')
         cache = Store(STORE.directory / 'community')
         saved = cache.load()
-        if (isinstance(saved.get('rows'), list)
+        if (isinstance(saved.get('catalog'), list)
                 and time.time() - saved.get('created', 0) < 900):
-            rows = saved['rows']
+            catalog_rows = saved['catalog']
         else:
-            rows = community_catalog()
-            cache.save({'created': time.time(), 'rows': rows})
-        rows = filter_community(rows, category, query)
+            catalog_rows = community_catalog()
+        rows = filter_community(catalog_rows, category, query)
         installed_ids = {item.get('manifest', {}).get('id')
                          for item in STORE.load().get('addons', [])}
-        cache.save({'created': time.time(), 'rows': rows})
+        cache.save({'created': time.time(), 'catalog': catalog_rows, 'visible': rows})
         window.setProperty('StremioCommunity.Status',
                            '{} addons{}'.format(len(rows),
                            ' · Search: ' + query if query else ''))
@@ -197,7 +196,7 @@ def run(params):
         from addons_ui import community_selected
         key = params.get('key', '')
         saved = Store(STORE.directory / 'community').load()
-        row = next((item for item in saved.get('rows', [])
+        row = next((item for item in saved.get('visible', [])
                     if descriptor_id(item.get('transportUrl', '')) == key), None)
         if not row or time.time() - saved.get('created', 0) > 900:
             xbmcgui.Dialog().notification('Community Addons', 'Catalog item expired. Reopen Community Addons.')
