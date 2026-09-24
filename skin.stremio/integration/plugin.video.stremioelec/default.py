@@ -3,6 +3,7 @@ import sys
 import time
 import re
 import json
+import html
 from urllib.parse import parse_qsl, urlencode, urlsplit
 
 import xbmcaddon
@@ -15,13 +16,38 @@ from protocol import base_url, catalogs, fetch, resource_url
 from account import AccountError, Store, create_link, read_link, pull_addons, pull_library, library_rows
 from sources import collect, direct_url
 from continue_playback import button_label, resume_seconds
-from addons_core import active_addons, merge_account
+from addons_core import active_addons, community_catalog, configuration_state, filter_community, merge_account
 
 HANDLE = int(sys.argv[1])
 BASE = sys.argv[0]
 ADDON = xbmcaddon.Addon()
 MANIFEST = ADDON.getSetting('manifest').strip()
 STORE = Store(xbmcvfs.translatePath(ADDON.getAddonInfo('profile')))
+
+
+
+def plain_text(value, limit=1200):
+    value = re.sub(r'<[^>]*>', ' ', str(value or ''))
+    value = html.unescape(value)
+    return re.sub(r'\s+', ' ', value).strip()[:limit]
+
+
+def safe_image(value):
+    if not isinstance(value, str):
+        return ''
+    parsed = urlsplit(value)
+    if parsed.scheme != 'https' or not parsed.netloc or parsed.username or parsed.password:
+        return ''
+    return value
+
+
+def resource_names(manifest):
+    rows = []
+    for resource in manifest.get('resources', []):
+        name = resource.get('name') if isinstance(resource, dict) else resource
+        if isinstance(name, str) and name not in rows:
+            rows.append(name)
+    return rows
 
 
 def connect_account():
@@ -119,6 +145,59 @@ def run(params):
                             'kind': available[0]['type'], 'id': available[0]['id']})
         xbmcplugin.endOfDirectory(HANDLE)
         return
+
+    if action == 'community_catalog':
+        window = xbmcgui.Window(1194)
+        category = window.getProperty('StremioCommunity.Category') or 'all'
+        query = window.getProperty('StremioCommunity.Query')
+        cache = Store(STORE.directory / 'community')
+        saved = cache.load()
+        if (isinstance(saved.get('rows'), list)
+                and time.time() - saved.get('created', 0) < 900):
+            rows = saved['rows']
+        else:
+            rows = community_catalog()
+            cache.save({'created': time.time(), 'rows': rows})
+        rows = filter_community(rows, category, query)
+        installed_ids = {item.get('manifest', {}).get('id')
+                         for item in STORE.load().get('addons', [])}
+        window.setProperty('StremioCommunity.Status',
+                           '{} addons{}'.format(len(rows),
+                           ' · Search: ' + query if query else ''))
+        for row in rows:
+            manifest = row['manifest']
+            entry = xbmcgui.ListItem(label=manifest.get('name', 'Stremio addon'))
+            logo = safe_image(manifest.get('logo')) or safe_image(manifest.get('background')) or 'DefaultAddon.png'
+            art = {'thumb': logo, 'icon': logo}
+            background = safe_image(manifest.get('background'))
+            if background:
+                art['fanart'] = background
+            entry.setArt(art)
+            installed = manifest.get('id') in installed_ids
+            config = configuration_state(manifest)
+            entry.setProperty('StremioDescription', plain_text(manifest.get('description', '')))
+            entry.setProperty('StremioVersion', str(manifest.get('version', '')))
+            entry.setProperty('StremioTypes', ', '.join(str(v) for v in manifest.get('types', []) if isinstance(v, str)))
+            entry.setProperty('StremioResources', ', '.join(resource_names(manifest)))
+            entry.setProperty('StremioTransportUrl', row['transportUrl'])
+            entry.setProperty('StremioInstalled', 'Installed' if installed else 'Community addon')
+            entry.setProperty('StremioActionLabel',
+                              'Press OK · Manage installed addon' if installed else
+                              ('Press OK · Configure' if config['required'] else 'Press OK · Install'))
+            xbmcplugin.addDirectoryItem(
+                HANDLE,
+                route(action='community_action', transport=row['transportUrl']),
+                entry,
+                False)
+        xbmcplugin.endOfDirectory(HANDLE)
+        return
+
+    if action == 'community_action':
+        from addons_ui import community_selected
+        community_selected(params.get('transport', ''), xbmcgui.Dialog())
+        xbmcplugin.endOfDirectory(HANDLE, succeeded=False)
+        return
+
     if action in ('connect', 'sync', 'sync_library', 'disconnect'):
         if action == 'connect':
             connect_account()
