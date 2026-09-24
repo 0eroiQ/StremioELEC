@@ -71,6 +71,8 @@ def begin_onboarding():
                   'previous_skin': previous or 'skin.estuary'})
     save(state)
     set_skin('skin.stremio')
+    # ReloadSkin is asynchronous; queue Welcome after the new skin is active.
+    xbmc.executebuiltin('AlarmClock(StremioWelcome,ReplaceWindow(1101),00:01,silent)')
 
 
 def enable():
