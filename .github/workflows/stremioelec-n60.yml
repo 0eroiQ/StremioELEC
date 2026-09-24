@@ -22,6 +22,7 @@ concurrency:
 
 jobs:
   image:
+    if: github.event_name == 'pull_request' || github.ref == 'refs/heads/stremioelec/n60-image-pipeline'
     runs-on: ubuntu-22.04
     timeout-minutes: 60
     steps:
@@ -40,17 +41,20 @@ jobs:
           import json, os, re
           lock = json.load(open('stremioelec/image.lock.json'))
           assert re.fullmatch(r'[0-9a-f]{40}', lock['skin']['commit'])
-          assert lock['skin']['repository'] == '0eroiQ/skin.bingie'
+          assert lock['skin']['repository'] == '0eroiQ/skin.stremio'
           with open(os.environ['GITHUB_OUTPUT'], 'a') as out:
               out.write('skin=' + lock['skin']['commit'] + '\n')
           PY
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/stremioelec/n60-image-pipeline'
         with:
-          repository: 0eroiQ/skin.bingie
+          repository: 0eroiQ/skin.stremio
+          ssh-key: ${{ secrets.STREMIO_SKIN_DEPLOY_KEY }}
           ref: ${{ steps.pins.outputs.skin }}
           path: skin-source
           persist-credentials: false
       - name: Test Stremio integration
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/stremioelec/n60-image-pipeline'
         run: python3 -m unittest discover -s skin-source/integration -p 'test_*.py'
       - name: Install image tools
         if: github.event_name != 'pull_request'
