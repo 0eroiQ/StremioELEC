@@ -70,9 +70,10 @@ reset or altered. The image starts with a fresh Stremio sign-in, not an account.
 - The initial live channel is published with `os: null` and `addons: null`:
   https://raw.githubusercontent.com/0eroiQ/StremioELEC/update-channel/stable.json
   This provides a working endpoint without offering unaccepted pilot packages.
-- SlyGuy playback worked in the Mac test runtime. Its packages are not
-  redistributed in this candidate pending redistribution/licence review; trailers
-  on this fresh image therefore need the original upstream installation.
+- SlyGuy playback worked in the Mac test runtime. The current image definition
+  checksum-locks its trailer resolver packages into SYSTEM, so users do not install
+  a trailer addon separately. Public stable redistribution still needs the normal
+  licence/dependency review before promotion.
 - Stream support remains what the bridge implements (direct HTTP/S); no claim
   of torrent engine support or watch-progress writeback.
 
