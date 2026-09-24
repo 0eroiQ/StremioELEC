@@ -7,6 +7,6 @@
     <summary lang="en_GB">Browse Stremio addon catalogs in Kodi</summary>
     <description lang="en_GB">Bingie Home setup, Stremio device-link sign-in, imported Continue Watching, direct HTTP playback and Kodi-language filtered subtitles. Progress writeback and torrent playback are not yet supported.</description>
     <platform>all</platform><license>GPL-2.0-or-later</license>
-    <source>https://github.com/0eroiQ/skin.stremio</source>
+    <source>https://github.com/0eroiQ/StremioELEC</source>
   </extension>
 </addon>

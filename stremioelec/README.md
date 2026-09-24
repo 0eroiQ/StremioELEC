@@ -1,5 +1,16 @@
 # StremioELEC N60 image pilot
 
+## Unified development project
+
+The skin and Stremio bridge live in `skin.stremio/` in this repository.
+Edit that directory directly; the image builds it from the same Git revision as
+the OS tooling. No separate skin repository, checkout key, or submodule is needed.
+The original skin history was imported without squashing; `skin.imported_commit`
+in the lock file records migration provenance, not a separate build dependency.
+
+The build installs the skin into `/usr/share/kodi/addons/skin.stremio`, selects
+it as Kodi's default, and removes Estuary from the generated image.
+
 This is an independent, unofficial LibreELEC derivative. The first pipeline
 repackages the **pinned official LibreELEC 12.2.1 Generic x86-64 image**, retaining
 its kernel, drivers, partition table and bootloader. It injects the pinned Stremio

@@ -28,7 +28,7 @@
 		<platform>all</platform>
 		<license>GPL v2.0</license>
 		<forum></forum>
-		<source>https://github.com/0eroiQ/skin.stremio</source>
+		<source>https://github.com/0eroiQ/StremioELEC</source>
 		<assets>
 			<icon>resources/icon.png</icon>
 			<fanart>resources/fanart.jpg</fanart>			
