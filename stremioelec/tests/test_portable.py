@@ -51,7 +51,7 @@ class PortableKodiTests(unittest.TestCase):
     def test_maintenance_has_restore_entry_only_for_portable(self):
         source = (ROOT / 'skin.stremio/integration/plugin.video.stremioelec/settings_ui.py').read_text()
         self.assertIn('System.HasAddon(service.stremioelec.portable)', source)
-        self.assertIn('Portable Kodi mode / Restore Kodi UI', source)
+        self.assertIn('Restore previous interface', source)
         self.assertIn('service.stremioelec.portable/control.py', source)
 
     def test_portable_service_enters_welcome_flow_without_native_prompt(self):

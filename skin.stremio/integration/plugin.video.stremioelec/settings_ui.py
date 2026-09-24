@@ -329,7 +329,7 @@ def account_menu():
         options.append('Disconnect this device')
     index = choose('Stremio account', options)
     if index == 0:
-        xbmc.executebuiltin('ActivateWindow(1102)')
+        xbmc.executebuiltin('ActivateWindow(1193)')
     elif index == 1:
         xbmc.executebuiltin('RunPlugin(plugin://plugin.video.stremioelec/?action=sync_library)')
     elif index == 2 and state.get('token'):
