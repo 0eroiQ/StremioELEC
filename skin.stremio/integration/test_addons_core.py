@@ -7,7 +7,8 @@ from unittest.mock import patch
 ADDON = Path(__file__).parent / 'plugin.video.stremioelec'
 sys.path.insert(0, str(ADDON))
 from addons_core import (account_addons, account_descriptors, active_addons,
-                         configure_url, configuration_state, install_local,
+                         community_catalog, configure_url, configuration_state,
+                         filter_community, install_descriptor_local, install_local,
                          merge_account, remove_local, set_enabled)
 
 
@@ -71,6 +72,45 @@ class AddonsCoreTests(unittest.TestCase):
         self.assertTrue(state['required'])
         self.assertEqual(configure_url('https://example.com/manifest.json'),
                          'https://example.com/configure')
+
+
+    def test_community_catalog_validates_dedupes_and_sorts(self):
+        a = {'id': 'org.a', 'name': 'Zulu', 'version': '1.0.0',
+             'resources': ['stream'], 'types': ['movie']}
+        b = {'id': 'org.b', 'name': 'Alpha', 'version': '1.0.0',
+             'resources': ['subtitles'], 'types': ['series']}
+        rows = community_catalog(fetcher=lambda _: {'addons': [
+            {'transportUrl': 'https://z.example/manifest.json', 'manifest': a},
+            {'transportUrl': 'https://a.example/manifest.json', 'manifest': b},
+            {'transportUrl': 'https://a.example/manifest.json', 'manifest': b},
+            {'transportUrl': 'http://bad.example/manifest.json', 'manifest': a},
+        ]})
+        self.assertEqual([row['manifest']['name'] for row in rows], ['Alpha', 'Zulu'])
+
+    def test_community_filters(self):
+        rows = [
+            {'transportUrl': 'https://a.example/manifest.json',
+             'manifest': {'id': 'a', 'name': 'Movie Streams', 'version': '1',
+                          'resources': ['stream'], 'types': ['movie']}},
+            {'transportUrl': 'https://b.example/manifest.json',
+             'manifest': {'id': 'b', 'name': 'Subs', 'version': '1',
+                          'resources': ['subtitles'], 'types': ['series']}},
+            {'transportUrl': 'https://c.example/manifest.json',
+             'manifest': {'id': 'c', 'name': 'Live', 'version': '1',
+                          'resources': [{'name': 'catalog'}], 'types': ['tv', 'channel']}},
+        ]
+        self.assertEqual(len(filter_community(rows, 'movies')), 2)
+        self.assertEqual([r['manifest']['name'] for r in filter_community(rows, 'subtitles')], ['Subs'])
+        self.assertEqual([r['manifest']['name'] for r in filter_community(rows, 'catalogs')], ['Live'])
+        self.assertEqual([r['manifest']['name'] for r in filter_community(rows, 'live')], ['Live'])
+        self.assertEqual([r['manifest']['name'] for r in filter_community(rows, 'all', 'movie')], ['Movie Streams'])
+
+    def test_catalog_descriptor_installs_without_second_network_fetch(self):
+        state = {'addons': [], 'disabledAddons': []}
+        manifest = self.manifest('Catalog Item')
+        item = install_descriptor_local(state, 'https://example.com/manifest.json', manifest)
+        self.assertEqual(item['manifest']['name'], 'Catalog Item')
+        self.assertFalse(item['account'])
 
     def test_rejects_non_https_manifest(self):
         with self.assertRaises(ValueError):
