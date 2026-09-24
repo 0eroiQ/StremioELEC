@@ -155,6 +155,10 @@ class SettingsTests(unittest.TestCase):
                         'activatewindow(skinsettings)', 'addons://sources/executable'):
             self.assertNotIn(blocked, overrides)
 
+        addon_info = (skin / 'DialogAddonInfo.xml').read_text()
+        for identity in ('12', '9', '10', '14', '8', '13', '7', '6'):
+            self.assertNotIn('Control.IsEnabled(' + identity + ')', addon_info)
+
     def test_rejected_setting_is_not_reported_success(self):
         with patch.object(self.module, 'rpc', side_effect=[{'settings': [
                 {'id': 'subtitles.downloadfirst', 'value': False}]}, False]):
