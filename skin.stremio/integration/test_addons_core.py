@@ -6,9 +6,9 @@ from unittest.mock import patch
 
 ADDON = Path(__file__).parent / 'plugin.video.stremioelec'
 sys.path.insert(0, str(ADDON))
-from addons_core import (account_descriptors, active_addons, configure_url,
-                         configuration_state, install_local, remove_local,
-                         set_enabled)
+from addons_core import (account_addons, account_descriptors, active_addons,
+                         configure_url, configuration_state, install_local,
+                         merge_account, remove_local, set_enabled)
 
 
 class AddonsCoreTests(unittest.TestCase):
@@ -37,6 +37,21 @@ class AddonsCoreTests(unittest.TestCase):
         self.assertEqual(len(state['addons']), 1)
         self.assertEqual(state['addons'][0]['transportUrl'],
                          'https://example.com/b/manifest.json')
+
+
+    def test_account_sync_preserves_local_only_addons(self):
+        state = {'addons': [], 'disabledAddons': []}
+        local = install_local(state, 'https://local.example/manifest.json',
+                              fetcher=lambda _: self.manifest('Local'))
+        remote_manifest = dict(self.manifest('Remote'), id='org.remote')
+        remote = [{'id': 'remote-id', 'transportUrl': 'https://remote.example/manifest.json',
+                   'manifest': remote_manifest, 'account': True,
+                   'flags': {'official': True}}]
+        merged = merge_account(state, remote)
+        self.assertEqual({item['manifest']['name'] for item in merged}, {'Local', 'Remote'})
+        state['addons'] = merged
+        self.assertEqual([item['manifest']['name'] for item in account_addons(state)], ['Remote'])
+        self.assertFalse(local.get('account'))
 
     def test_account_descriptors_preserve_flags(self):
         manifest = self.manifest()
