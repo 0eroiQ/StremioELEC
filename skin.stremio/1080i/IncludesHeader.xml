@@ -436,7 +436,7 @@
     <include name="WeatherInfoRight">
         <!-- weather info -->
         <control type="group">
-            <visible>!String.IsEmpty(Window(Weather).Property(Current.FanartCode)) + Skin.String(WeatherIconPack.path)</visible>
+            <visible>!String.IsEmpty(Window(Weather).Property(Current.Condition))</visible>
 			<visible>![Skin.String(ClearLogoLocation, topright) + $EXP[AllNoneBingieViews]]</visible>
             <!--Weather Today-->
             <control type="multiimage">
@@ -507,7 +507,7 @@
             </control>
         </control>
 		<control type="group">
-        <visible>!String.IsEmpty(Window(Weather).Property(Current.FanartCode)) + Skin.String(WeatherIconPack.path)</visible>
+        <visible>!String.IsEmpty(Window(Weather).Property(Current.Condition))</visible>
 		<visible>Skin.String(ClearLogoLocation, topright) + $EXP[AllNoneBingieViews]</visible>
             <!--Weather Today-->
             <control type="multiimage">
@@ -581,7 +581,7 @@
     
     <include name="WeatherInfoCompactRight">
         <control type="group">
-            <visible>!String.IsEmpty(Window(Weather).Property(Current.FanartCode)) + Skin.String(WeatherIconPack.path)</visible>
+            <visible>!String.IsEmpty(Window(Weather).Property(Current.Condition))</visible>
 			<visible>![Skin.String(ClearLogoLocation, topright) + $EXP[AllNoneBingieViews]]</visible>
             <control type="multiimage">
                 <right>43</right>
@@ -590,7 +590,7 @@
                 <width>92</width>
                 <height>92</height>
                 <aspectratio align="right" aligny="bottom">keep</aspectratio>
-                <visible>!String.IsEmpty(Window(Weather).Property(Current.FanartCode)) + Skin.String(WeatherIconPack.path)</visible> 
+                <visible>!String.IsEmpty(Window(Weather).Property(Current.Condition))</visible> 
             </control>
             <!-- current temp -->
             <control type="label">
@@ -647,7 +647,7 @@
             </control>
         </control>
 		<control type="group">
-            <visible>!String.IsEmpty(Window(Weather).Property(Current.FanartCode)) + Skin.String(WeatherIconPack.path)</visible>
+            <visible>!String.IsEmpty(Window(Weather).Property(Current.Condition))</visible>
 			<visible>Skin.String(ClearLogoLocation, topright) + $EXP[AllNoneBingieViews]</visible>
             <control type="multiimage">
                 <left>43</left>
@@ -656,7 +656,7 @@
                 <width>92</width>
                 <height>92</height>
                 <aspectratio align="left" aligny="bottom">keep</aspectratio>
-                <visible>!String.IsEmpty(Window(Weather).Property(Current.FanartCode)) + Skin.String(WeatherIconPack.path)</visible> 
+                <visible>!String.IsEmpty(Window(Weather).Property(Current.Condition))</visible> 
             </control>
             <!-- current temp -->
             <control type="label">
@@ -857,7 +857,7 @@
 					<right>34</right>
 					<posy>-2</posy>
 					<aspectratio align="right" aligny="bottom">keep</aspectratio>
-					<visible>!String.IsEmpty(Window(Weather).Property(Current.FanartCode)) + Skin.String(WeatherIconPack.path)</visible>
+					<visible>!String.IsEmpty(Window(Weather).Property(Current.Condition))</visible>
 				</control>  
                 <control type="label">
                     <!--Time-->
@@ -928,7 +928,7 @@
 					<left>34</left>
 					<posy>-2</posy>
 					<aspectratio align="left" aligny="bottom">keep</aspectratio>
-					<visible>!String.IsEmpty(Window(Weather).Property(Current.FanartCode)) + Skin.String(WeatherIconPack.path)</visible>
+					<visible>!String.IsEmpty(Window(Weather).Property(Current.Condition))</visible>
 				</control>  
                 <control type="label">
                     <!--Time-->
