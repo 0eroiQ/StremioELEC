@@ -36,6 +36,13 @@ class DispatchTests(unittest.TestCase):
                     self.assertEqual(sys.path, previous_path)
                     run.assert_called_once()
 
+    def test_weather_is_allowed(self):
+        with patch.dict(sys.modules, {'xbmcaddon': MagicMock(), 'xbmcgui': MagicMock(), 'xbmcvfs': MagicMock()}):
+            spec = importlib.util.spec_from_file_location('dispatch_weather_test', ROOT / 'extras/stremio_dispatch.py')
+            module = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(module)
+        self.assertIn('weather.py', module.SCRIPTS)
+
     def test_skin_has_no_assumed_bridge_directory(self):
         for path in (ROOT / '1080i').glob('*.xml'):
             self.assertNotIn('special://home/addons/plugin.video.stremioelec/', path.read_text(), path.name)
