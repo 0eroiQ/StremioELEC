@@ -2,6 +2,7 @@
 <!-- BINGIE -->
 <window>
     <defaultcontrol always="true">50</defaultcontrol>
+    <onload>RunScript(special://skin/extras/stremio_dispatch.py,weather.py,refresh)</onload>
     
 	<onunload>ClearProperty(ShowViewSubMenu,Home)</onunload>
     <controls>
@@ -43,7 +44,7 @@
                     <!--Settings-->
                     <description>Settings</description>
                     <label>$LOCALIZE[5]</label>
-                    <onclick>ActivateWindow(servicesettings,weather)</onclick>
+                    <onclick>RunScript(special://skin/extras/stremio_dispatch.py,settings_ui.py,weather)</onclick>
                     <include>SideBladeMenuButton</include>
                 </control>
                 <control type="spincontrolex" id="3">
