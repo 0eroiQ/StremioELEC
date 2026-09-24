@@ -118,6 +118,12 @@ class SettingsTests(unittest.TestCase):
         configure = (skin / 'Custom_1195_StremioAddonConfigure.xml').read_text()
         self.assertIn('StremioAddonConfig.QR', configure)
         self.assertIn('Install from URL', configure)
+        community = (skin / 'Custom_1194_StremioCommunityAddons.xml').read_text()
+        self.assertIn('plugin://plugin.video.stremioelec/?action=community_catalog', community)
+        for label in ('Movies &amp; Series', 'Streams', 'Subtitles', 'Catalogs', 'Live TV', 'Search'):
+            self.assertIn(label, community)
+        self.assertIn('StremioDescription', community)
+        self.assertIn('StremioResources', community)
         community = (skin / 'Custom_1194_CommunityAddons.xml').read_text()
         self.assertIn('plugin://plugin.video.stremioelec/?action=community_catalog', community)
         skin_manifest = ET.parse(skin.parent / 'addon.xml').getroot()
