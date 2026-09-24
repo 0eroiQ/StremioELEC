@@ -40,24 +40,23 @@ class OnboardingTest(unittest.TestCase):
                     self.assertEqual(bool(props.get('StremioOnboardingReady')), not fails)
                     self.assertNotIn('StremioOnboardingBusy', props)
 
-    def test_fresh_install_opens_qr_login(self):
+    def test_fresh_install_opens_welcome(self):
         root = ET.parse(ROOT / '1080i/IncludesVariables.xml').getroot()
-        self.assertEqual(root.find("variable[@name='StartUpWindow']/value").text, '1102')
+        self.assertEqual(root.find("variable[@name='StartUpWindow']/value").text, '1101')
 
     def test_welcome_does_not_mutate_device_settings(self):
         root = ET.parse(ROOT / '1080i/Custom_1101_StartUp.xml').getroot()
         actions = [node.text for node in root.findall('.//onclick')]
         self.assertIn('ReplaceWindow(1102)', actions)
-        self.assertFalse(any('kodisetting' in action for action in actions))
-        self.assertEqual(actions, ['ReplaceWindow(1102)'])
+        self.assertFalse(any('kodisetting' in action.lower() for action in actions))
+        self.assertFalse(any('Settings.SetSettingValue' in action for action in actions))
         buttons = root.findall(".//control[@type='button']")
-        self.assertEqual(len(buttons), 1)
-        self.assertEqual(buttons[0].findtext('label'), 'Connect to Stremio')
-        self.assertEqual(buttons[0].findtext('onleft'), '101')
-        self.assertEqual(buttons[0].findtext('onright'), '101')
+        self.assertEqual([b.findtext('label') for b in buttons], ['Start Setup', 'Exit Setup'])
+        self.assertEqual(buttons[1].findtext('visible'),
+                         'System.HasAddon(service.stremioelec.portable)')
 
     def test_qr_and_ready_state_are_wired(self):
-        root = ET.parse(ROOT / '1080i/Custom_1102_StartUp2.xml').getroot()
+        root = ET.parse(ROOT / '1080i/Custom_1193_StremioConnect.xml').getroot()
         self.assertIn('onboarding.py', root.find('onload').text)
         self.assertEqual(root.find(".//control[@id='101']/enable").text,
                          '!String.IsEmpty(Window(Home).Property(StremioOnboardingReady))')
