@@ -177,9 +177,13 @@ def account_descriptors(addons):
         url = normalize_manifest_url(item.get('transportUrl', ''))
         manifest = validate_manifest(item.get('manifest'))
         row = {'transportUrl': url, 'manifest': manifest}
-        # Preserve official/protected flags received from Stremio.
-        if isinstance(item.get('flags'), dict):
-            row['flags'] = item['flags']
+        # Stremio descriptors always carry flags. Preserve account values;
+        # new/local addons default to ordinary non-protected descriptors.
+        flags = item.get('flags') if isinstance(item.get('flags'), dict) else {}
+        row['flags'] = {
+            'official': bool(flags.get('official', False)),
+            'protected': bool(flags.get('protected', False)),
+        }
         rows.append(row)
     return rows
 
@@ -187,7 +191,9 @@ def account_descriptors(addons):
 def push_account(token, addons):
     if not token:
         raise AccountError('Connect your Stremio account first.')
-    payload = {'authKey': token, 'addons': account_descriptors(addons)}
+    payload = {'type': 'AddonCollectionSet',
+               'authKey': token,
+               'addons': account_descriptors(addons)}
     data = request('https://api.strem.io/api/addonCollectionSet', payload)
     if data.get('error'):
         raise AccountError('Stremio rejected the addon collection update.')
