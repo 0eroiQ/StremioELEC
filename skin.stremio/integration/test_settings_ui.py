@@ -120,6 +120,9 @@ class SettingsTests(unittest.TestCase):
         self.assertIn('Install from URL', configure)
         community = (skin / 'Custom_1194_CommunityAddons.xml').read_text()
         self.assertIn('plugin://plugin.video.stremioelec/?action=community_catalog', community)
+        skin_manifest = ET.parse(skin_root / 'addon.xml').getroot()
+        self.assertEqual(skin_manifest.get('id'), 'skin.stremio')
+        self.assertEqual(skin_manifest.get('version'), '2.2.0')
         self.assertIn('addons_ui.py,community_search', community)
         for category in ('all', 'movies', 'streams', 'subtitles', 'catalogs', 'live'):
             self.assertIn('addons_ui.py,community_filter,' + category, community)
