@@ -448,12 +448,18 @@ def run(section):
         elif index in (2, 3) and DIALOG.yesno('StremioELEC', 'This affects the whole device. Continue?'):
             xbmc.executebuiltin('Reboot' if index == 2 else 'Powerdown')
     elif section == 'maintenance':
-        index = choose('Maintenance', ['Restore default Home (10 rows)', 'Reset login and Home / return to welcome'])
+        options = ['Restore default Home (10 rows)', 'Reset login and Home / return to welcome']
+        portable = xbmc.getCondVisibility('System.HasAddon(service.stremioelec.portable)')
+        if portable:
+            options.append('Portable Kodi mode / Restore Kodi UI')
+        index = choose('Maintenance', options)
         if index == 0 and DIALOG.yesno('Restore Home', 'Replace your Home rows with the default ten rows?'):
             prepare(PROFILE, xbmcvfs.translatePath(ADDON.getAddonInfo('path')), force_home=True)
             xbmc.executebuiltin('ReloadSkin()')
         elif index == 1:
             reset_account()
+        elif portable and index == 2:
+            xbmc.executebuiltin('RunScript(special://home/addons/service.stremioelec.portable/control.py)')
     elif section == 'about':
         DIALOG.ok('About StremioELEC', 'StremioELEC test build\nPowered by Kodi, Bingie skin and TMDb Bingie Helper.\nOriginal component licences and credits remain included with their source.\nOS updates require our OS image. Music and Live TV integrations are not yet installed. Weather is provided by the StremioELEC core runtime.')
 
