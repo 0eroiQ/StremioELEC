@@ -102,7 +102,7 @@ class SettingsTests(unittest.TestCase):
             self.assertEqual([call.args[0].relative_to(self.module.PROFILE).as_posix()
                               for call in store.call_args_list],
                              ['.', 'streams', 'playback', 'subtitle-results', 'setup'])
-            self.xbmc.executebuiltin.assert_called_with('ReplaceWindow(1102)')
+            self.xbmc.executebuiltin.assert_called_with('ReplaceWindow(1101)')
 
     def test_stremio_first_settings_architecture(self):
         skin = ADDON.parent.parent / '1080i'
