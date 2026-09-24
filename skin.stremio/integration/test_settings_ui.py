@@ -185,7 +185,8 @@ class SettingsTests(unittest.TestCase):
 
     def test_visual_community_cache_keeps_full_catalog(self):
         default_py = (ADDON / 'default.py').read_text()
-        self.assertIn("'rows': all_rows, 'visible': rows", default_py)
+        self.assertIn("'catalog': catalog_rows, 'visible': rows", default_py)
+        self.assertIn("saved.get('catalog')", default_py)
         self.assertIn("saved.get('visible', [])", default_py)
         self.assertNotIn("cache.save({'created': time.time(), 'rows': rows})", default_py)
 
