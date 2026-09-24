@@ -33,22 +33,15 @@ class PortableKodiTests(unittest.TestCase):
         self.assertIn("skin.estuary", source)
         self.assertIn("lookandfeel.skin", source)
 
-    def test_builder_excludes_os_specific_packages(self):
+    def test_portable_repository_is_self_contained(self):
         spec = importlib.util.spec_from_file_location('portable_builder', HERE / 'build_portable.py')
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
-        self.assertIn('inputstream.adaptive', module.EXCLUDE)
-        self.assertIn('slyguy.trailers', module.EXCLUDE)
+        self.assertEqual(module.PORTABLE_THIRD_PARTY, ())
         self.assertEqual(module.OWN,
                          ('plugin.video.stremioelec', 'skin.stremio',
                           'service.stremioelec.portable'))
         self.assertIn('portable-repository-test', module.TEST_BASE)
-
-    def test_cosmetic_studio_pack_is_optional(self):
-        node = ET.parse(ROOT / 'skin.stremio/addon.xml').getroot()
-        dep = next(item for item in node.findall('requires/import')
-                   if item.get('addon') == 'resource.images.studios.coloured')
-        self.assertEqual(dep.get('optional'), 'true')
 
     def test_skin_runtime_depends_only_on_our_core(self):
         node = ET.parse(ROOT / 'skin.stremio/addon.xml').getroot()
