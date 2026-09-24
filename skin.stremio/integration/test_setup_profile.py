@@ -24,7 +24,8 @@ class SetupTest(unittest.TestCase):
         urls = [row.findtext('action') for row in rows]
         self.assertEqual(len(set(urls)), 10)
         self.assertIn('action=continue', urls[0])
-        self.assertTrue(all('plugin.video.tmdb.bingie.helper' in url for url in urls[1:]))
+        self.assertTrue(all(url.startswith('plugin://plugin.video.stremioelec/') for url in urls))
+        self.assertFalse(any('plugin.video.tmdb.bingie.helper' in url for url in urls))
         self.assertTrue(all("'20'" in row.findtext('additional-properties') for row in rows))
 
     def test_original_backup_survives_reapply(self):
