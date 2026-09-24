@@ -1,4 +1,4 @@
-"""Small adapter to the separately installed, unmodified SlyGuy Trailers."""
+"""System-runtime adapter to the checksum-pinned, unmodified SlyGuy Trailers component."""
 from urllib.parse import urlencode
 import json
 from trailers import video_identity
