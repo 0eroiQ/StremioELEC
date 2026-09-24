@@ -110,6 +110,10 @@ class SettingsTests(unittest.TestCase):
         self.assertEqual(len(top.findall('.//content/item')), 3)
 
         stremio = (skin / 'Custom_1198_StremioSettings.xml').read_text()
+        self.assertIn('ActivateWindow(1196)', stremio)
+        addons = (skin / 'Custom_1196_StremioAddons.xml').read_text()
+        for text in ('My Addons', 'Install from URL', 'Sync from Stremio account'):
+            self.assertIn(text, addons)
         for section in ('account', 'home', 'catalogs', 'subtitles', 'weather', 'maintenance', 'about'):
             self.assertIn('settings_ui.py,' + section, stremio)
         self.assertNotIn('settings_ui.py,system', stremio)
