@@ -1346,14 +1346,14 @@
                 <posy>990</posy>
 				<orientation>horizontal</orientation>
 				<itemgap>20</itemgap>
-				<width>1200</width>
+				<width>860</width>
                 <defaultcontrol>5</defaultcontrol>
 				<onup condition="String.IsEqual(Container(1000).ListItem.Property(listTyp), 1100)">1100</onup>
 				<onup condition="String.IsEqual(Container(1000).ListItem.Property(listTyp), 1900)">1900</onup>
 				<onup condition="String.IsEqual(Container(1000).ListItem.Property(listTyp), 1200)">1200</onup>
 				<onup condition="String.IsEqual(Container(1000).ListItem.Property(listTyp), 1300)">1300</onup>
 				<onleft>1000</onleft>
-				<onright>1000</onright>
+				<onright>1999</onright>
 				<itemlayout height="80" width="300">
 					<control type="button">
 						<width>300</width>
@@ -1392,6 +1392,24 @@
                         <label>$INFO[ListItem.Label]</label>
                     </control>
                 </focusedlayout>
+            </control>
+
+            <!-- StremioELEC owns OS update policy. Keep LibreELEC's network,
+                 Bluetooth and service controls, but route updates exclusively
+                 through our verified StremioELEC feed. -->
+            <control type="button" id="1999">
+                <posx>1560</posx>
+                <posy>990</posy>
+                <width>320</width>
+                <height>80</height>
+                <font>Reg24</font>
+                <align>center</align>
+                <label>System Updates</label>
+                <include>DialogButtonOther</include>
+                <onleft>1000</onleft>
+                <onright>1000</onright>
+                <onup>1100</onup>
+                <onclick>RunScript(special://xbmc/addons/service.stremioelec.updates/ui.py)</onclick>
             </control>
         </control>
     </controls>
