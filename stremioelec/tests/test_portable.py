@@ -44,6 +44,12 @@ class PortableKodiTests(unittest.TestCase):
                           'service.stremioelec.portable'))
         self.assertIn('portable-repository-test', module.TEST_BASE)
 
+    def test_cosmetic_studio_pack_is_optional(self):
+        node = ET.parse(ROOT / 'skin.stremio/addon.xml').getroot()
+        dep = next(item for item in node.findall('requires/import')
+                   if item.get('addon') == 'resource.images.studios.coloured')
+        self.assertEqual(dep.get('optional'), 'true')
+
     def test_skin_xml_declaration_is_standard(self):
         first = (ROOT / 'skin.stremio/addon.xml').read_text().splitlines()[0]
         self.assertEqual(first, '<?xml version="1.0" encoding="utf-8"?>')
