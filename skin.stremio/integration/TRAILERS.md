@@ -1,16 +1,15 @@
 # Trailer integration
 
-## Current macOS pilot: SlyGuy
+## Current StremioELEC runtime: system-bundled SlyGuy resolver
 
 Manual trailer buttons and Trailers & More keep the exact selected TMDb
-YouTube clip, but trailer_player.py now hands playback to the separately
-installed, unmodified SlyGuy Trailers through its /play/ route. The bridge
+YouTube clip, but trailer_player.py now hands playback to the checksum-pinned, system-bundled, unmodified SlyGuy Trailers through its /play/ route. The bridge
 does not copy SlyGuy implementation code, import account credentials, change
 SlyGuy defaults, or add SlyGuy options to Stremio Settings. It does not silently
 replace a failed selected clip with an IMDb trailer. Legacy automatic previews
 are outside this change.
 
-Installed in the isolated portable macOS Kodi only:
+Pinned in the current StremioELEC image definition (also exercised in the isolated macOS Kodi pilot):
 
 - slyguy.trailers 0.2.0
 - script.module.slyguy 0.86.98
@@ -33,11 +32,10 @@ main Play Trailer button: fullscreen video displayed without the info overlay.
 70 integration unit tests passed, including exact-clip routing, disabled-addon
 guard, modal closure, and recovery of a stale busy flag without a loading dialog.
 
-The offline bundle builder has NOT been changed to redistribute SlyGuy. Its
-licensing/distribution and target-specific binary dependencies need review
-before including it in a public appliance image. Keep the original addon IDs
-and attribution. Fresh deployment must install/enable these dependencies
-before exposing the manual trailer controls.
+The N60 image builder checksum-locks these upstream packages into SYSTEM, so
+users do not install a trailer addon or repository themselves. Keep the original
+addon IDs, licences and attribution. Public stable redistribution still requires
+the normal licence/dependency review; do not treat a green CI image as that review.
 
 The adapter closes the video-info modal synchronously, then uses Kodi JSON-RPC
 Player.Open, without creating an extra loading dialog. A
