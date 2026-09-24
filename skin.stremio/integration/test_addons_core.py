@@ -62,6 +62,28 @@ class AddonsCoreTests(unittest.TestCase):
         }])
         self.assertEqual(rows[0]['flags'], {'official': True, 'protected': True})
         self.assertNotIn('id', rows[0])
+        defaults = account_descriptors([{
+            'transportUrl': 'https://new.example/manifest.json',
+            'manifest': manifest
+        }])
+        self.assertEqual(defaults[0]['flags'], {'official': False, 'protected': False})
+
+
+    def test_push_account_matches_stremio_api_shape(self):
+        from addons_core import push_account
+        manifest = self.manifest()
+        with patch('addons_core.request', return_value={'result': {'ok': True}}) as request:
+            push_account('token', [{
+                'transportUrl': 'https://example.com/manifest.json',
+                'manifest': manifest
+            }])
+        request.assert_called_once()
+        endpoint, payload = request.call_args.args
+        self.assertEqual(endpoint, 'https://api.strem.io/api/addonCollectionSet')
+        self.assertEqual(payload['type'], 'AddonCollectionSet')
+        self.assertEqual(payload['authKey'], 'token')
+        self.assertEqual(payload['addons'][0]['flags'],
+                         {'official': False, 'protected': False})
 
     def test_configure_metadata_and_url(self):
         manifest = self.manifest()
