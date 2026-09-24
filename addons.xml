@@ -24,7 +24,7 @@
             <screenshot>resources/screenshot-03.jpg</screenshot>
         </assets>
     </extension>
-</addon><addon id="plugin.video.stremioelec" name="StremioELEC Core" version="0.7.0" provider-name="0eroiQ">
+</addon><addon id="plugin.video.stremioelec" name="StremioELEC Core" version="0.8.0" provider-name="0eroiQ">
   <requires>
     <import addon="xbmc.python" version="3.0.0" />
     <import addon="script.module.qrcode" version="6.1.0+matrix.3" optional="true" />
@@ -490,10 +490,10 @@
         <description lang="zh_CN">皮肤加载项，提供简单的用户快捷方式管理和列表（需要皮肤支持）</description>
         <description lang="zh_TW">插件为皮肤提供了简单的管理和用户连接方式列表 (需要皮肤支持)</description>
     </extension>
-</addon><addon id="service.stremioelec.portable" name="StremioELEC for Kodi" version="0.1.0" provider-name="0eroiQ">
+</addon><addon id="service.stremioelec.portable" name="StremioELEC for Kodi" version="0.2.0" provider-name="0eroiQ">
   <requires>
     <import addon="xbmc.python" version="3.0.0" />
-    <import addon="plugin.video.stremioelec" version="0.7.0" />
+    <import addon="plugin.video.stremioelec" version="0.8.0" />
     <import addon="skin.stremio" version="2.2.0" />
   </requires>
   <extension point="xbmc.service" library="service.py" />
@@ -507,7 +507,7 @@
     <license>GPL-2.0-or-later</license>
     <source>https://github.com/0eroiQ/StremioELEC</source>
   </extension>
-</addon><addon id="skin.stremio" version="2.2.0" name="StremioELEC" provider-name="0eroiQ, matke">
+</addon><addon id="skin.stremio" version="2.3.0" name="StremioELEC" provider-name="0eroiQ, matke">
 	<requires>
 		<import version="5.17.0" addon="xbmc.gui" />
 		<import addon="script.bingie.helper" version="1.1.2" />
