@@ -3,7 +3,7 @@
   "version": "0.4.0-test.1",
   "update_schema": 1,
   "sequence": 11,
-  "addons_sequence": 8,
+  "addons_sequence": 9,
   "kodi_major": 21,
   "libreelec_major": 12,
   "target": "Generic.x86_64",
