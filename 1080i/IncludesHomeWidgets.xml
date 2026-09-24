@@ -320,6 +320,7 @@
 				<align>left</align>
 				<aligny>center</aligny>
 				<label>[B]$VAR[SquareListDetails][/B]</label>
+                <visible>!Skin.HasSetting(StremioHideCardLabels)</visible>
 				<font>Reg26</font>
 				<textcolor>$INFO[Skin.String(TagOverlaysTextColor)]</textcolor>
 			</control>
@@ -343,6 +344,7 @@
 				<align>left</align>
 				<aligny>center</aligny>
 				<label>[B]$VAR[SquareListDetails][/B]</label>
+                <visible>!Skin.HasSetting(StremioHideCardLabels)</visible>
 				<font>Reg26</font>
 				<textcolor>$INFO[Skin.String(TagOverlaysTextColor)]</textcolor>
 			</control>
@@ -375,6 +377,7 @@
 				<align>left</align>
 				<aligny>center</aligny>
 				<label>[B]$VAR[SquareListDetails][/B]</label>
+                <visible>!Skin.HasSetting(StremioHideCardLabels)</visible>
 				<font>Reg26</font>
 				<scroll>true</scroll>
 				<textcolor>$INFO[Skin.String(TagOverlaysTextColor)]</textcolor>
@@ -388,8 +391,17 @@
     </include>
 	
 	<!-- widget landscape layout -->
-    <include name="widget_layout_landscape">
+    <include name="StremioCompactLandscapeHeight">
+        <height>251</height>
+    </include>
+    <include name="StremioNormalWidgetHeight">
         <height>$PARAM[height]</height>
+    </include>
+    <include name="widget_layout_landscape">
+        <include condition="Skin.HasSetting(StremioHideCardLabels)">StremioCompactLandscapeHeight</include>
+        <include content="StremioNormalWidgetHeight" condition="!Skin.HasSetting(StremioHideCardLabels)">
+            <param name="height" value="$PARAM[height]" />
+        </include>
         <itemlayout width="418" height="339">
             <control type="group">
                 <include content="left">
@@ -429,6 +441,7 @@
 				<align>left</align>
 				<aligny>center</aligny>
 				<label>[B]$VAR[ThumbListDetails_2][/B]</label>
+                <visible>!Skin.HasSetting(StremioHideCardLabels)</visible>
 				<font>Reg26</font>
 				<textcolor>$INFO[Skin.String(TagOverlaysTextColor)]</textcolor>
 				<visible>!Window.IsActive(1116)</visible>
@@ -443,6 +456,7 @@
 				<align>left</align>
 				<aligny>center</aligny>
 				<label>$VAR[ThumbListDetails_3]</label>
+                <visible>!Skin.HasSetting(StremioHideCardLabels) + !Skin.HasSetting(StremioHideCardGenres)</visible>
 				<font>tagsecrow</font>
 				<textcolor>$INFO[Skin.String(TagOverlaysTextColor)]</textcolor>
 				<animation effect="fade" start="0" end="70" time="0" condition="true">Conditional</animation>
@@ -500,6 +514,7 @@
 				<align>left</align>
 				<aligny>center</aligny>
 				<label>[B]$VAR[ThumbListDetails_2][/B]</label>
+                <visible>!Skin.HasSetting(StremioHideCardLabels)</visible>
 				<font>Reg26</font>
 				<textcolor>$INFO[Skin.String(TagOverlaysTextColor)]</textcolor>
 				<scroll>true</scroll>
@@ -515,6 +530,7 @@
 				<align>left</align>
 				<aligny>center</aligny>
 				<label>$VAR[ThumbListDetails_3]</label>
+                <visible>!Skin.HasSetting(StremioHideCardLabels) + !Skin.HasSetting(StremioHideCardGenres)</visible>
 				<font>tagsecrow</font>
 				<textcolor>$INFO[Skin.String(TagOverlaysTextColor)]</textcolor>
 				<animation effect="fade" start="0" end="70" time="0" condition="true">Conditional</animation>
@@ -568,6 +584,7 @@
 				<align>left</align>
 				<aligny>center</aligny>
 				<label>[B]$VAR[ThumbListDetails_2][/B]</label>
+                <visible>!Skin.HasSetting(StremioHideCardLabels)</visible>
 				<font>Reg26</font>
 				<textcolor>$INFO[Skin.String(TagOverlaysTextColor)]</textcolor>
 				<visible>!Window.IsActive(1116)</visible>
@@ -582,6 +599,7 @@
 				<align>left</align>
 				<aligny>center</aligny>
 				<label>$VAR[ThumbListDetails_3]</label>
+                <visible>!Skin.HasSetting(StremioHideCardLabels) + !Skin.HasSetting(StremioHideCardGenres)</visible>
 				<font>tagsecrow</font>
 				<textcolor>$INFO[Skin.String(TagOverlaysTextColor)]</textcolor>
 				<animation effect="fade" start="0" end="70" time="0" condition="true">Conditional</animation>
@@ -627,6 +645,7 @@
                 <include>widget_header_leftalign</include>
 				<textcolor>$INFO[Skin.String(BingieHeaderTextColor)]</textcolor>
                 <label>$PARAM[widgetName]</label>
+                <animation effect="slide" end="0,-22" time="0" condition="Skin.HasSetting(StremioView) + [String.IsEqual(Skin.String(widgetstyle),poster) | [Skin.HasSetting(StremioHideCardLabels) + String.IsEqual(Skin.String(widgetstyle),landscape)]] + Control.HasFocus($PARAM[widgetid])">Conditional</animation>
                 <animation effect="slide" end="50" time="0" condition="Container($PARAM[widgetid]).IsUpdating + Integer.IsEqual(Container($PARAM[widgetid]).NumItems,0)">Conditional</animation>
                 <visible>String.IsEmpty(Container($PARAM[widgetid]).ListItem.Property(similartitle)) + String.IsEmpty(Container($PARAM[widgetid]).ListItem.Property(genretitle))</visible>
 			</control>
@@ -638,6 +657,7 @@
                 <include>widget_header_leftalign</include>
 				<textcolor>$INFO[Skin.String(BingieHeaderTextColor)]</textcolor>
                 <label>$INFO[Container($PARAM[widgetid]).ListItem.Property(similartitle),$LOCALIZE[31333] ,]$INFO[Container($PARAM[widgetid]).ListItem.Property(genretitle)]</label>
+                <animation effect="slide" end="0,-22" time="0" condition="Skin.HasSetting(StremioView) + [String.IsEqual(Skin.String(widgetstyle),poster) | [Skin.HasSetting(StremioHideCardLabels) + String.IsEqual(Skin.String(widgetstyle),landscape)]] + Control.HasFocus($PARAM[widgetid])">Conditional</animation>
                 <animation effect="slide" end="50" time="0" condition="Container($PARAM[widgetid]).IsUpdating + Integer.IsEqual(Container($PARAM[widgetid]).NumItems,0)">Conditional</animation>
                 <visible>!String.IsEmpty(Container($PARAM[widgetid]).ListItem.Property(similartitle)) | !String.IsEmpty(Container($PARAM[widgetid]).ListItem.Property(genretitle))</visible>
 			</control>

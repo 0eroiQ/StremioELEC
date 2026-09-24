@@ -23,9 +23,9 @@ def resource_url(manifest, resource, kind, identity, extras=None):
     return url + '.json'
 
 
-def fetch(url):
+def fetch(url, timeout=15):
     request = Request(url, headers={'Accept': 'application/json', 'User-Agent': 'StremioELEC/0.1'})
-    with urlopen(request, timeout=15) as response:
+    with urlopen(request, timeout=timeout) as response:
         data = response.read(8 * 1024 * 1024 + 1)
     if len(data) > 8 * 1024 * 1024:
         raise ValueError('Addon response is too large')

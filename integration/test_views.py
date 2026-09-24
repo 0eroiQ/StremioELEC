@@ -7,6 +7,24 @@ ROOT = pathlib.Path(__file__).resolve().parents[1]
 
 
 class HomeViewsTest(unittest.TestCase):
+    def test_card_secondary_text_can_be_hidden_independently(self):
+        root = ET.parse(ROOT / '1080i/IncludesHomeWidgets.xml').getroot()
+        labels = [c for c in root.findall('.//control') if c.findtext('label') == '$VAR[ThumbListDetails_3]']
+        self.assertEqual(len(labels), 3)
+        for control in labels:
+            self.assertIn('!Skin.HasSetting(StremioHideCardLabels) + !Skin.HasSetting(StremioHideCardGenres)', [v.text for v in control.findall('visible')])
+        titles = [c for c in root.findall('.//control') if c.findtext('label') == '[B]$VAR[ThumbListDetails_2][/B]']
+        for control in titles:
+            self.assertFalse(any('StremioHideCardGenres' in (v.text or '') for v in control.findall('visible')))
+
+    def test_continue_play_button_uses_exact_saved_route(self):
+        root = ET.parse(ROOT / '1080i/IncludesDialogVideoInfo.xml').getroot()
+        button = root.find("include[@name='StremioContinuePlayButton']/control")
+        self.assertEqual(button.findtext('visible'), '!String.IsEmpty(ListItem.Property(StremioContinuePath))')
+        actions = [node.text for node in button.findall('onclick')]
+        self.assertIn('ActivateWindow(Videos,$INFO[Window(Home).Property(StremioContinueTarget)],return)', actions)
+        self.assertEqual(sum(node.text == 'StremioContinuePlayButton' for node in root.findall('.//include')), 2)
+
     def test_stremio_widget_picker_is_browsable_and_optional(self):
         root = ET.parse(ROOT / 'shortcuts/overrides.xml').getroot()
         node = root.find("widget-groupings/shortcut[@label='Stremio catalogs']")
@@ -25,7 +43,8 @@ class HomeViewsTest(unittest.TestCase):
 
     def test_row_position_is_scoped_to_stremio(self):
         root = ET.parse(ROOT / '1080i/IncludesHomeBingie.xml').getroot()
-        self.assertEqual(root.find("include[@name='StremioHomeRowPosition']/top").text, '649')
+        self.assertEqual(root.find("include[@name='StremioNormalHomeRowPosition']/top").text, '649')
+        self.assertEqual(root.find("include[@name='StremioCompactHomeRowPosition']/top").text, '739')
         self.assertEqual(root.find("include[@name='OriginalBingieHomeRowPosition']/top").text, '564')
         rows = root.find(".//control[@id='77777']")
         includes = {node.text: node.get('condition') for node in rows.findall('include')}

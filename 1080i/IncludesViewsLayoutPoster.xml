@@ -207,6 +207,7 @@
     </include>
 	<include name="PosterTagOverlayBingie">
         <control type="group">
+            <visible>!Skin.HasSetting(StremioHideCardLabels) | ![Window.IsActive(Home) | $EXP[IsBingieHubsActive]]</visible>
 			<visible>!String.IsEqual(ListItem.Label,..)</visible>
 			<visible>!String.Contains(ListItem.Label,$LOCALIZE[33078])</visible>
 			<visible>![$EXP[IsTvShowDBType] + $EXP[IsTVShowInLastEpisodes] + Skin.HasSetting(EnableNewEpisodesIndicator)]</visible>

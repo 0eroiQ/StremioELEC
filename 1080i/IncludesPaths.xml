@@ -132,8 +132,7 @@
     </variable>
 	
 	<variable name="Path_MyList">
-        <value condition="!Skin.HasSetting(AddToFavorites) + [Library.HasContent(Movies) | Library.HasContent(TVShows)]">plugin://script.bingie.widgets/?action=mylist&amp;mediatype=media&amp;limit=100&amp;reload=$INFO[Window(Home).Property(widgetreload)]</value>
-		<value condition="Skin.HasSetting(AddToFavorites) | !Library.HasContent(Movies) + !Library.HasContent(TVShows)">plugin://plugin.video.tmdb.bingie.helper?info=trakt_favorites&amp;tmdb_type=both&amp;widget=true&amp;sort_by=added&amp;sort_how=desc&amp;reload=$INFO[Window(Home).Property(TMDbBingieHelper.Widgets.Reload)])</value>
+        <value>$INFO[Window(Home).Property(StremioLibraryURL)]</value>
     </variable>
 	
 	<variable name="Path_CastInMovies">

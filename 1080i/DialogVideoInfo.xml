@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- BINGIE -->
 <window>
+    <onload>ClearProperty(StremioLibraryReady,Home)</onload>
+    <onload>SetProperty(StremioLibraryLabel,Checking Stremio library…,Home)</onload>
+    <onload>RunScript(special://skin/extras/stremio_dispatch.py,library_ui.py,status)</onload>
     <defaultcontrol always="true">8000</defaultcontrol>
 	<onload condition="!String.IsEqual(ListItem.Property(tmdb_type),person)">SetFocus(8000)</onload>
 	<onload condition="String.IsEqual(ListItem.Property(tmdb_type),person)">SetFocus(2999,0)</onload>

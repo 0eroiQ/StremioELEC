@@ -1,17 +1,158 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- BINGIE -->
 <window>
-<defaultcontrol always="true">100</defaultcontrol>
-<controls>
-<control type="image"><left>0</left><top>0</top><width>1920</width><height>1080</height><texture colordiffuse="FF080808">white.png</texture></control>
-<control type="label"><left>150</left><top>65</top><width>1550</width><height>80</height><font>Bold40</font><label>StremioELEC Settings</label><textcolor>white</textcolor></control>
-<control type="grouplist" id="100"><left>150</left><top>185</top><width>1560</width><height>785</height><orientation>vertical</orientation><itemgap>10</itemgap>
-<control type="button" id="200"><width>1560</width><height>72</height><font>Reg30</font><textoffsetx>0</textoffsetx><align>center</align><textcolor>white</textcolor><focusedcolor>black</focusedcolor><texturefocus border="15" colordiffuse="FFFFFFFF">diffuse/bgpanel.png</texturefocus><texturenofocus border="15" colordiffuse="FF202020">diffuse/bgpanel.png</texturenofocus><label>Stremio account and addons</label><onclick>RunScript(special://skin/extras/stremio_dispatch.py,settings_ui.py,account)</onclick></control>
-<control type="button" id="201"><width>1560</width><height>72</height><font>Reg30</font><textoffsetx>0</textoffsetx><align>center</align><textcolor>white</textcolor><focusedcolor>black</focusedcolor><texturefocus border="15" colordiffuse="FFFFFFFF">diffuse/bgpanel.png</texturefocus><texturenofocus border="15" colordiffuse="FF202020">diffuse/bgpanel.png</texturenofocus><label>Home and layout</label><onclick>RunScript(special://skin/extras/stremio_dispatch.py,settings_ui.py,home)</onclick></control>
-<control type="button" id="202"><width>1560</width><height>72</height><font>Reg30</font><textoffsetx>0</textoffsetx><align>center</align><textcolor>white</textcolor><focusedcolor>black</focusedcolor><texturefocus border="15" colordiffuse="FFFFFFFF">diffuse/bgpanel.png</texturefocus><texturenofocus border="15" colordiffuse="FF202020">diffuse/bgpanel.png</texturenofocus><label>Catalogs and artwork</label><onclick>RunScript(special://skin/extras/stremio_dispatch.py,settings_ui.py,catalogs)</onclick></control>
-<control type="button" id="203"><width>1560</width><height>72</height><font>Reg30</font><textoffsetx>0</textoffsetx><align>center</align><textcolor>white</textcolor><focusedcolor>black</focusedcolor><texturefocus border="15" colordiffuse="FFFFFFFF">diffuse/bgpanel.png</texturefocus><texturenofocus border="15" colordiffuse="FF202020">diffuse/bgpanel.png</texturenofocus><label>Video and display</label><onclick>RunScript(special://skin/extras/stremio_dispatch.py,settings_ui.py,video)</onclick></control>
-<control type="button" id="204"><width>1560</width><height>72</height><font>Reg30</font><textoffsetx>0</textoffsetx><align>center</align><textcolor>white</textcolor><focusedcolor>black</focusedcolor><texturefocus border="15" colordiffuse="FFFFFFFF">diffuse/bgpanel.png</texturefocus><texturenofocus border="15" colordiffuse="FF202020">diffuse/bgpanel.png</texturenofocus><label>Audio</label><onclick>RunScript(special://skin/extras/stremio_dispatch.py,settings_ui.py,audio)</onclick></control>
-<control type="button" id="205"><width>1560</width><height>72</height><font>Reg30</font><textoffsetx>0</textoffsetx><align>center</align><textcolor>white</textcolor><focusedcolor>black</focusedcolor><texturefocus border="15" colordiffuse="FFFFFFFF">diffuse/bgpanel.png</texturefocus><texturenofocus border="15" colordiffuse="FF202020">diffuse/bgpanel.png</texturenofocus><label>Subtitles</label><onclick>RunScript(special://skin/extras/stremio_dispatch.py,settings_ui.py,subtitles)</onclick></control>
-<control type="button" id="206"><width>1560</width><height>72</height><font>Reg30</font><textoffsetx>0</textoffsetx><align>center</align><textcolor>white</textcolor><focusedcolor>black</focusedcolor><texturefocus border="15" colordiffuse="FFFFFFFF">diffuse/bgpanel.png</texturefocus><texturenofocus border="15" colordiffuse="FF202020">diffuse/bgpanel.png</texturenofocus><label>System</label><onclick>RunScript(special://skin/extras/stremio_dispatch.py,settings_ui.py,system)</onclick></control>
-<control type="button" id="207"><width>1560</width><height>72</height><font>Reg30</font><textoffsetx>0</textoffsetx><align>center</align><textcolor>white</textcolor><focusedcolor>black</focusedcolor><texturefocus border="15" colordiffuse="FFFFFFFF">diffuse/bgpanel.png</texturefocus><texturenofocus border="15" colordiffuse="FF202020">diffuse/bgpanel.png</texturenofocus><label>Maintenance and reset</label><onclick>RunScript(special://skin/extras/stremio_dispatch.py,settings_ui.py,maintenance)</onclick></control>
-<control type="button" id="208"><width>1560</width><height>72</height><font>Reg30</font><textoffsetx>0</textoffsetx><align>center</align><textcolor>white</textcolor><focusedcolor>black</focusedcolor><texturefocus border="15" colordiffuse="FFFFFFFF">diffuse/bgpanel.png</texturefocus><texturenofocus border="15" colordiffuse="FF202020">diffuse/bgpanel.png</texturenofocus><label>About StremioELEC</label><onclick>RunScript(special://skin/extras/stremio_dispatch.py,settings_ui.py,about)</onclick></control>
-</control></controls></window>
+    <defaultcontrol always="true">9000</defaultcontrol>
+    <include>DefaultSkinSettings</include>
+    <!--set trailer alarm off-->
+    <onload condition="System.HasAlarm(preview_delay)">CancelAlarm(preview_delay,silent)</onload>
+    <controls>
+        <!--Global Background-->
+        <include>GlobalBackground</include>
+		<!-- Now Playing -->
+		<include>NowPlayingBackground</include>
+        <!--Header-->
+        <include>Header</include>
+        <control type="group">
+            <include>animation_window_open_close</include>
+            <bottom>135</bottom>
+            <height>75%</height>
+            <!--Panel-->
+            <control type="image">
+                <posx>60</posx>
+                <width>1800</width>
+                <texture border="15">diffuse/bgpanel.png</texture>
+            <colordiffuse>$INFO[Skin.String(GeneralPanelsColor)]</colordiffuse>
+            </control>
+
+            <control type="image">
+                <posx>60</posx>
+                <width>560</width>
+                <texture border="15">diffuse/bgpanel.png</texture>
+                <colordiffuse>$INFO[Skin.String(GeneralPanelsColor)]</colordiffuse>
+            </control>
+
+            <!--Picture	(Fanart)-->
+            <control type="image">
+                <posx>90</posx>
+                <posy>30</posy>
+                <width>500</width>
+                <height>300</height>
+                <texture background="true">$INFO[Container(9000).ListItem.ActualIcon]</texture>
+                <aspectratio>scale</aspectratio>
+				<fadetime>350</fadetime>
+            </control>
+
+            <!--InfoText-->
+            <control type="textbox">
+                <posx>90</posx>
+                <posy>351</posy>
+                <width>500</width>
+                <height>270</height>
+                <font>Reg30</font>
+                <align>left</align>
+                <label>$INFO[Container(9000).ListItem.Label2]</label>
+            </control>
+
+            <!--List 9000-->
+            <control type="panel" id="9000">
+                <right>69</right>
+                <top>22</top>
+                <height>780</height>
+                <width>1208</width>
+                <orientation>vertical</orientation>
+                <onup>9000</onup>
+                <ondown>9000</ondown>
+                <preloaditems>4</preloaditems>
+                <itemlayout height="260" width="302">
+                    <control type="group">
+                        <width>288</width>
+                        <height>246</height>
+                        <include>SquarePosterPanelLayout</include>
+						<control type="textbox">
+							<left>15</left>
+							<right>15</right>
+							<bottom>8</bottom>
+							<height>38</height>
+							<align>center</align>
+							<aligny>center</aligny>
+							<label>[UPPERCASE]$INFO[ListItem.label][/UPPERCASE]</label>
+							<font>settings</font>
+							<autoscroll>false</autoscroll>
+							<textcolor>white</textcolor>
+						</control>
+                    </control>
+                </itemlayout>
+                <focusedlayout height="260" width="302">
+                    <control type="group">
+                        <width>288</width>
+                        <height>246</height>
+                        <include>SquarePosterPanelLayoutFocus</include>
+						<control type="textbox">
+							<left>15</left>
+							<right>15</right>
+							<bottom>8</bottom>
+							<height>38</height>
+							<align>center</align>
+							<aligny>center</aligny>
+							<label>[UPPERCASE]$INFO[ListItem.label][/UPPERCASE]</label>
+							<font>settings</font>
+							<autoscroll delay="2000" time="2000" repeat="2000">true</autoscroll>
+							<textcolor>white</textcolor>
+						</control>
+                    </control>
+                </focusedlayout>
+                <content>
+                    <item id="11">
+                        <description>Skin Settings</description>
+                        <label>$LOCALIZE[20077]</label>
+                        <label2>$LOCALIZE[31407]</label2>
+                        <onclick>activatewindow(skinsettings)</onclick>
+                        <icon>special://skin/extras/media/backgrounds/settings_bingie.jpg</icon>
+                        <thumb>addonskin.png</thumb>
+                    </item>
+
+
+
+                    <item id="4">
+                        <description>Player</description>
+                        <label>$LOCALIZE[14201]</label>
+                        <label2>$LOCALIZE[31402]</label2>
+                        <onclick>ActivateWindow(PlayerSettings)</onclick>
+                        <icon>special://skin/extras/media/backgrounds/settings_player_settings.jpg</icon>
+                        <thumb>player.png</thumb>
+                    </item>
+
+                    <item id="8">
+                        <description>Network/Services</description>
+                        <label>$LOCALIZE[14036]</label>
+                        <label2>$LOCALIZE[31405]</label2>
+                        <onclick>activatewindow(ServiceSettings)</onclick>
+                        <icon>special://skin/extras/media/backgrounds/settings_services.jpg</icon>
+                        <thumb>network.png</thumb>
+                    </item>
+                    <item id="9">
+                        <description>System</description>
+                        <label>$LOCALIZE[13000]</label>
+                        <label2>$LOCALIZE[31406]</label2>
+                        <onclick>activatewindow(SystemSettings)</onclick>
+                        <icon>special://skin/extras/media/backgrounds/settings_system.jpg</icon>
+                        <thumb>settings.png</thumb>
+                    </item>
+                    <item id="10">
+                        <description>System Info</description>
+                        <label>$LOCALIZE[130]</label>
+                        <label2>$LOCALIZE[31409]</label2>
+                        <onclick>activatewindow(7)</onclick>
+                        <icon>special://skin/extras/media/backgrounds/settings_system_info.jpg</icon>
+                        <thumb>cpu.png</thumb>
+                    </item>
+
+
+                <item id="90"><label>StremioELEC</label><label2>Account, addons, catalog APIs, updates and safe restore.</label2><onclick>ActivateWindow(1198)</onclick><icon>special://skin/extras/media/backgrounds/settings_bingie.jpg</icon><thumb>addonskin.png</thumb></item></content>
+            </control>
+
+        </control>
+
+        <include condition="Skin.HasSetting(DebugGrid) | Skin.HasSetting(DebugInfo)">DebugInfo</include>
+    </controls>
+</window>

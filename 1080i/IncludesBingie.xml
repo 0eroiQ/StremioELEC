@@ -69,9 +69,13 @@
 
     <!-- Fixed Focus Navigation Factory -->
     <include name="Fixed_Focus_Navigation_Factory">
-		<include content="Fixed_Focus_Navigation" condition="String.IsEqual(Skin.String(widgetstyle),landscape)">
+		<include content="Fixed_Focus_Navigation" condition="String.IsEqual(Skin.String(widgetstyle),landscape) + !Skin.HasSetting(StremioHideCardLabels)">
             <param name="widgetid" value="$PARAM[widgetid]"/>
             <param name="FixedAnimationHeight" value="-383"/>
+        </include>
+        <include content="Fixed_Focus_Navigation" condition="String.IsEqual(Skin.String(widgetstyle),landscape) + Skin.HasSetting(StremioHideCardLabels)">
+            <param name="widgetid" value="$PARAM[widgetid]"/>
+            <param name="FixedAnimationHeight" value="-293"/>
         </include>
         <include content="Fixed_Focus_Navigation" condition="String.IsEqual(Skin.String(widgetstyle),poster)">
             <param name="widgetid" value="$PARAM[widgetid]"/>
@@ -4093,4 +4097,3 @@
     </variable>
 	
 </includes>
-

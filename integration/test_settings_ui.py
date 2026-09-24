@@ -12,6 +12,14 @@ sys.path.insert(0, str(ADDON))
 
 
 class SettingsTests(unittest.TestCase):
+    def test_subtitle_color_palette(self):
+        for key in ('subtitles.colorpick', 'subtitles.bordercolorpick', 'subtitles.bgcolorpick', 'subtitles.shadowcolor'):
+            options = self.module.setting_options({'id': key, 'value': 'FFFFFFFF'})
+            self.assertEqual(len(options), 11)
+            self.assertIn({'label': 'Yellow', 'value': 'FFFFFF00'}, options)
+            for option in options:
+                self.assertRegex(option['value'], r'^FF[0-9A-F]{6}$')
+
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.xbmc = MagicMock()
@@ -40,6 +48,22 @@ class SettingsTests(unittest.TestCase):
             self.module.reset_account()
             prepare.assert_not_called()
             store.assert_not_called()
+
+    def test_cec_opens_device_settings_without_restarting(self):
+        with patch.object(self.module, 'choose', return_value=4):
+            self.module.run('system')
+        self.xbmc.executebuiltin.assert_called_once_with('ActivateWindow(peripherals)')
+
+    def test_navigation_sounds_toggle(self):
+        for current, expected in ((0, 1), (1, 0), (2, 0)):
+            with patch.object(self.module, 'choose', side_effect=[0, -1]), patch.object(self.module, 'get_setting', return_value=current), patch.object(self.module, 'rpc', return_value=True) as rpc:
+                self.module.navigation_sounds_menu()
+                rpc.assert_called_once_with('Settings.SetSettingValue', {'setting': 'audiooutput.guisoundmode', 'value': expected})
+
+    def test_navigation_cancel_does_not_change_sound(self):
+        with patch.object(self.module, 'choose', return_value=-1), patch.object(self.module, 'get_setting', return_value=1), patch.object(self.module, 'rpc') as rpc:
+            self.module.navigation_sounds_menu()
+            rpc.assert_not_called()
 
     def test_updates_open_only_our_updater(self):
         with patch.object(self.module, 'choose', return_value=1):
@@ -75,14 +99,20 @@ class SettingsTests(unittest.TestCase):
                              ['.', 'streams', 'playback', 'subtitle-results', 'setup'])
             self.xbmc.executebuiltin.assert_called_with('ReplaceWindow(1102)')
 
-    def test_original_settings_entries_absent(self):
+    def test_native_settings_restored_with_safe_entry_points(self):
         skin = ADDON.parent.parent / '1080i'
-        for name in ('Settings.xml', 'SkinSettings.xml'):
-            tree = ET.parse(skin / name)
-            actions = [node.text for node in tree.findall('.//onclick')]
-            self.assertEqual(len(actions), 9)
-            self.assertTrue(all('settings_ui.py,' in action for action in actions))
-            self.assertFalse(any('OpenSettings' in action for action in actions))
+        actions = [(n.text or '').lower() for n in ET.parse(skin / 'Settings.xml').findall('.//onclick')]
+        for allowed in ('playersettings', 'servicesettings', 'systemsettings', 'skinsettings', '1198'):
+            self.assertTrue(any(allowed in action for action in actions))
+        for blocked in ('addonbrowser', 'profiles', 'interfacesettings', 'mediasettings', 'gamesettings', 'filemanager'):
+            self.assertFalse(any(blocked in action for action in actions))
+        self.assertIn('SkinSettings_HomeLayout', (skin / 'SkinSettings.xml').read_text())
+        self.assertIn('settings_ui.py,account', (skin / 'Custom_1198_StremioSettings.xml').read_text())
+        settings = (skin / 'IncludesSkinSettings.xml').read_text()
+        self.assertNotIn('type=resetall', settings)
+        self.assertNotIn('action=RESTORE', settings)
+        self.assertNotIn('action=RESET', settings)
+        self.assertNotIn('value="plugin.video.tmdb.bingie.helper"', settings)
 
     def test_rejected_setting_is_not_reported_success(self):
         with patch.object(self.module, 'rpc', side_effect=[{'settings': [

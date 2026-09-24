@@ -59,7 +59,7 @@
 
 	<!-- My List Hub -->
     <shortcut>
-        <label>$LOCALIZE[31534]</label>
+        <label>My Library</label>
         <label2 />
         <icon>shortcuts/mylist.png</icon>
         <thumb />

@@ -87,8 +87,8 @@
         </control>
         <!-- Supported Addons -->
         <control type="togglebutton" id="31">
-            <label>$LOCALIZE[31194]</label>
-            <altlabel>$LOCALIZE[31194]</altlabel>
+            <label>StremioELEC</label>
+            <altlabel>StremioELEC</altlabel>
             <onfocus>SetProperty(SkinSettingSection,31,Home)</onfocus>
             <include condition="!Window.IsActive(Custom_1105_SkinSettings.xml)">SkinSettings_MenuButtonLarge</include>
             <include condition="Window.IsActive(Custom_1105_SkinSettings.xml)">SkinSettings_MenuButtonSmall</include>
@@ -105,8 +105,8 @@
         </control>
 		<!-- Backup & Restore -->
         <control type="togglebutton" id="14">
-            <label>$LOCALIZE[31271]</label>
-            <altlabel>$LOCALIZE[31271]</altlabel>
+            <label>Restore StremioELEC</label>
+            <altlabel>Restore StremioELEC</altlabel>
             <onfocus>SetProperty(SkinSettingSection,14,Home)</onfocus>
             <include condition="!Window.IsActive(Custom_1105_SkinSettings.xml)">SkinSettings_MenuButtonLarge</include>
             <include condition="Window.IsActive(Custom_1105_SkinSettings.xml)">SkinSettings_MenuButtonSmall</include>
@@ -391,7 +391,6 @@
             <label>$PARAM[labelprefix]$PARAM[label]</label>
             <label2>$INFO[Skin.String($PARAM[skinsetting].name)]             </label2>
             <onclick condition="System.HasAddon(script.skin.helper.colorpicker)">RunScript(script.skin.helper.colorpicker,action=COLORPICKER,skinstring=$PARAM[skinsetting],header=$PARAM[label],palette=$INFO[Skin.String(defaultcolorpalette)])</onclick>
-            <onclick condition="!System.HasAddon(script.skin.helper.colorpicker)">InstallAddon(script.skin.helper.colorpicker)</onclick>
             <visible>$PARAM[visible]</visible>
         </control>
     </include>
@@ -507,8 +506,6 @@
         <control type="radiobutton" id="31370">
             <include>SkinSettings_Button</include>
             <label>$LOCALIZE[31370]</label>
-			<onclick condition="!System.HasAddon(plugin.video.youtube) + String.IsEqual(Skin.String(trailersource),youtube) + String.IsEqual(Skin.String(AutoYoutubeTrailer),true)">InstallAddon(plugin.video.youtube)</onclick>
-			<onclick condition="!System.HasAddon(plugin.video.imdb.trailers) + String.IsEqual(Skin.String(trailersource),imdb) + String.IsEqual(Skin.String(AutoYoutubeTrailer),true)">InstallAddon(plugin.video.imdb.trailers)</onclick>
             <onclick condition="String.IsEqual(Skin.String(AutoYoutubeTrailer),false) | System.HasAddon(plugin.video.youtube) + String.IsEqual(Skin.String(trailersource),youtube) | System.HasAddon(plugin.video.imdb.trailers) + System.HasAddon(plugin.video.imdb.trailers)">Skin.ToggleSetting(SpotLightTrailers)</onclick>
             <selected>Skin.HasSetting(SpotLightTrailers)</selected>
             <visible>$EXP[StremioSpotlightEnabled]</visible>
@@ -517,8 +514,6 @@
         <control type="radiobutton" id="31173">
             <include>SkinSettings_Button</include>
             <label>$LOCALIZE[31173]</label>
-			<onclick condition="!System.HasAddon(plugin.video.youtube) + String.IsEqual(Skin.String(trailersource),youtube) + String.IsEqual(Skin.String(AutoYoutubeTrailer),true)">InstallAddon(plugin.video.youtube)</onclick>
-			<onclick condition="!System.HasAddon(plugin.video.imdb.trailers) + String.IsEqual(Skin.String(trailersource),imdb) + String.IsEqual(Skin.String(AutoYoutubeTrailer),true)">InstallAddon(plugin.video.imdb.trailers)</onclick>
             <onclick condition="String.IsEqual(Skin.String(AutoYoutubeTrailer),false) | System.HasAddon(plugin.video.youtube) + String.IsEqual(Skin.String(trailersource),youtube) | String.IsEqual(Skin.String(trailersource),imdb) + System.HasAddon(plugin.video.imdb.trailers)">Skin.ToggleSetting(BingieAutoTrailer)</onclick>
             <selected>Skin.HasSetting(BingieAutoTrailer)</selected>
         </control>	
@@ -628,7 +623,6 @@
 		<control type="radiobutton" id="31338">
             <include>SkinSettings_Button</include>
             <label>$LOCALIZE[31338]</label>
-			<onclick condition="!System.HasAddon(resource.images.studios.white)">InstallAddon(resource.images.studios.white)</onclick>
             <onclick condition="System.HasAddon(resource.images.studios.white)">Skin.ToggleSetting(PreferWhiteFooter)</onclick>
 			<selected>Skin.HasSetting(PreferWhiteFooter)</selected>
 			<visible>Skin.HasSetting(EnableRatings) | Skin.HasSetting(EnableStudioLogo)</visible>
@@ -1937,50 +1931,17 @@
 		<control type="label" id="6003">
             <height>5</height>
         </control>
-        <include content="SkinSettings_ActionButton">
-            <param name="id" value="31415" />
-            <param name="label" value="31415" />
-            <param name="action" value="RunScript(script.skinshortcuts,type=resetall)" />
-            <param name="visible" value="true" />
-        </include>
+        <control type="button" id="31415"><include>SkinSettings_Button</include><label>Restore StremioELEC layout</label><onclick>RunScript(special://skin/extras/stremio_dispatch.py,settings_ui.py,maintenance)</onclick></control>
     </include>
 
 
     <!-- Supported Addons Tab -->
     <!-- Supported Addons Settings -->
     <include name="Supported_Addons_Settings">
-        <control type="label" id="31194">
-            <include>SkinSettings_Header</include>
-            <label>$LOCALIZE[31194]</label>
-        </control>
-		<include content="SkinSettings_AddonButton">
-            <param name="id" value="300" />
-            <param name="addon" value="script.bingie.widgets" />
-        </include>
-        <include content="SkinSettings_AddonButton">
-            <param name="id" value="301" />
-            <param name="addon" value="script.skin.helper.skinbackup" />
-        </include>
-        <include content="SkinSettings_AddonButton">
-            <param name="id" value="302" />
-            <param name="addon" value="script.skinshortcuts" />
-        </include>
-        <include content="SkinSettings_AddonButton">
-            <param name="id" value="303" />
-            <param name="addon" value="plugin.program.autocompletion" />
-        </include>
-        <include content="SkinSettings_AddonButton">
-            <param name="id" value="304" />
-            <param name="addon" value="service.upnext" />
-        </include>
-		<include content="SkinSettings_AddonButton">
-            <param name="id" value="305" />
-            <param name="addon" value="plugin.video.tmdb.bingie.helper" />
-        </include>
-        <include content="SkinSettings_AddonButton">
-            <param name="id" value="306" />
-            <param name="addon" value="plugin.video.youtube" />
-        </include>
+<control type="button" id="300"><include>SkinSettings_Button</include><label>Stremio account and addons</label><onclick>RunScript(special://skin/extras/stremio_dispatch.py,settings_ui.py,account)</onclick></control>
+<control type="button" id="305"><include>SkinSettings_Button</include><label>Catalogs, ratings and API keys</label><onclick>RunScript(special://skin/extras/stremio_dispatch.py,settings_ui.py,catalogs)</onclick></control>
+<control type="button" id="306"><include>SkinSettings_Button</include><label>StremioELEC updates and device</label><onclick>RunScript(special://skin/extras/stremio_dispatch.py,settings_ui.py,system)</onclick></control>
+<control type="button" id="307"><include>SkinSettings_Button</include><label>Additional Stremio appearance options</label><onclick>RunScript(special://skin/extras/stremio_dispatch.py,settings_ui.py,home)</onclick></control>
     </include>
 
     <!-- Color Themes Tab -->
@@ -2005,8 +1966,7 @@
             <description>Select Theme</description>
             <label>$LOCALIZE[31368]</label>
             <include>SkinSettings_Button</include>
-            <onclick>RunScript(script.skin.helper.skinbackup,action=colorthemes)</onclick>
-            <onclick condition="!System.HasAddon(script.skin.helper.skinbackup)">InstallAddon(script.skin.helper.skinbackup)</onclick>
+            <visible>false</visible>
             <onclick>ClearProperty(startupDone,Home)</onclick>
         </control>
     </include>
@@ -2044,41 +2004,7 @@
     <!-- Backup Tab -->
     <!-- Backup Settings -->
     <include name="Backup_Settings">
-        <!-- backup and restore -->
-        <control type="label" id="31271">
-            <include>SkinSettings_Header</include>
-            <label>$LOCALIZE[31271]</label>
-        </control>
-        <include content="SkinSettings_ActionButton">
-            <param name="id" value="31367" />
-            <param name="label" value="31367" />
-            <param name="action" value="RunAddon(script.skin.helper.skinbackup)" />
-            <param name="visible" value="System.HasAddon(script.skin.helper.skinbackup)" />
-        </include>
-        <include content="SkinSettings_ActionButton">
-            <param name="id" value="31272" />
-            <param name="label" value="31272" />
-            <param name="action" value="RunScript(script.skin.helper.skinbackup,action=backup)" />
-            <param name="visible" value="System.HasAddon(script.skin.helper.skinbackup)" />
-        </include>
-        <include content="SkinSettings_ActionButton">
-            <param name="id" value="31273" />
-            <param name="label" value="31273" />
-            <param name="action" value="RunScript(script.skin.helper.skinbackup,action=RESTORE)" />
-            <param name="visible" value="System.HasAddon(script.skin.helper.skinbackup)" />
-        </include>
-        <include content="SkinSettings_ActionButton">
-            <param name="id" value="31274" />
-            <param name="label" value="31274" />
-            <param name="action" value="RunScript(script.skin.helper.skinbackup,action=RESET)" />
-            <param name="visible" value="System.HasAddon(script.skin.helper.skinbackup)" />
-        </include>
-        <include content="SkinSettings_ActionButton">
-            <param name="id" value="313671" />
-            <param name="label" value="31367" />
-            <param name="action" value="RunPlugin(plugin://script.skin.helper.skinbackup)" />
-            <param name="visible" value="!System.HasAddon(script.skin.helper.skinbackup)" />
-        </include>
+<control type="button" id="320"><include>SkinSettings_Button</include><label>Restore StremioELEC layout / reset</label><onclick>RunScript(special://skin/extras/stremio_dispatch.py,settings_ui.py,maintenance)</onclick></control>
     </include>
 
     <!-- General Tab -->

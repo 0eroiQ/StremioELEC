@@ -91,7 +91,7 @@ def prepare(profile, addon_path, force_home=False):
     # Record the original before touching any persistent setting.
     if not state:
         state = {'completed': False, 'device_policy': 'safe-unverified-hdmi', 'before': {}, 'applied': {}}
-        for key in ('audiooutput.passthrough', 'videoplayer.adjustrefreshrate', 'videoplayer.usedisplayasclock', 'subtitles.movie', 'subtitles.tv'):
+        for key in ('filelists.showparentdiritems', 'audiooutput.passthrough', 'videoplayer.adjustrefreshrate', 'videoplayer.usedisplayasclock', 'subtitles.movie', 'subtitles.tv'):
             state['before'][key] = get_setting(key)
         state_store.save(state)
     replace_backed_up(target, home_xml(), backups)
@@ -108,7 +108,8 @@ def prepare(profile, addon_path, force_home=False):
     # Preserve platform decoder defaults, resolution and output device.
     # Until HDMI is verified use decoded audio and avoid automatic mode changes.
     if not state.get('completed'):
-        for key, value in [('audiooutput.passthrough', False),
+        for key, value in [('filelists.showparentdiritems', False),
+                           ('audiooutput.passthrough', False),
                            ('videoplayer.adjustrefreshrate', 0),
                            ('videoplayer.usedisplayasclock', False)]:
             if state['before'].get(key) is not None:

@@ -18,8 +18,12 @@ DIALOG = xbmcgui.Dialog()
 HOME = 'special://profile/addon_data/script.skinshortcuts/skin.stremio-10000-1.DATA.xml'
 
 COLORS = [('White', 'FFFFFFFF'), ('Yellow', 'FFFFFF00'), ('Light gray', 'FFCCCCCC'),
-          ('Black', 'FF000000'), ('Cyan', 'FF00FFFF')]
-APPEARANCE = [('PreferTvShowThumbWidget', 'Use show artwork for episodes'),
+          ('Black', 'FF000000'), ('Cyan', 'FF00FFFF'), ('Green', 'FF00FF00'),
+          ('Red', 'FFFF0000'), ('Blue', 'FF0000FF'), ('Orange', 'FFFFA500'),
+          ('Pink', 'FFFFC0CB'), ('Magenta', 'FFFF00FF')]
+APPEARANCE = [('StremioHideCardLabels', 'Hide card names and details'),
+              ('StremioHideCardGenres', 'Hide genres / secondary text under cards'),
+              ('PreferTvShowThumbWidget', 'Use show artwork for episodes'),
               ('EnableColorDetailsIcons', 'Colored detail icons'),
               ('EnableStudioLogo', 'Studio logos'),
               ('AutoCloseVideoOSD', 'Automatically hide playback controls'),
@@ -32,7 +36,7 @@ def setting_options(setting):
     options = setting.get('options') or setting.get('definition', {}).get('options', [])
     if options:
         return options
-    if setting.get('id') in ('subtitles.colorpick', 'subtitles.bordercolorpick', 'subtitles.bgcolorpick'):
+    if setting.get('id') in ('subtitles.colorpick', 'subtitles.bordercolorpick', 'subtitles.bgcolorpick', 'subtitles.shadowcolor'):
         return [{'label': label, 'value': value} for label, value in COLORS]
     if isinstance(setting.get('value'), (int, float)) and not isinstance(setting.get('value'), bool):
         if all(key in setting for key in ('minimum', 'maximum', 'step')):
@@ -120,8 +124,11 @@ def display_value(value):
 
 
 def helper_menu():
-    selection = choose('Catalogs and artwork', ['Catalog and artwork options', 'TMDb trailer API key'])
+    selection = choose('Catalogs and artwork', ['Catalog and artwork options', 'TMDb trailer API key', 'Ratings'])
     if selection < 0:
+        return
+    if selection == 2:
+        ratings_menu()
         return
     if selection == 1:
         action = choose('TMDb trailer API key', ['Replace key (stored locally)', 'Remove key (use existing trailer list)'])
@@ -165,6 +172,52 @@ def helper_menu():
             selected = choose(labels[index], names)
             if selected >= 0:
                 helper.setSetting(key, options[selected].text)
+
+
+def ratings_menu():
+    toggles = [('EnableRatings', 'Show ratings'),
+               ('EnableStudioLogo', 'Show studio logos'),
+               ('PreferWhiteFooter', 'White ratings / studio logos'),
+               ('EnableTop250WhiteLabel', 'White Top 250 label'),
+               ('details_row_rating', 'Rating in details row'),
+               ('DisableRatingsPlotCritics', 'Hide ratings / critics in plot'),
+               ('videoinfo_button_myrating', 'My rating button in info')]
+    selectors = [('ratings', 'Choose ratings and awards'),
+                 ('footer_visibility', 'Ratings visibility'),
+                 ('top250_visibility', 'Top 250 visibility')]
+    while True:
+        values = [xbmc.getCondVisibility('Skin.HasSetting(' + key + ')') for key, _ in toggles]
+        labels = [label + ': ' + display_value(value) for (_, label), value in zip(toggles, values)]
+        index = choose('Ratings', labels + [label for _, label in selectors] + ['Details rating color', 'Ratings API keys (MDBList / OMDb)'])
+        if index < 0:
+            return
+        if index < len(toggles):
+            key = toggles[index][0]
+            if key == 'PreferWhiteFooter' and not values[index] and not xbmc.getCondVisibility('System.HasAddon(resource.images.studios.white)'):
+                DIALOG.ok('White studio logos', 'The white studio artwork pack is not included on this device. No addon will be installed automatically.')
+                continue
+            xbmc.executebuiltin(('Skin.Reset(' if values[index] else 'Skin.SetBool(') + key + ')')
+        elif index < len(toggles) + len(selectors):
+            key, label = selectors[index - len(toggles)]
+            xbmc.executebuiltin('RunScript(script.bingie.toolbox,action=setskinsetting,setting=' + key + ',header=' + label + ')')
+            return
+        elif index == len(toggles) + len(selectors):
+            color = choose('Details rating color', [label for label, _ in COLORS])
+            if color >= 0:
+                xbmc.executebuiltin('Skin.SetString(BingieRatingInDetailsColor,' + COLORS[color][1] + ')')
+        else:
+            helper = xbmcaddon.Addon('plugin.video.tmdb.bingie.helper')
+            selected = choose('Ratings API keys', ['MDBList', 'OMDb'])
+            if selected < 0:
+                continue
+            key = ('mdblist_apikey', 'omdb_apikey')[selected]
+            action = choose('API key', ['Replace key (stored locally)', 'Remove key'])
+            if action == 0:
+                value = DIALOG.input('New API key', type=xbmcgui.INPUT_ALPHANUM, option=xbmcgui.ALPHANUM_HIDE_INPUT)
+                if value.strip():
+                    helper.setSetting(key, value.strip())
+            elif action == 1 and DIALOG.yesno('Remove API key', 'Remove this key from the device?'):
+                helper.setSetting(key, '')
 
 
 def home_menu():
@@ -212,6 +265,9 @@ def appearance_menu():
             return
         key = APPEARANCE[index][0]
         xbmc.executebuiltin(('Skin.Reset(' if state[index] else 'Skin.SetBool(') + key + ')')
+        if key == 'StremioHideCardLabels':
+            xbmc.executebuiltin('ReloadSkin()')
+            return
 
 
 def reset_account():
@@ -240,25 +296,101 @@ def account_menu():
         DIALOG.ok('Connected Stremio addons', '\n'.join(p.get('manifest', {}).get('name', 'Stremio addon') for p in providers) or 'No addons imported.')
 
 
+def navigation_sounds_menu():
+    while True:
+        mode = get_setting('audiooutput.guisoundmode')
+        if mode is None:
+            DIALOG.ok('Navigation sounds', 'This option is not available on this device.')
+            return
+        index = choose('Navigation sounds', ['Navigation sounds: ' + ('Off' if mode == 0 else 'On'), 'Volume'])
+        if index < 0:
+            return
+        if index == 0:
+            # Kodi mode 1 plays UI sounds only when media playback is stopped.
+            if not rpc('Settings.SetSettingValue', {'setting': 'audiooutput.guisoundmode', 'value': 1 if mode == 0 else 0}):
+                raise RuntimeError('Navigation sound setting was rejected')
+        else:
+            edit_kodi('audiooutput.guisoundvolume', 'Navigation sound volume')
+
+
+def remote_control_menu():
+    entries = [('services.webserver', 'Allow remote control via HTTP'),
+               ('services.esenabled', 'Application control'),
+               ('services.esallinterfaces', 'Allow applications on other systems'),
+               ('services.zeroconf', 'Announce device on local network')]
+    while True:
+        values = [get_setting(key) for key, _ in entries]
+        index = choose('Remote control', [label + ': ' + display_value(value) for (_, label), value in zip(entries, values)] +
+                       ['HTTP username', 'Change HTTP password', 'HTTP port', 'Connection information'])
+        if index < 0:
+            return
+        if index < 4:
+            key, label = entries[index]
+            if values[index] is None:
+                DIALOG.ok('Remote control', 'This service is not available on this device.')
+                continue
+            if not values[index] and index in (0, 2):
+                if not DIALOG.yesno('Remote control', 'Allow control from your local network? Use only on a trusted network. Application control does not use the HTTP password. Do not forward these ports on your router.'):
+                    continue
+            if index == 0 and not values[index]:
+                if not get_setting('services.webserverusername', '') or not get_setting('services.webserverpassword', ''):
+                    DIALOG.ok('Remote control', 'Set an HTTP username and password before enabling HTTP control.')
+                    continue
+                if not rpc('Settings.SetSettingValue', {'setting': 'services.webserverauthentication', 'value': True}):
+                    raise RuntimeError('Authentication could not be enabled')
+            if index == 2 and not values[index]:
+                if not rpc('Settings.SetSettingValue', {'setting': 'services.esenabled', 'value': True}):
+                    raise RuntimeError('Application control could not be enabled')
+            if not rpc('Settings.SetSettingValue', {'setting': key, 'value': not values[index]}):
+                raise RuntimeError('Remote control setting rejected')
+        elif index in (4, 5, 6):
+            key = {4: 'services.webserverusername', 5: 'services.webserverpassword', 6: 'services.webserverport'}[index]
+            value = DIALOG.input({4: 'HTTP username', 5: 'New HTTP password', 6: 'HTTP port'}[index],
+                                 type=xbmcgui.INPUT_NUMERIC if index == 6 else xbmcgui.INPUT_ALPHANUM,
+                                 option=xbmcgui.ALPHANUM_HIDE_INPUT if index == 5 else 0)
+            if not value:
+                continue
+            if index == 6:
+                if not value.isdigit() or not 1024 <= int(value) <= 65535:
+                    DIALOG.ok('HTTP port', 'Choose a port from 1024 to 65535.')
+                    continue
+                value = int(value)
+            if not rpc('Settings.SetSettingValue', {'setting': key, 'value': value}):
+                raise RuntimeError('Remote control setting rejected')
+        else:
+            DIALOG.ok('Remote app connection', 'IP: ' + xbmc.getInfoLabel('Network.IPAddress') +
+                      '\nHTTP port: ' + str(get_setting('services.webserverport')) +
+                      '\nUsername: ' + str(get_setting('services.webserverusername', '')) +
+                      '\nUse the password you set here. Connect the phone to the same local network.')
+
+
 def run(section):
     if section == 'account':
         account_menu()
     elif section == 'home':
-        index = choose('Home and appearance', ['Choose and order Home rows', 'Appearance'])
+        index = choose('Home and appearance', ['Choose and order Home rows', 'Appearance', 'Card layout: Posters / Landscapes'])
         if index == 0:
             home_menu()
         elif index == 1:
             appearance_menu()
+        elif index == 2:
+            xbmc.executebuiltin('RunScript(script.bingie.toolbox,action=setskinsetting,setting=widgetstyle,header=Card layout)')
     elif section == 'catalogs':
         helper_menu()
     elif section == 'audio':
+        index = choose('Audio', ['Navigation sounds', 'Playback audio'])
+        if index == 0:
+            navigation_sounds_menu()
+            return
+        if index < 0:
+            return
         kodi_menu('Audio', [('audiooutput.audiodevice', 'Output device'), ('audiooutput.channels', 'Channels'), ('locale.audiolanguage', 'Preferred language'), ('audiooutput.passthrough', 'Passthrough'), ('audiooutput.passthroughdevice', 'Passthrough device'), ('audiooutput.ac3passthrough', 'Dolby Digital capable receiver'), ('audiooutput.eac3passthrough', 'Dolby Digital Plus capable receiver'), ('audiooutput.dtspassthrough', 'DTS capable receiver'), ('audiooutput.truehdpassthrough', 'TrueHD capable receiver'), ('audiooutput.dtshdpassthrough', 'DTS-HD capable receiver')])
     elif section == 'video':
         kodi_menu('Video and display', [('videoscreen.resolution', 'Resolution'), ('videoscreen.screenmode', 'Display mode'), ('videoplayer.adjustrefreshrate', 'Match frame rate'), ('videoplayer.usedisplayasclock', 'Sync playback to display'), ('videoplayer.usevtb', 'VideoToolbox hardware decoding'), ('videoplayer.usemediacodec', 'MediaCodec hardware decoding'), ('videoplayer.usemediacodecsurface', 'MediaCodec surface'), ('videoplayer.usevaapi', 'VAAPI hardware decoding'), ('videoplayer.usedxva2', 'DXVA hardware decoding')])
     elif section == 'subtitles':
-        kodi_menu('Subtitles', [('locale.subtitlelanguage', 'Preferred language'), ('subtitles.languages', 'Download languages'), ('subtitles.downloadfirst', 'Automatically download first subtitle'), ('subtitles.fontsize', 'Text size'), ('subtitles.fontname', 'Font'), ('subtitles.style', 'Text style'), ('subtitles.colorpick', 'Text color'), ('subtitles.align', 'Position'), ('subtitles.backgroundtype', 'Background style'), ('subtitles.bordercolorpick', 'Border color'), ('subtitles.overridestyles', 'Override subtitle styles')])
+        kodi_menu('Subtitles', [('locale.subtitlelanguage', 'Preferred language'), ('subtitles.languages', 'Download languages'), ('subtitles.downloadfirst', 'Automatically download first subtitle'), ('subtitles.fontsize', 'Text size'), ('subtitles.fontname', 'Font'), ('subtitles.style', 'Text style'), ('subtitles.colorpick', 'Subtitle color'), ('subtitles.align', 'Position'), ('subtitles.backgroundtype', 'Background style'), ('subtitles.bordercolorpick', 'Border color'), ('subtitles.bgcolorpick', 'Background color'), ('subtitles.shadowcolor', 'Shadow color'), ('subtitles.overridestyles', 'Override subtitle styles')])
     elif section == 'system':
-        index = choose('System', ['System information', 'Updates', 'Restart', 'Power off'])
+        index = choose('System', ['System information', 'Updates', 'Restart', 'Power off', 'HDMI-CEC / TV remote', 'Remote control / Kodi remote apps'])
         if index == 0:
             DIALOG.ok('StremioELEC', 'Kodi engine: ' + xbmc.getInfoLabel('System.BuildVersion') + '\nIP: ' + xbmc.getInfoLabel('Network.IPAddress'))
         elif index == 1:
@@ -266,7 +398,12 @@ def run(section):
                 xbmc.executebuiltin('RunScript(special://xbmc/addons/service.stremioelec.updates/ui.py)')
             else:
                 DIALOG.ok('StremioELEC updates', 'Updates are available on the StremioELEC OS image. This development runtime has no system updater.')
-        elif index > 1 and DIALOG.yesno('StremioELEC', 'This affects the whole device. Continue?'):
+        elif index == 5:
+            remote_control_menu()
+        elif index == 4:
+            DIALOG.ok('HDMI-CEC / TV remote', 'Select your CEC adapter, then set the HDMI port used on your TV. For a direct connection, HDMI 3 uses physical address 3000. Do not use this address if connected through an AV receiver.')
+            xbmc.executebuiltin('ActivateWindow(peripherals)')
+        elif index in (2, 3) and DIALOG.yesno('StremioELEC', 'This affects the whole device. Continue?'):
             xbmc.executebuiltin('Reboot' if index == 2 else 'Powerdown')
     elif section == 'maintenance':
         index = choose('Maintenance', ['Restore default Home (10 rows)', 'Reset login and Home / return to welcome'])

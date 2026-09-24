@@ -2194,7 +2194,7 @@ msgid "Trailers settings"
 msgstr ""
 
 msgctxt "#31534"
-msgid "My list"
+msgid "My Library"
 msgstr ""
 
 msgctxt "#31535"

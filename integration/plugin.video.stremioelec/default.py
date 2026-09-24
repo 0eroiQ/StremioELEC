@@ -1,6 +1,8 @@
 """Kodi entry point. No account writes, library mutations or torrent engine."""
 import sys
 import time
+import re
+import json
 from urllib.parse import parse_qsl, urlencode, urlsplit
 
 import xbmcaddon
@@ -12,6 +14,7 @@ import xbmcplugin
 from protocol import base_url, catalogs, fetch, resource_url
 from account import AccountError, Store, create_link, read_link, pull_addons, pull_library, library_rows
 from sources import collect, direct_url
+from continue_playback import button_label, resume_seconds
 
 HANDLE = int(sys.argv[1])
 BASE = sys.argv[0]
@@ -69,8 +72,11 @@ def item(meta):
     info.setTitle(meta.get('name', ''))
     info.setPlot(meta.get('description', ''))
     info.setMediaType('tvshow' if meta.get('type') == 'series' else 'movie')
+    if re.fullmatch(r'tt[0-9]+', str(meta.get('id', ''))):
+        info.setUniqueIDs({'imdb': meta['id']}, 'imdb')
     entry.setArt({key: value for key, value in {
-        'poster': meta.get('poster'), 'thumb': meta.get('background') or meta.get('poster'),
+        'poster': meta.get('poster'), 'thumb': meta.get('landscape') or meta.get('background') or 'DefaultVideo.png',
+        'landscape': meta.get('landscape') or meta.get('background') or 'DefaultVideo.png',
         'fanart': meta.get('background'), 'clearlogo': meta.get('logo')
     }.items() if isinstance(value, str)})
     return entry
@@ -178,17 +184,49 @@ def run(params):
             xbmcplugin.addDirectoryItem(HANDLE, route(action='provider', provider=addon['id']),
                                        xbmcgui.ListItem(label=label), True)
     elif action in ('library', 'continue'):
+        from artwork import enrich
         xbmcplugin.setContent(HANDLE, 'videos')
-        for saved in library_rows(STORE.load().get('library', []), action == 'continue'):
-            meta = dict(saved, id=saved['_id'])
+        state = STORE.load()
+        if action == 'library' and params.get('hub') == '1' and params.get('refresh') == '1':
+            if not state.get('token'):
+                raise AccountError('Connect to Stremio to open My Library.')
+            try:
+                state['library'] = pull_library(state['token'])
+                STORE.save(state)
+            except AccountError:
+                xbmcgui.Dialog().notification('My Library', 'Offline — showing the last synced library')
+        rows = library_rows(state.get('library', []), action == 'continue')
+        # Home is bounded; keep the full Library browsable.
+        if action == 'continue':
+            rows = rows[:20]
+        enriched = enrich(rows, state.get('addons', []), STORE.directory / 'artwork')
+        if action == 'library' and params.get('hub') == '1':
+            from library_filters import select_rows
+            genres = sorted({g for r in enriched for g in (r.get('genres') or []) if isinstance(g, str)})
+            xbmcgui.Window(10000).setProperty('LibraryGenres', json.dumps(genres))
+            enriched = select_rows(enriched, params.get('kind', 'all'), params.get('sort', 'recent'), params.get('genre', ''))
+        for meta in enriched:
+            saved = meta
             entry = item(meta)
             progress = saved['state']
             video = progress.get('video_id')
             if action == 'continue' and (saved['type'] == 'movie' or video):
-                target = route(action='streams', kind=saved['type'], id=video or saved['_id'])
+                target = route(action='streams', kind=saved['type'], id=video or saved['_id'],
+                               resume_ms=str(int(resume_seconds(progress.get('timeOffset')) * 1000)))
+                entry.setProperty('StremioContinuePath', target)
+                entry.setProperty('StremioContinueLabel', button_label(saved))
                 entry.setProperty('StremioResumeMilliseconds', str(progress.get('timeOffset', 0)))
+                # The info dialog uses the item's folder for More episodes.
+                # Keep that route at show level; Play has its own exact stream route.
+                if saved['type'] == 'series':
+                    target = route(action='meta', kind='series', id=saved['_id'])
             else:
                 target = route(action='meta', kind=saved['type'], id=saved['_id'])
+            # Use the same season/episode browser as Bingie catalog titles.
+            # Exact IMDb lookup only: never guess another show from its title.
+            if saved['type'] == 'series' and re.fullmatch(r'tt[0-9]+', saved['_id']):
+                target = 'plugin://plugin.video.tmdb.bingie.helper/?' + urlencode({
+                    'info': 'seasons', 'tmdb_type': 'tv', 'imdb_id': saved['_id']})
             xbmcplugin.addDirectoryItem(HANDLE, target, entry, True)
     elif action == 'provider':
         manifest = descriptor['manifest'] if descriptor else fetch(manifest_url)
@@ -239,7 +277,8 @@ def run(params):
         cached = {}
         for stream in playable:
             key = secrets.token_hex(16)
-            cached[key] = dict(stream, kind=params['kind'], id=params['id'])
+            cached[key] = dict(stream, kind=params['kind'], id=params['id'],
+                               resume_ms=int(resume_seconds(params.get('resume_ms')) * 1000))
             entry = xbmcgui.ListItem(label=stream['label'])
             entry.setProperty('IsPlayable', 'true')
             xbmcplugin.addDirectoryItem(HANDLE, route(action='play', key=key), entry, False)
@@ -258,6 +297,8 @@ def run(params):
         if time.time() - cache.get('created', 0) > 3600 or not direct_url({'url': url}):
             raise ValueError('Source expired; reopen the stream list')
         entry = xbmcgui.ListItem(path=url)
+        if isinstance(stream, dict) and resume_seconds(stream.get('resume_ms')):
+            entry.setProperty('StartOffset', str(resume_seconds(stream['resume_ms'])))
         if isinstance(stream, dict):
             from subtitles import prepare_selected
             try:

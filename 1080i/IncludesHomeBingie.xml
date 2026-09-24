@@ -3,7 +3,14 @@
 <includes>
     <!-- Keep original Bingie geometry; Stremio leaves only the next row heading at the bottom. -->
     <include name="StremioHomeRowPosition">
+        <include condition="Skin.HasSetting(StremioHideCardLabels) + String.IsEqual(Skin.String(widgetstyle),landscape)">StremioCompactHomeRowPosition</include>
+        <include condition="!Skin.HasSetting(StremioHideCardLabels) | !String.IsEqual(Skin.String(widgetstyle),landscape)">StremioNormalHomeRowPosition</include>
+    </include>
+    <include name="StremioNormalHomeRowPosition">
         <top>649</top>
+    </include>
+    <include name="StremioCompactHomeRowPosition">
+        <top>739</top>
     </include>
     <include name="OriginalBingieHomeRowPosition">
         <top>564</top>
@@ -742,6 +749,10 @@
 				</control>
                 <!-- Footer -->
 				<control type="group">
+						<!-- Landscape cards sit lower; keep their ratings close to the row. -->
+                        <animation effect="slide" end="0,115" time="150" condition="Skin.HasSetting(StremioView) + String.IsEqual(Skin.String(widgetstyle),landscape) + !$EXP[IsCurrentWidgetSpotlight]">Conditional</animation>
+                        <!-- Poster row is 90px above compact landscape: 115 - 90 = 25. -->
+                        <animation effect="slide" end="0,25" time="150" condition="Skin.HasSetting(StremioView) + String.IsEqual(Skin.String(widgetstyle),poster) + !$EXP[IsCurrentWidgetSpotlight]">Conditional</animation>
 						<visible>!Window.IsActive(DialogVideoInfo.xml)</visible>
 						<include>Animation_Right_Home</include>
 						<include>Bingie_Footer</include>
@@ -781,6 +792,15 @@
                 <include condition="Window.IsActive(1113)">skinshortcuts-template-customhub</include>
                 <include condition="Window.IsActive(1114)">skinshortcuts-template-mylisthub</include>
 				<include condition="Window.IsActive(1120)">skinshortcuts-template-musichub</include>				
+            </control>
+            <!-- Compact rows: retain the next heading, conceal its artwork. -->
+            <control type="image">
+                <visible>Skin.HasSetting(StremioView) + Skin.HasSetting(StremioHideCardLabels) + String.IsEqual(Skin.String(widgetstyle),landscape) + [Window.IsActive(Home) | $EXP[IsBingieHubsActive]]</visible>
+                <left>0</left>
+                <top>1074</top>
+                <width>2070</width>
+                <height>6</height>
+                <texture colordiffuse="FF000000">colors/color_white.png</texture>
             </control>
 			
 			<include condition="String.IsEqual(Skin.String(widgetstyle),poster) + !Skin.HasSetting(DisableDummySpotlight)">SpotlightDummyPosterWidget</include>
