@@ -238,7 +238,7 @@
                     <align>center</align>
                     <label>$LOCALIZE[518]</label>
 					<include>DialogButtonOther</include>
-					<visible>Control.IsEnabled(12)</visible>
+					<visible>false</visible>
                 </control>
 				
 				<control type="button" id="9">
@@ -248,7 +248,7 @@
                     <align>center</align>
                     <label>$LOCALIZE[24020]</label>
 					<include>DialogButtonOther</include>
-					<visible>Control.IsEnabled(9)</visible>
+					<visible>false</visible>
                 </control>
 				
 				<control type="button" id="10">
@@ -258,7 +258,7 @@
                     <align>center</align>
                     <label>$LOCALIZE[39024]</label>
                     <include>DialogButtonOther</include>
-                    <visible>Control.IsEnabled(10)</visible>
+                    <visible>false</visible>
                 </control>
 				
 				<control type="button" id="14">
@@ -268,7 +268,7 @@
                     <align>center</align>
                     <label>$LOCALIZE[24069]</label>
                     <include>DialogButtonOther</include>
-                    <visible>Control.IsEnabled(14)</visible>
+                    <visible>false</visible>
                 </control>
 				
 				<control type="togglebutton" id="22112">
@@ -305,7 +305,7 @@
                     <align>center</align>
                     <label>$LOCALIZE[24069]</label>
 					<include>DialogButtonOther</include>
-					<visible>Control.IsEnabled(8)</visible>
+					<visible>false</visible>
                 </control>
               
                 <control type="radiobutton" id="13">
@@ -318,7 +318,7 @@
                     <label>$LOCALIZE[21340]</label>
 					<textwidth>160</textwidth>
 					<include>DialogButtonOther</include>
-                    <visible>Control.IsEnabled(13)</visible>
+                    <visible>false</visible>
                 </control>
 
 				<control type="button" id="7">
@@ -328,7 +328,7 @@
                     <align>center</align>
                     <label>$LOCALIZE[24021]</label>
 					<include>DialogButtonOther</include>
-					<visible>Control.IsEnabled(7)</visible>
+					<visible>false</visible>
                 </control>				
 				
 				<control type="button" id="6">
@@ -338,7 +338,7 @@
                     <align>center</align>
                     <label>$LOCALIZE[24022]</label>
 					<include>DialogButtonOther</include>
-					<visible>Control.IsEnabled(6)</visible>
+					<visible>false</visible>
                 </control>                           								               
             </control>
             <!--Arrows-->
