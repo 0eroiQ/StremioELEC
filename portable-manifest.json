@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "kodi_major": 21,
+  "mode": "portable",
+  "repository_branch": "portable-repository-test",
+  "install_first": "repository.stremioelec.test-0.1.0.zip",
+  "addons": {
+    "plugin.video.stremioelec": "0.7.0",
+    "skin.stremio": "2.2.0",
+    "service.stremioelec.portable": "0.1.0"
+  },
+  "excluded_os_components": [
+    "inputstream.adaptive",
+    "repository.slyguy",
+    "script.module.slyguy",
+    "slyguy.dependencies",
+    "slyguy.trailers"
+  ]
+}

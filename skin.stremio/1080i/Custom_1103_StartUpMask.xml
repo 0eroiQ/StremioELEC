@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<window type="dialog" id="1103">
-    <!-- Keep startup state handling without the upstream intro image/video. -->
-    <onload>ClearProperty(StartupMask,Home)</onload>
-    <visible>!String.IsEmpty(Window(Home).Property(StartupMask))</visible>
-    <controls />
-</window>
