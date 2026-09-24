@@ -89,8 +89,11 @@ def pull_addons(token):
         if url in seen:
             continue
         seen.add(url)
-        addons.append({'id': hashlib.sha256(url.encode()).hexdigest(),
-                       'transportUrl': url, 'manifest': manifest})
+        item = {'id': hashlib.sha256(url.encode()).hexdigest(),
+                'transportUrl': url, 'manifest': manifest}
+        if isinstance(descriptor.get('flags'), dict):
+            item['flags'] = descriptor['flags']
+        addons.append(item)
     return addons, skipped
 
 
