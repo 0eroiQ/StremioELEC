@@ -5,6 +5,9 @@ from urllib.parse import urlsplit, urlunsplit
 from account import AccountError, request
 from protocol import fetch
 
+COMMUNITY_CATALOG = 'https://v3-cinemeta.strem.io/addon_catalog/all/community.json'
+COMMUNITY_LIMIT = 2000
+
 
 def normalize_manifest_url(value):
     value = (value or '').strip()
@@ -43,9 +46,9 @@ def make_descriptor(url, manifest, flags=None):
     return result
 
 
-def install_local(state, url, fetcher=fetch):
+def install_descriptor_local(state, url, manifest):
     url = normalize_manifest_url(url)
-    manifest = validate_manifest(fetcher(url))
+    manifest = validate_manifest(manifest)
     descriptor = make_descriptor(url, manifest)
     descriptor['account'] = False
     addons = list(state.get('addons', []))
@@ -58,6 +61,72 @@ def install_local(state, url, fetcher=fetch):
     disabled.discard(descriptor['id'])
     state['disabledAddons'] = sorted(disabled)
     return descriptor
+
+
+def install_local(state, url, fetcher=fetch):
+    url = normalize_manifest_url(url)
+    return install_descriptor_local(state, url, fetcher(url))
+
+
+def _resource_names(manifest):
+    result = set()
+    for item in manifest.get('resources', []):
+        if isinstance(item, str):
+            result.add(item)
+        elif isinstance(item, dict) and isinstance(item.get('name'), str):
+            result.add(item['name'])
+    return result
+
+
+def community_catalog(fetcher=fetch):
+    payload = fetcher(COMMUNITY_CATALOG)
+    rows = payload.get('addons') if isinstance(payload, dict) else None
+    if not isinstance(rows, list) or len(rows) > COMMUNITY_LIMIT:
+        raise ValueError('Invalid community addon catalog')
+    valid, seen = [], set()
+    for row in rows:
+        try:
+            if not isinstance(row, dict):
+                raise ValueError()
+            url = normalize_manifest_url(row.get('transportUrl', ''))
+            manifest = validate_manifest(row.get('manifest'))
+            key = (manifest.get('id'), url)
+            if key in seen:
+                continue
+            seen.add(key)
+            valid.append({'transportUrl': url, 'manifest': manifest})
+        except (TypeError, ValueError):
+            continue
+    return sorted(valid, key=lambda item: item['manifest'].get('name', '').casefold())
+
+
+def filter_community(rows, category='all', query=''):
+    query = (query or '').strip().casefold()
+    result = []
+    for row in rows:
+        manifest = row.get('manifest', {})
+        resources = _resource_names(manifest)
+        types = {str(v).casefold() for v in manifest.get('types', []) if isinstance(v, str)}
+        if category == 'movies' and not types.intersection({'movie', 'series', 'anime'}):
+            continue
+        if category == 'subtitles' and 'subtitles' not in resources:
+            continue
+        if category == 'catalogs' and 'catalog' not in resources:
+            continue
+        if category == 'live' and not types.intersection({'tv', 'channel'}):
+            continue
+        if category == 'streams' and 'stream' not in resources:
+            continue
+        haystack = ' '.join([
+            str(manifest.get('name', '')),
+            str(manifest.get('description', '')),
+            ' '.join(sorted(resources)),
+            ' '.join(sorted(types)),
+        ]).casefold()
+        if query and query not in haystack:
+            continue
+        result.append(row)
+    return result
 
 
 def remove_local(state, identity):
