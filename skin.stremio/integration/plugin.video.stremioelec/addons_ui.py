@@ -244,7 +244,7 @@ def addon_actions(dialog):
         except Exception:
             dialog.ok('Stremio Addons', 'Stremio account was not changed.')
             return
-        state['addons'] = remote
+        state['addons'] = merge_account(state, remote)
         state['disabledAddons'] = sorted(set(state.get('disabledAddons', [])) - {identity})
         STORE.save(state)
         publish('Removed from Stremio account')
