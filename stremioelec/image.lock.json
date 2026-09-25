@@ -10,7 +10,7 @@
   "libreelec": {
     "version": "12.2.1",
     "source_commit": "6209f5a3b067c45fbf527286dd84ee483294b46a",
-    "url": "https://releases.libreelec.tv/LibreELEC-Generic.x86_64-12.2.1.img.gz",
+    "url": "https://ftp.halifax.rwth-aachen.de/libreelec/LibreELEC-Generic.x86_64-12.2.1.img.gz",
     "sha256": "85fcac13e046858a142a3161f45771073fa9d3b4a836e5fa4890c4f924a386b8"
   },
   "skin": {
