@@ -1,7 +1,7 @@
 import sys, unittest
 from pathlib import Path
 sys.path.insert(0,str(Path(__file__).parent/'plugin.video.stremioelec'))
-from weather import apply,condition,search,wind_direction
+from weather import apply,condition,search,wind_direction,normalize_country,country_code
 class FakeWindow:
     def __init__(self): self.values={}
     def setProperty(self,k,v): self.values[k]=v
@@ -9,6 +9,32 @@ class WeatherTest(unittest.TestCase):
     def test_search(self):
         rows=search('Perth',fetcher=lambda _:{'results':[{'name':'Perth','admin1':'Western Australia','country':'Australia','latitude':-31.95,'longitude':115.86}]})
         self.assertEqual(rows[0]['label'],'Perth, Western Australia, Australia')
+    def test_australian_postcode_uses_bundled_index(self):
+        import tempfile
+        from pathlib import Path
+        with tempfile.TemporaryDirectory() as tmp:
+            path=Path(tmp)/'AU.txt'
+            path.write_text(
+                'AU\t6000\tPerth\tWestern Australia\tWA\tVincent\t\t\t\t-31.9522\t115.8614\t4\n'
+                'AU\t6000\tCity Delivery Centre\tWestern Australia\tWA\tVincent\t\t\t\t-31.9522\t115.8614\t4\n'
+            )
+            rows=search('6000',country='Australia (24h)',postcode_path=path,
+                        fetcher=lambda _: (_ for _ in ()).throw(AssertionError('network geocoder should not be used')))
+        self.assertEqual(rows[0]['label'],'Perth 6000, Western Australia, Australia')
+        self.assertEqual(rows[0]['country_code'],'AU')
+        self.assertAlmostEqual(rows[0]['latitude'],-31.9522)
+
+    def test_country_filter_is_sent_for_city_search(self):
+        urls=[]
+        rows=search('Perth',country='Australia (24h)',
+                    fetcher=lambda url:(urls.append(url) or {'results':[{
+                        'name':'Perth','admin1':'Western Australia','country':'Australia',
+                        'country_code':'AU','latitude':-31.95,'longitude':115.86}]}))
+        self.assertIn('countryCode=AU',urls[0])
+        self.assertEqual(rows[0]['label'],'Perth, Western Australia, Australia')
+        self.assertEqual(normalize_country('Australia (24h)'),'Australia')
+        self.assertEqual(country_code('Australia (24h)'),'AU')
+
     def test_codes(self):
         self.assertEqual(condition(0),('Clear sky','32')); self.assertEqual(wind_direction(270),'W')
     def test_apply(self):

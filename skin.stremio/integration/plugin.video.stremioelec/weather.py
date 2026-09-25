@@ -3,14 +3,39 @@
 Part of the StremioELEC SYSTEM runtime. No Kodi weather addon or API key.
 """
 import json
+import re
 import time
 from datetime import datetime
+from pathlib import Path
 from urllib.parse import urlencode, urlsplit
 from urllib.request import Request, urlopen
 
 GEOCODE='https://geocoding-api.open-meteo.com/v1/search'
 FORECAST='https://api.open-meteo.com/v1/forecast'
 ALLOWED={'geocoding-api.open-meteo.com','api.open-meteo.com'}
+GEONAMES_AU = Path(__file__).resolve().parent / 'resources' / 'geonames' / 'AU.txt'
+COUNTRY_CODES = {
+    'australia': 'AU',
+    'new zealand': 'NZ',
+    'usa': 'US',
+    'united states': 'US',
+    'united kingdom': 'GB',
+    'canada': 'CA',
+    'ireland': 'IE',
+    'germany': 'DE',
+    'france': 'FR',
+    'italy': 'IT',
+    'spain': 'ES',
+    'netherlands': 'NL',
+    'switzerland': 'CH',
+    'austria': 'AT',
+    'croatia': 'HR',
+    'bosnia and herzegovina': 'BA',
+    'serbia': 'RS',
+    'montenegro': 'ME',
+    'north macedonia': 'MK',
+    'slovenia': 'SI',
+}
 WMO={
 0:('Clear sky','32'),1:('Mainly clear','34'),2:('Partly cloudy','30'),3:('Overcast','26'),
 45:('Fog','20'),48:('Rime fog','20'),51:('Light drizzle','9'),53:('Drizzle','9'),55:('Heavy drizzle','9'),
@@ -31,15 +56,93 @@ def fetch_json(url,timeout=12):
     if not isinstance(out,dict): raise ValueError('Invalid weather response')
     return out
 
-def search(query,fetcher=fetch_json):
-    if not isinstance(query,str) or not query.strip(): return []
-    data=fetcher(GEOCODE+'?'+urlencode({'name':query.strip(),'count':8,'language':'en','format':'json'}))
+def normalize_country(region):
+    """Return a plain country name from Kodi region labels such as Australia (24h)."""
+    if not isinstance(region, str):
+        return ''
+    return re.sub(r'\s*\([^)]*\)\s*$', '', region).strip()
+
+
+def country_code(region):
+    return COUNTRY_CODES.get(normalize_country(region).casefold(), '')
+
+
+def _au_postcode_search(postcode, path=GEONAMES_AU):
+    """Resolve Australian postcodes from the bundled GeoNames postal dataset."""
+    if not re.fullmatch(r'\d{4}', str(postcode or '').strip()):
+        return []
+    target = str(postcode).strip()
+    rows = []
+    try:
+        with Path(path).open(encoding='utf-8', errors='replace') as stream:
+            for line in stream:
+                parts = line.rstrip('\n').split('\t')
+                if len(parts) < 11 or parts[0] != 'AU' or parts[1] != target:
+                    continue
+                try:
+                    lat, lon = float(parts[9]), float(parts[10])
+                except (TypeError, ValueError):
+                    continue
+                place = parts[2].strip()
+                admin1 = parts[3].strip()
+                label = ', '.join(v for v in (place + ' ' + target, admin1, 'Australia') if v)
+                rows.append({
+                    'label': label,
+                    'latitude': lat,
+                    'longitude': lon,
+                    'country_code': 'AU',
+                    'postcode': target,
+                    'place': place,
+                })
+    except OSError:
+        return []
+
+    # Put normal locality names before delivery-centre/GPO records and de-duplicate labels.
+    def rank(row):
+        name = row.get('place', '').casefold()
+        service = any(token in name for token in ('delivery centre', ' gpo', 'boxes', 'bc '))
+        return (1 if service else 0, len(name), name)
+
+    output, seen = [], set()
+    for row in sorted(rows, key=rank):
+        key = row['label'].casefold()
+        if key in seen:
+            continue
+        seen.add(key)
+        output.append(row)
+        if len(output) >= 8:
+            break
+    return output
+
+
+def search(query, country='', fetcher=fetch_json, postcode_path=GEONAMES_AU):
+    if not isinstance(query,str) or not query.strip():
+        return []
+    query = query.strip()
+    country_name = normalize_country(country)
+    code = country_code(country_name)
+
+    if code == 'AU' and re.fullmatch(r'\d{4}', query):
+        rows = _au_postcode_search(query, postcode_path)
+        if rows:
+            return rows
+
+    params = {'name': query, 'count': 8, 'language': 'en', 'format': 'json'}
+    if code:
+        params['countryCode'] = code
+    elif country_name:
+        params['name'] = query + ', ' + country_name
+    data=fetcher(GEOCODE+'?'+urlencode(params))
     rows=[]
     for item in data.get('results') or []:
         lat,lon=item.get('latitude'),item.get('longitude')
-        if not isinstance(lat,(int,float)) or not isinstance(lon,(int,float)): continue
+        if not isinstance(lat,(int,float)) or not isinstance(lon,(int,float)):
+            continue
+        if code and str(item.get('country_code','')).upper() not in ('', code):
+            continue
         label=', '.join(str(v) for v in (item.get('name'),item.get('admin1'),item.get('country')) if v)
-        rows.append({'label':label or query.strip(),'latitude':float(lat),'longitude':float(lon)})
+        rows.append({'label':label or query,'latitude':float(lat),'longitude':float(lon),
+                     'country_code':str(item.get('country_code','')).upper()})
     return rows
 
 def forecast(latitude,longitude,fetcher=fetch_json):

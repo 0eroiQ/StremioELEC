@@ -255,7 +255,8 @@ def weather_menu():
         if not query.strip():
             continue
         try:
-            rows = search(query.strip())
+            region = rpc('Settings.GetSettingValue', {'setting': 'locale.country'}).get('value', '')
+            rows = search(query.strip(), country=region)
         except Exception:
             DIALOG.ok('Weather', 'Location search failed. Check the network connection and retry.')
             continue
