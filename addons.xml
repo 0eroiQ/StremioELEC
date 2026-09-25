@@ -19,7 +19,7 @@
   <requires>
     <import addon="xbmc.python" version="3.0.0" />
     <import addon="plugin.video.stremioelec" version="0.9.2" />
-    <import addon="skin.stremio" version="3.1.1" />
+    <import addon="skin.stremio" version="3.1.2" />
   </requires>
   <extension point="xbmc.service" library="service.py" />
   <extension point="xbmc.python.script" library="control.py">
@@ -32,7 +32,7 @@
     <license>GPL-2.0-or-later</license>
     <source>https://github.com/0eroiQ/StremioELEC</source>
   </extension>
-</addon><addon id="skin.stremio" version="3.1.1" name="StremioELEC" provider-name="0eroiQ, matke">
+</addon><addon id="skin.stremio" version="3.1.2" name="StremioELEC" provider-name="0eroiQ, matke">
   <requires>
         <import version="5.17.0" addon="xbmc.gui" />
         <import addon="plugin.video.stremioelec" />
