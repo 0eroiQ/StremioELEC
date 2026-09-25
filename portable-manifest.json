@@ -5,9 +5,9 @@
   "repository_branch": "portable-repository-test",
   "install_first": "repository.stremioelec.test-0.2.0.zip",
   "addons": {
-    "plugin.video.stremioelec": "0.9.1",
+    "plugin.video.stremioelec": "0.9.2",
     "skin.stremio": "3.1.1",
-    "service.stremioelec.portable": "0.3.1"
+    "service.stremioelec.portable": "0.3.2"
   },
   "third_party_addons": []
 }
