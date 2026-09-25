@@ -1,8 +1,8 @@
 {
   "schema": 1,
-  "version": "0.4.0-test.3",
+  "version": "0.4.0-test.4",
   "update_schema": 1,
-  "sequence": 14,
+  "sequence": 15,
   "addons_sequence": 13,
   "kodi_major": 21,
   "libreelec_major": 12,

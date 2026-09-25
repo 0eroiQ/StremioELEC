@@ -43,6 +43,11 @@ class DispatchTests(unittest.TestCase):
             spec.loader.exec_module(module)
         self.assertIn('weather.py', module.SCRIPTS)
 
+    def test_system_core_uses_explicit_addon_identity(self):
+        source = (ROOT / 'integration/plugin.video.stremioelec/default.py').read_text()
+        self.assertIn("xbmcaddon.Addon('plugin.video.stremioelec')", source)
+        self.assertNotIn('xbmcaddon.Addon()', source)
+
     def test_skin_has_no_assumed_bridge_directory(self):
         for path in (ROOT / '1080i').glob('*.xml'):
             self.assertNotIn('special://home/addons/plugin.video.stremioelec/', path.read_text(), path.name)

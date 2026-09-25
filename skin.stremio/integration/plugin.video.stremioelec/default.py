@@ -26,7 +26,7 @@ from metadata_bridge import (details as metadata_details, people as metadata_peo
 
 HANDLE = int(sys.argv[1])
 BASE = sys.argv[0]
-ADDON = xbmcaddon.Addon()
+ADDON = xbmcaddon.Addon('plugin.video.stremioelec')
 MANIFEST = ADDON.getSetting('manifest').strip()
 HOME_MANIFEST = 'https://v3-cinemeta.strem.io/manifest.json'
 STORE = Store(xbmcvfs.translatePath(ADDON.getAddonInfo('profile')))
