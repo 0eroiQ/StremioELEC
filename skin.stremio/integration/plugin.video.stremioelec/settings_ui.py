@@ -16,6 +16,8 @@ ADDON = xbmcaddon.Addon('plugin.video.stremioelec')
 PROFILE = Path(xbmcvfs.translatePath(ADDON.getAddonInfo('profile')))
 DIALOG = xbmcgui.Dialog()
 HOME = 'special://profile/addon_data/script.skinshortcuts/skin.stremio-10000-1.DATA.xml'
+SETTINGS_COMMAND_WINDOW_ID = 1198
+SETTINGS_RUNTIME_WINDOW_ID = 11198
 
 COLORS = [('White', 'FFFFFFFF'), ('Yellow', 'FFFFFF00'), ('Light gray', 'FFCCCCCC'),
           ('Black', 'FF000000'), ('Cyan', 'FF00FFFF'), ('Green', 'FF00FF00'),
@@ -159,7 +161,7 @@ def setting_summary(setting):
 
 
 def sync_window():
-    window = xbmcgui.Window(1198)
+    window = xbmcgui.Window(SETTINGS_RUNTIME_WINDOW_ID)
     definitions = {s['id']: s for s in rpc('Settings.GetSettings', {'level': 'expert'}).get('settings', [])}
     for key, prop in SETTINGS_WINDOW_PROPERTIES.items():
         setting = definitions.get(key)

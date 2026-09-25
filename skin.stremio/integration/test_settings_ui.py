@@ -248,6 +248,14 @@ class SettingsTests(unittest.TestCase):
         tree = ET.parse(ADDON.parent.parent / '1080i/SettingsCategory.xml')
         self.assertIn('ReplaceWindow(1198)', [n.text for n in tree.findall('onload')])
 
+    def test_settings_properties_use_kodi_runtime_custom_window_id(self):
+        self.assertEqual(self.module.SETTINGS_COMMAND_WINDOW_ID, 1198)
+        self.assertEqual(self.module.SETTINGS_RUNTIME_WINDOW_ID, 11198)
+        with patch.object(self.module, 'rpc', return_value={'settings': []}),              patch.object(self.module, 'Store') as store:
+            store.return_value.load.return_value = {}
+            self.module.sync_window()
+        self.gui.Window.assert_called_with(11198)
+
 
 if __name__ == '__main__':
     unittest.main()

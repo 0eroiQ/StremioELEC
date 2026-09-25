@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<addon id="skin.stremio" version="3.1.1" name="StremioELEC" provider-name="0eroiQ, matke">
+<addon id="skin.stremio" version="3.1.2" name="StremioELEC" provider-name="0eroiQ, matke">
   <requires>
         <import version="5.17.0" addon="xbmc.gui" />
         <import addon="plugin.video.stremioelec" />

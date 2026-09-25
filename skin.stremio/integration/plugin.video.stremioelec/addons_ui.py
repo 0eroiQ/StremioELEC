@@ -18,6 +18,9 @@ from addons_core import (account_addons, active_addons, community_catalog, confi
 WINDOW_ID = 1196
 CONFIG_WINDOW_ID = 1195
 COMMUNITY_WINDOW_ID = 1194
+WINDOW_RUNTIME_ID = 11196
+CONFIG_WINDOW_RUNTIME_ID = 11195
+COMMUNITY_WINDOW_RUNTIME_ID = 11194
 ADDON = xbmcaddon.Addon('plugin.video.stremioelec')
 PROFILE = Path(xbmcvfs.translatePath(ADDON.getAddonInfo('profile')))
 STORE = Store(PROFILE)
@@ -27,7 +30,7 @@ def publish(status=None):
     state = STORE.load()
     total = len(state.get('addons', []))
     enabled = len(active_addons(state))
-    window = xbmcgui.Window(WINDOW_ID)
+    window = xbmcgui.Window(WINDOW_RUNTIME_ID)
     window.setProperty('StremioAddons.Count', str(total))
     window.setProperty('StremioAddons.Enabled', str(enabled))
     window.setProperty('StremioAddons.Status', status or
@@ -69,7 +72,7 @@ def finish_install(state, descriptor, dialog):
 
 
 def refresh_community():
-    window = xbmcgui.Window(COMMUNITY_WINDOW_ID)
+    window = xbmcgui.Window(COMMUNITY_WINDOW_RUNTIME_ID)
     try:
         window.setFocusId(50)
     except Exception:
@@ -78,7 +81,7 @@ def refresh_community():
 
 
 def community_init():
-    window = xbmcgui.Window(COMMUNITY_WINDOW_ID)
+    window = xbmcgui.Window(COMMUNITY_WINDOW_RUNTIME_ID)
     if not window.getProperty('StremioCommunity.Category'):
         window.setProperty('StremioCommunity.Category', 'all')
     if window.getProperty('StremioCommunity.Query') is None:
@@ -90,7 +93,7 @@ def community_filter(category):
     allowed = {'all', 'movies', 'streams', 'subtitles', 'catalogs', 'live'}
     if category not in allowed:
         return
-    window = xbmcgui.Window(COMMUNITY_WINDOW_ID)
+    window = xbmcgui.Window(COMMUNITY_WINDOW_RUNTIME_ID)
     window.setProperty('StremioCommunity.Category', category)
     window.setProperty('StremioCommunity.Query', '')
     window.setProperty('StremioCommunity.Status', 'Loading ' + category + ' addons…')
@@ -98,7 +101,7 @@ def community_filter(category):
 
 
 def community_search(dialog):
-    window = xbmcgui.Window(COMMUNITY_WINDOW_ID)
+    window = xbmcgui.Window(COMMUNITY_WINDOW_RUNTIME_ID)
     query = dialog.input('Search Community Addons',
                          defaultt=window.getProperty('StremioCommunity.Query'),
                          type=xbmcgui.INPUT_ALPHANUM).strip()
@@ -139,7 +142,7 @@ def show_config(manifest, transport_url, dialog):
         PROFILE.mkdir(parents=True, exist_ok=True)
         path = PROFILE / 'addon-configure-qr.png'
         qrcode.make(url).save(str(path))
-        window = xbmcgui.Window(CONFIG_WINDOW_ID)
+        window = xbmcgui.Window(CONFIG_WINDOW_RUNTIME_ID)
         window.setProperty('StremioAddonConfig.Name', manifest.get('name', 'Stremio addon'))
         window.setProperty('StremioAddonConfig.URL', url)
         window.setProperty('StremioAddonConfig.QR', str(path))

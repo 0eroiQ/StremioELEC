@@ -29,6 +29,7 @@ BASE = sys.argv[0]
 ADDON = xbmcaddon.Addon('plugin.video.stremioelec')
 MANIFEST = ADDON.getSetting('manifest').strip()
 HOME_MANIFEST = 'https://v3-cinemeta.strem.io/manifest.json'
+COMMUNITY_RUNTIME_WINDOW_ID = 11194
 STORE = Store(xbmcvfs.translatePath(ADDON.getAddonInfo('profile')))
 
 
@@ -283,7 +284,7 @@ def run(params):
         return
 
     if action == 'community_catalog':
-        window = xbmcgui.Window(1194)
+        window = xbmcgui.Window(COMMUNITY_RUNTIME_WINDOW_ID)
         category = window.getProperty('StremioCommunity.Category') or 'all'
         query = window.getProperty('StremioCommunity.Query')
         cache = Store(STORE.directory / 'community')

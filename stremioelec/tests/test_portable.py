@@ -48,7 +48,7 @@ class PortableKodiTests(unittest.TestCase):
         deps = [item.get('addon') for item in node.findall('requires/import')
                 if not item.get('addon', '').startswith('xbmc.')]
         self.assertEqual(deps, ['plugin.video.stremioelec'])
-        self.assertEqual(node.get('version'), '3.1.1')
+        self.assertEqual(node.get('version'), '3.1.2')
 
     def test_skin_xml_declaration_is_standard(self):
         first = (ROOT / 'skin.stremio/addon.xml').read_text().splitlines()[0]
