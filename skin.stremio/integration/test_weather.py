@@ -35,6 +35,14 @@ class WeatherTest(unittest.TestCase):
         self.assertEqual(normalize_country('Australia (24h)'),'Australia')
         self.assertEqual(country_code('Australia (24h)'),'AU')
 
+    def test_forecast_payload_timezone_can_drive_kodi_region(self):
+        from weather import forecast
+        urls=[]
+        payload=forecast(-31.9522,115.8614,fetcher=lambda url:(
+            urls.append(url) or {'timezone':'Australia/Perth'}))
+        self.assertEqual(payload['timezone'],'Australia/Perth')
+        self.assertIn('timezone=auto',urls[0])
+
     def test_codes(self):
         self.assertEqual(condition(0),('Clear sky','32')); self.assertEqual(wind_direction(270),'W')
     def test_apply(self):

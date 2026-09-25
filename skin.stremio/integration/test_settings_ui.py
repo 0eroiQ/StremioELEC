@@ -67,6 +67,30 @@ class SettingsTests(unittest.TestCase):
             self.module.navigation_sounds_menu()
             rpc.assert_not_called()
 
+    def test_weather_location_syncs_kodi_timezone(self):
+        import weather
+        self.dialog.input.return_value = '6000'
+        row = {'label': 'Perth 6000, Western Australia, Australia',
+               'latitude': -31.9522, 'longitude': 115.8614}
+        calls = []
+        def rpc(method, params=None):
+            calls.append((method, params))
+            if method == 'Settings.GetSettingValue':
+                return {'value': 'Australia (24h)'}
+            if method == 'Settings.SetSettingValue':
+                return True
+            if method == 'Settings.GetSettings':
+                return {'settings': []}
+            return {}
+        with patch.object(self.module, 'choose', side_effect=[0, 0, -1]),              patch.object(self.module, 'rpc', side_effect=rpc),              patch.object(self.module, 'sync_window'),              patch.object(weather, 'search', return_value=[row]),              patch.object(weather, 'refresh', return_value={'timezone': 'Australia/Perth'}):
+            self.module.weather_menu()
+        self.assertIn(
+            ('Settings.SetSettingValue',
+             {'setting': 'locale.timezone', 'value': 'Australia/Perth'}),
+            calls)
+        self.module.ADDON.setSetting.assert_any_call(
+            'weather_location', 'Perth 6000, Western Australia, Australia')
+
     def test_updates_open_only_our_updater(self):
         def visibility(expr):
             return expr == 'System.HasAddon(service.stremioelec.updates)'

@@ -463,7 +463,7 @@
     </variable>
 	
 	<variable name="DefSpotlightWidgetContent">
-		<value condition="Library.HasContent(Movies) | Library.HasContent(TVShows)">plugin://script.bingie.widgets/?action=random&amp;mediatype=media&amp;limit=5</value>
+		<value condition="Library.HasContent(Movies) | Library.HasContent(TVShows)">plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=movie&amp;id=imdbRating</value>
         <value condition="!Library.HasContent(Movies) + !Library.HasContent(TVShows)">plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=movie&amp;id=imdbRating</value>
     </variable>
 	
@@ -478,14 +478,14 @@
     </variable>
 	
 	<variable name="DefSpotlightNewHubContent">
-		<value condition="Library.HasContent(Movies) | Library.HasContent(TVShows)">plugin://script.bingie.widgets/?action=newrelease&amp;mediatype=media&amp;limit=5</value>
+		<value condition="Library.HasContent(Movies) | Library.HasContent(TVShows)">plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=movie&amp;id=year</value>
         <value condition="!Library.HasContent(Movies) + !Library.HasContent(TVShows)">plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=movie&amp;id=year</value>
     </variable>
 	
 	<variable name="DefWidgetContent">
         <value condition="Skin.HasSetting(StremioHomeDefaults)">plugin://plugin.video.stremioelec/?action=continue</value>
 		<value condition="System.HasAddon(plugin.video.stremioelec) + Skin.HasSetting(StremioCatalogPilot)">plugin://plugin.video.stremioelec/?action=catalog&amp;kind=movie&amp;id=top</value>
-		<value condition="Library.HasContent(Movies) | Library.HasContent(TVShows)">plugin://script.bingie.widgets/?action=inprogressnextepisode&amp;mediatype=media&amp;limit=25&amp;reload=$INFO[Window(Home).Property(widgetreload)]</value>
+		<value condition="Library.HasContent(Movies) | Library.HasContent(TVShows)">plugin://plugin.video.stremioelec/?action=continue</value>
         <value condition="!Library.HasContent(Movies) + !Library.HasContent(TVShows)">plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=movie&amp;id=top</value>
     </variable>
 	
@@ -497,7 +497,7 @@
 	
 	<variable name="DefWidget1Content">
         <value condition="Skin.HasSetting(StremioHomeDefaults)">plugin://plugin.video.stremioelec/?action=library</value>
-		<value condition="Library.HasContent(Movies) | Library.HasContent(TVShows)">plugin://script.bingie.widgets/?action=recent&amp;mediatype=media&amp;limit=25&amp;reload=$INFO[Window(Home).Property(widgetreload)]</value>
+		<value condition="Library.HasContent(Movies) | Library.HasContent(TVShows)">plugin://plugin.video.stremioelec/?action=library</value>
         <value condition="!Library.HasContent(Movies) + !Library.HasContent(TVShows)">plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=series&amp;id=top</value>
     </variable>
 	
@@ -520,7 +520,7 @@
     </variable>
 	
 	<variable name="DefWidget3Content">
-		<value condition="Library.HasContent(Movies) | Library.HasContent(TVShows)">plugin://script.bingie.widgets/?action=forgenre&amp;mediatype=media&amp;limit=25&amp;reload=$INFO[Window(Home).Property(widgetreload)]</value>
+		<value condition="Library.HasContent(Movies) | Library.HasContent(TVShows)">plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=series&amp;id=imdbRating</value>
         <value condition="!Library.HasContent(Movies) + !Library.HasContent(TVShows)">plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=series&amp;id=imdbRating</value>
     </variable>
 	
@@ -540,12 +540,12 @@
     </variable>
 	
 	<variable name="DefWidget5Content">
-		<value condition="Library.HasContent(Movies) | Library.HasContent(TVShows)">plugin://script.bingie.widgets/?action=similar&amp;mediatype=media&amp;limit=25&amp;reload=$INFO[Window(Home).Property(widgetreload)]</value>
+		<value condition="Library.HasContent(Movies) | Library.HasContent(TVShows)">plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=movie&amp;id=imdbRating</value>
 		<value condition="!Library.HasContent(Movies) + !Library.HasContent(TVShows)">plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=series&amp;id=imdbRating</value>
 	</variable>
 	
 	<variable name="DefWidget5Name">
-		<value condition="Library.HasContent(Movies) | Library.HasContent(TVShows)">$ADDON[script.bingie.widgets 32011]</value>
+		<value condition="Library.HasContent(Movies) | Library.HasContent(TVShows)">Recommended</value>
 		<value condition="!Library.HasContent(Movies) + !Library.HasContent(TVShows)">$LOCALIZE[31443]</value>
     </variable>
 	
@@ -580,7 +580,7 @@
     </variable>
 	
 	<variable name="DefTVShowHubContent">
-		<value condition="Library.HasContent(Movies) | Library.HasContent(TVShows)">plugin://script.bingie.widgets/?action=inprogress&amp;mediatype=episodes&amp;reload=$INFO[Window(Home).Property(widgetreload)]</value>
+		<value condition="Library.HasContent(Movies) | Library.HasContent(TVShows)">plugin://plugin.video.stremioelec/?action=continue</value>
 		<value condition="!Library.HasContent(Movies) + !Library.HasContent(TVShows)">plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=series&amp;id=top</value>
 	</variable>
 	
@@ -610,7 +610,7 @@
     </variable>
 	
 	<variable name="DefNewHubContent">
-		<value condition="Library.HasContent(Movies) | Library.HasContent(TVShows)">plugin://script.bingie.widgets/?action=recent&amp;mediatype=media&amp;reload=$INFO[Window(Home).Property(widgetreload)]</value>
+		<value condition="Library.HasContent(Movies) | Library.HasContent(TVShows)">plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=movie&amp;id=year</value>
 		<value condition="!Library.HasContent(Movies) + !Library.HasContent(TVShows)">plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=movie&amp;id=year</value>
 	</variable>
 	
@@ -620,7 +620,7 @@
     </variable>
 	
 	<variable name="DefNewHub1Content">
-		<value condition="Library.HasContent(Movies) | Library.HasContent(TVShows)">plugin://script.bingie.widgets/?action=popular&amp;mediatype=media&amp;reload=$INFO[Window(Home).Property(widgetreload)]</value>
+		<value condition="Library.HasContent(Movies) | Library.HasContent(TVShows)">plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=series&amp;id=top</value>
 		<value condition="!Library.HasContent(Movies) + !Library.HasContent(TVShows)">plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=series&amp;id=year</value>
 	</variable>
 	
@@ -650,7 +650,7 @@
     </variable>
 	
 	<variable name="DefSomethingHubContent">
-		<value condition="Library.HasContent(Movies) | Library.HasContent(TVShows)">plugin://script.bingie.widgets/?action=random&amp;mediatype=media&amp;reload=$INFO[Window(Home).Property(widgetreload)]</value>
+		<value condition="Library.HasContent(Movies) | Library.HasContent(TVShows)">plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=movie&amp;id=top</value>
 		<value condition="!Library.HasContent(Movies) + !Library.HasContent(TVShows)">plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=movie&amp;id=top</value>
 	</variable>
 	

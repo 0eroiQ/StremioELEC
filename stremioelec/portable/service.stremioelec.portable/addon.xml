@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<addon id="service.stremioelec.portable" name="StremioELEC for Kodi" version="0.3.3" provider-name="0eroiQ">
+<addon id="service.stremioelec.portable" name="StremioELEC for Kodi" version="0.3.4" provider-name="0eroiQ">
   <requires>
     <import addon="xbmc.python" version="3.0.0" />
-    <import addon="plugin.video.stremioelec" version="0.9.3" />
-    <import addon="skin.stremio" version="3.1.2" />
+    <import addon="plugin.video.stremioelec" version="0.9.4" />
+    <import addon="skin.stremio" version="3.1.3" />
   </requires>
   <extension point="xbmc.service" library="service.py" />
   <extension point="xbmc.python.script" library="control.py">

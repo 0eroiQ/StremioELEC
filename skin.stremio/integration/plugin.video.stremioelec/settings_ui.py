@@ -270,7 +270,19 @@ def weather_menu():
         ADDON.setSetting('weather_location', row['label'])
         ADDON.setSetting('weather_lat', str(row['latitude']))
         ADDON.setSetting('weather_lon', str(row['longitude']))
-        refresh(force=True)
+        payload = refresh(force=True) or {}
+        timezone = str(payload.get('timezone') or '').strip()
+        if timezone:
+            result = rpc('Settings.SetSettingValue', {
+                'setting': 'locale.timezone',
+                'value': timezone,
+            })
+            if result is False:
+                DIALOG.notification(
+                    'Region & Location',
+                    'Weather location saved, but Kodi rejected the time zone.')
+            else:
+                sync_window()
 
 
 def home_menu():

@@ -3,6 +3,7 @@
 <includes>
     <!-- seasons content for view525 -->
     <variable name="View525SeasonsContent">
+        <value condition="[String.IsEqual(ListItem.DBType,episode) | Container.Content(episodes)] + !String.IsEmpty(ListItem.Property(StremioSeriesID))">$INFO[ListItem.Property(StremioSeriesID),plugin://plugin.video.stremioelec/?action=seasons&amp;kind=series&amp;id=,]</value>
         <value condition="[String.IsEqual(ListItem.DBType,episode) | Container.Content(episodes)] + !String.IsEmpty(ListItem.DBID) + !String.IsEmpty(Window(Home).Property(ListItem.TVShowID))">$INFO[Window(Home).Property(ListItem.TVShowID),videodb://tvshows/titles/,/]</value>
         <value/>
     </variable>
@@ -537,7 +538,7 @@
                     <height>390</height>  				
                     <!-- Seasons list -->
                     <control type="list" id="5250">
-                        <visible allowhiddenfocus="true">Container(525).Content(episodes) + !String.IsEmpty(Container(525).ListItem.DBID)</visible>
+                        <visible allowhiddenfocus="true">Container(525).Content(episodes) + [!String.IsEmpty(Container(525).ListItem.DBID) | !String.IsEmpty(Container(525).ListItem.Property(StremioSeriesID))]</visible>
                         <visible>Integer.IsGreater(Container(5250).NumItems,0) + !Container(5250).IsUpdating</visible>
                         <animation effect="fade" start="0" end="100" time="250">Visible</animation>
                         <left>15</left>
@@ -688,7 +689,8 @@
                         <!-- landscape content -->
                         <include>View_525_Landscape_Defs</include>
                         <!-- details content -->
-                        <include>View_525_Details_Defs</include>
+                        <include condition="!Skin.HasSetting(View525_EnableAirDate)">View_525_Details_Defs</include>
+                        <include condition="Skin.HasSetting(View525_EnableAirDate)">View_525_Details_Defs_2</include>
                     </itemlayout>
                     <focusedlayout width="1050" height="280">
                         <!-- panel/border -->
@@ -704,7 +706,8 @@
                         <!-- landscape content -->
                         <include>View_525_Landscape_Defs</include>
                         <!-- details content -->
-                        <include>View_525_Details_Defs_Focus</include>
+                        <include condition="!Skin.HasSetting(View525_EnableAirDate)">View_525_Details_Defs_Focus</include>
+                        <include condition="Skin.HasSetting(View525_EnableAirDate)">View_525_Details_Defs_Focus_2</include>
                         <!-- hidden button -->
                         <include>View525_Hidden_Button</include>
 						<include>LibraryAutoTrailerStopButton</include>

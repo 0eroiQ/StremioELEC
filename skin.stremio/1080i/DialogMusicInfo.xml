@@ -254,6 +254,7 @@
         </control>
 		<control type="button" id="3102">
 		  <!--Youtube-->
+          <visible>System.HasAddon(plugin.video.youtube)</visible>
 		  <width>302</width>
           <height>80</height>
           <align>center</align>

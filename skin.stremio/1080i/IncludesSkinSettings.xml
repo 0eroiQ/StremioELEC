@@ -390,7 +390,7 @@
             <radioposx>1114</radioposx>
             <label>$PARAM[labelprefix]$PARAM[label]</label>
             <label2>$INFO[Skin.String($PARAM[skinsetting].name)]             </label2>
-            <onclick condition="System.HasAddon(script.skin.helper.colorpicker)">RunScript(script.skin.helper.colorpicker,action=COLORPICKER,skinstring=$PARAM[skinsetting],header=$PARAM[label],palette=$INFO[Skin.String(defaultcolorpalette)])</onclick>
+            <onclick>ActivateWindow(1198)</onclick>
             <visible>$PARAM[visible]</visible>
         </control>
     </include>
@@ -455,7 +455,7 @@
             <include>SkinSettings_Button</include>
             <label>$LOCALIZE[31507]</label>
             <label2>$INFO[Skin.String(widgetstyle.label)]</label2>
-            <onclick>RunScript(script.bingie.toolbox,action=setskinsetting,setting=widgetstyle,header=$LOCALIZE[31507])</onclick>
+            <onclick>ActivateWindow(1198)</onclick>
         </control>
         <!-- Enable Fixed Frame in Home & Hubs (Moving Frame) -->
         <control type="radiobutton" id="31123">
@@ -523,7 +523,7 @@
             <label>$LOCALIZE[31213]</label>
             <label2>$INFO[Skin.String(main_auto_trailer_interval.label)]</label2>
             <visible>Skin.HasSetting(BingieAutoTrailer) | Skin.HasSetting(SpotLightTrailers)</visible>
-            <onclick>RunScript(script.bingie.toolbox,action=setskinsetting,setting=main_auto_trailer_interval,header=$LOCALIZE[31213])</onclick>
+            <onclick>ActivateWindow(1198)</onclick>
         </control>		
 	</include>
 
@@ -537,14 +537,14 @@
         <include content="SkinSettings_ActionButton">
             <param name="id" value="31144" />
             <param name="label" value="31144" />
-            <param name="action" value="RunScript(script.bingie.toolbox,action=setskinsetting,setting=details_row,header=$LOCALIZE[31144])" />
+            <param name="action" value="ActivateWindow(1198)" />
         </include>
 		<!-- Select mpaa style -->
 		<control type="button" id="31309">
             <include>SkinSettings_Button</include>
             <label>$LOCALIZE[31309]</label>
             <label2>$INFO[Skin.String(mpaa_style.label)]</label2>
-            <onclick>RunScript(script.bingie.toolbox,action=setskinsetting,setting=mpaa_style,header=$LOCALIZE[31309])</onclick>
+            <onclick>ActivateWindow(1198)</onclick>
         </control>	
 		<!-- Prefer Red/White Details Icons -->	
 		<control type="radiobutton" id="31282">
@@ -581,14 +581,14 @@
             <include>SkinSettings_Button</include>
             <label>$LOCALIZE[31418]</label>
             <label2>$INFO[Skin.String(ThumbsUpRateValue.label)]</label2>
-            <onclick>RunScript(script.bingie.toolbox,action=setskinsetting,setting=ThumbsUpRateValue,header=$LOCALIZE[31418])</onclick>
+            <onclick>ActivateWindow(1198)</onclick>
         </control>
         <!--Thumbs down rate value-->
         <control type="button" id="31416">
             <include>SkinSettings_Button</include>
             <label>$LOCALIZE[31416]</label>
             <label2>$INFO[Skin.String(ThumbsDownRateValue.label)]</label2>
-            <onclick>RunScript(script.bingie.toolbox,action=setskinsetting,setting=ThumbsDownRateValue,header=$LOCALIZE[31416])</onclick>
+            <onclick>ActivateWindow(1198)</onclick>
         </control>
     </include>
 
@@ -609,7 +609,7 @@
 		<include content="SkinSettings_ActionButton">
             <param name="id" value="31006" />
             <param name="label" value="      $LOCALIZE[31006]" />
-            <param name="action" value="RunScript(script.bingie.toolbox,action=setskinsetting,setting=ratings,header=$LOCALIZE[31006])" />
+            <param name="action" value="ActivateWindow(1198)" />
             <param name="visible" value="Skin.HasSetting(EnableRatings)" />
         </include>	
 		<!-- Enable Studio Logo -->
@@ -631,14 +631,14 @@
         <include content="SkinSettings_ActionButton">
             <param name="id" value="31118" />
             <param name="label" value="$LOCALIZE[31118]" />
-            <param name="action" value="RunScript(script.bingie.toolbox,action=setskinsetting,setting=footer_visibility,header=$LOCALIZE[31118])" />
+            <param name="action" value="ActivateWindow(1198)" />
 			<param name="visible" value="Skin.HasSetting(EnableRatings) | Skin.HasSetting(EnableStudioLogo)" />
         </include>
 		<!-- Top250 visibility -->
         <include content="SkinSettings_ActionButton">
             <param name="id" value="31323" />
             <param name="label" value="$LOCALIZE[31323]" />
-            <param name="action" value="RunScript(script.bingie.toolbox,action=setskinsetting,setting=top250_visibility,header=$LOCALIZE[31118])" />
+            <param name="action" value="ActivateWindow(1198)" />
 			<param name="visible" value="Skin.HasSetting(EnableRatings)" />
         </include>
 		<!-- Prefer White Top250 Sublabel -->	
@@ -715,7 +715,7 @@
             <include>SkinSettings_Button</include>
             <label>$LOCALIZE[31361]</label>
             <label2>$INFO[Skin.String(CustomBackgroundSetting.label)]</label2>
-            <onclick>RunScript(script.bingie.toolbox,action=selectimage,skinstring=CustomBackgroundSetting,header=$LOCALIZE[31361],allowmulti=true,resourceaddon=resource.images.skinbackgrounds)</onclick>
+            <onclick>ActivateWindow(1198)</onclick>
         </control>
 		<!-- background color -->
         <include content="SkinSettings_ColorButton">
@@ -734,7 +734,7 @@
             <include>SkinSettings_Button</include>
             <label>$LOCALIZE[31449]</label>
             <label2>$INFO[Skin.String(RandomFanartDelay.label)]</label2>
-            <onclick>RunScript(script.bingie.toolbox,action=setskinsetting,setting=RandomFanartDelay,header=$LOCALIZE[31449])</onclick>
+            <onclick>ActivateWindow(1198)</onclick>
         </control>
         <!--background animation-->
         <control type="radiobutton" id="31266">
@@ -764,7 +764,7 @@
         <include content="SkinSettings_ActionButton">
             <param name="id" value="31487" />
             <param name="label" value="31487" />
-            <param name="action" value="RunScript(script.bingie.toolbox,action=ENABLEVIEWS,richlayout=true)" />
+            <param name="action" value="ActivateWindow(1198)" />
             <param name="visible" value="true" />
         </include>
         <!-- Show ClearLogo (If Available) -->
@@ -772,21 +772,21 @@
             <include>SkinSettings_Button</include>
             <label>$LOCALIZE[31327]</label>
             <label2>$INFO[Skin.String(ClearLogoLocation.label)]</label2>
-            <onclick>RunScript(script.bingie.toolbox,action=setskinsetting,setting=ClearLogoLocation,header=$LOCALIZE[31327])</onclick>
+            <onclick>ActivateWindow(1198)</onclick>
         </control>
 		<!-- display tags in views -->
         <control type="button" id="31141">
             <include>SkinSettings_Button</include>
             <label>$LOCALIZE[31141]</label>
             <label2>$INFO[Skin.String(Views_DisplayTags.label)]</label2>
-            <onclick>RunScript(script.bingie.toolbox,action=setskinsetting,setting=Views_DisplayTags,header=$LOCALIZE[31141])</onclick>
+            <onclick>ActivateWindow(1198)</onclick>
         </control>	
 		<!-- style for codec info -->
         <control type="button" id="31197">
             <include>SkinSettings_Button</include>
             <label>$LOCALIZE[31197]</label>
             <label2>$INFO[Skin.String(mediaflagsstyle.label)]</label2>
-            <onclick>RunScript(script.bingie.toolbox,action=setskinsetting,setting=mediaflagsstyle,header=$LOCALIZE[31197])</onclick>
+            <onclick>ActivateWindow(1198)</onclick>
         </control>
     </include>
 
@@ -808,13 +808,13 @@
         <include content="SkinSettings_ActionButton">
             <param name="id" value="31082" />
             <param name="label" value="31082" />
-            <param name="action" value="RunScript(script.bingie.toolbox,action=setskinsetting,setting=videoinfo_buttons,header=$LOCALIZE[31082])" />
+            <param name="action" value="ActivateWindow(1198)" />
         </include>
         <!-- Select which details to show in videoinfo -->
         <include content="SkinSettings_ActionButton">
             <param name="id" value="31359" />
             <param name="label" value="$LOCALIZE[31359]" />
-            <param name="action" value="RunScript(script.bingie.toolbox,action=setskinsetting,setting=videoinfo_details,header=$LOCALIZE[31359])" />
+            <param name="action" value="ActivateWindow(1198)" />
         </include>
 		<!-- Replace Cast and Crew List with Cast and Crew Images -->
 		<control type="radiobutton" id="31184">
@@ -1566,12 +1566,12 @@
             <include>SkinSettings_Button</include>
             <label>$LOCALIZE[31245]</label>
             <label2>$INFO[Skin.String(GuideRows.label)]</label2>
-            <onclick>RunScript(script.bingie.toolbox,action=setskinsetting,setting=GuideRows,header=$LOCALIZE[31245])</onclick>
+            <onclick>ActivateWindow(1198)</onclick>
         </control>
 		<include content="SkinSettings_ActionButton">
             <param name="id" value="31312" />
             <param name="label" value="$LOCALIZE[31312]" />
-            <param name="action" value="RunScript(script.bingie.toolbox,action=setskinsetting,setting=logonumber_visibility,header=$LOCALIZE[31312])" />
+            <param name="action" value="ActivateWindow(1198)" />
         </include>
         <control type="radiobutton" id="31239">
             <include>SkinSettings_Button</include>
@@ -1622,7 +1622,7 @@
 		<include content="SkinSettings_ActionButton">
             <param name="id" value="31060" />
             <param name="label" value="$LOCALIZE[31060]" />
-            <param name="action" value="RunScript(script.bingie.toolbox,action=setskinsetting,setting=bingie_osd_buttons,header=$LOCALIZE[31060])" />
+            <param name="action" value="ActivateWindow(1198)" />
             <param name="visible" value="Skin.HasSetting(UseBingieOSD)" />
         </include>
 		<!-- Autoclose OSD -->
@@ -1645,7 +1645,7 @@
             <include>SkinSettings_Button</include>
             <label>$LOCALIZE[31129]</label>
             <label2>$INFO[Skin.String(volumestyle.label)]</label2>
-            <onclick>RunScript(script.bingie.toolbox,action=setskinsetting,setting=volumestyle,header=$LOCALIZE[31129])</onclick>
+            <onclick>ActivateWindow(1198)</onclick>
         </control>
     </include>
 
@@ -1678,7 +1678,7 @@
             <include>SkinSettings_Button</include>
             <label>$LOCALIZE[31197]</label>
             <label2>$INFO[Skin.String(osdmediaflagsstyle.label)]</label2>
-            <onclick>RunScript(script.bingie.toolbox,action=setskinsetting,setting=osdmediaflagsstyle,header=$LOCALIZE[31197])</onclick>
+            <onclick>ActivateWindow(1198)</onclick>
             <visible>!Skin.HasSetting(UseBingieOSD)</visible>
         </control>
         <control type="radiobutton" id="31325">
@@ -1780,14 +1780,14 @@
             <include>SkinSettings_Button</include>
             <label>$LOCALIZE[31555]</label>
             <label2>$INFO[Skin.String(MusicArtistLogo.label)]</label2>
-            <onclick>RunScript(script.bingie.toolbox,action=setskinsetting,setting=MusicArtistLogo,header=$LOCALIZE[31555])</onclick>
+            <onclick>ActivateWindow(1198)</onclick>
         </control>
         <control type="button" id="31504">
             <description>Fallback image music playback</description>
             <include>SkinSettings_Button</include>
             <label>$LOCALIZE[31504]</label>
             <label2>$INFO[Skin.String(MusicBackground.label)]</label2>
-            <onclick>RunScript(script.bingie.toolbox,action=selectimage,skinstring=MusicBackground,header=$LOCALIZE[31504],allowmulti=true,resourceaddon=resource.images.skinbackgrounds)</onclick>
+            <onclick>ActivateWindow(1198)</onclick>
         </control>
         <control type="radiobutton" id="31083">
             <description>Animate Music background</description>
@@ -1828,25 +1828,25 @@
         <include content="SkinSettings_ActionButton">
             <param name="id" value="31014" />
             <param name="label" value="31014" />
-            <param name="action" value="RunScript(script.skinshortcuts,type=manage&amp;group=mainmenu)" />
+            <param name="action" value="ActivateWindow(1198)" />
             <param name="visible" value="true" />
         </include>
 		<include content="SkinSettings_ActionButton">
             <param name="id" value="31202" />
             <param name="label" value="31202" />
-            <param name="action" value="RunScript(script.skinshortcuts,type=manage&amp;group=searchmenu)" />
+            <param name="action" value="ActivateWindow(1198)" />
             <param name="visible" value="Library.HasContent(Movies) | Library.HasContent(TVShows)" />
         </include>
 		<include content="SkinSettings_ActionButton">
             <param name="id" value="312022" />
             <param name="label" value="31202" />
-            <param name="action" value="RunScript(script.skinshortcuts,type=manage&amp;group=tmdbsearchmenu)" />
+            <param name="action" value="ActivateWindow(1198)" />
             <param name="visible" value="!Library.HasContent(Movies) + !Library.HasContent(TVShows)" />
         </include>
         <include content="SkinSettings_ActionButton">
             <param name="id" value="31204" />
             <param name="label" value="31204" />
-            <param name="action" value="RunScript(script.skinshortcuts,type=manage&amp;group=powermenu)" />
+            <param name="action" value="ActivateWindow(1198)" />
             <param name="visible" value="true" />
         </include>				
 		<control type="label" id="31413">
@@ -1869,19 +1869,19 @@
 		<include content="SkinSettings_ActionButton">
             <param name="id" value="31434" />
             <param name="label" value="31434" />
-            <param name="action" value="RunScript(script.skinshortcuts,type=manage&amp;group=moviehub)" />
+            <param name="action" value="ActivateWindow(1198)" />
             <param name="visible" value="true" />
         </include>
 		<include content="SkinSettings_ActionButton">
             <param name="id" value="31058" />
             <param name="label" value="31058" />
-            <param name="action" value="RunScript(script.skinshortcuts,type=manage&amp;group=tvshowhub)" />
+            <param name="action" value="ActivateWindow(1198)" />
             <param name="visible" value="true" />
         </include>
 		<include content="SkinSettings_ActionButton">
             <param name="id" value="31506" />
             <param name="label" value="31506" />
-            <param name="action" value="RunScript(script.skinshortcuts,type=manage&amp;group=newhub)" />
+            <param name="action" value="ActivateWindow(1198)" />
             <param name="visible" value="true" />
         </include>
 		<include content="SkinSettings_ActionButton">
@@ -1893,25 +1893,25 @@
 		<include content="SkinSettings_ActionButton">
             <param name="id" value="31166" />
             <param name="label" value="31166" />
-            <param name="action" value="RunScript(script.skinshortcuts,type=manage&amp;group=mylisthub)" />
+            <param name="action" value="ActivateWindow(1198)" />
             <param name="visible" value="true" />
         </include>
 		<include content="SkinSettings_ActionButton">
             <param name="id" value="31472" />
             <param name="label" value="31472" />
-            <param name="action" value="RunScript(script.skinshortcuts,type=manage&amp;group=musichub)" />
+            <param name="action" value="ActivateWindow(1198)" />
             <param name="visible" value="true" />
         </include>
 		<include content="SkinSettings_ActionButton">
             <param name="id" value="31383" />
             <param name="label" value="31383" />
-            <param name="action" value="RunScript(script.skinshortcuts,type=manage&amp;group=somethinghub)" />
+            <param name="action" value="ActivateWindow(1198)" />
             <param name="visible" value="true" />
         </include>
 		<include content="SkinSettings_ActionButton">
             <param name="id" value="31250" />
             <param name="label" value="31250" />
-            <param name="action" value="RunScript(script.skinshortcuts,type=manage&amp;group=customhub)" />
+            <param name="action" value="ActivateWindow(1198)" />
             <param name="visible" value="true" />
         </include>		
         <control type="label" id="31170">
@@ -1975,12 +1975,12 @@
     <include name="ColorThemes_Pallete_Settings">
         <!-- Default palette for Color Picker -->
         <control type="label" id="31054">
-			<visible>System.HasAddon(script.skin.helper.colorpicker)</visible>
+			<visible>true</visible>
             <include>SkinSettings_Header</include>
             <label>$LOCALIZE[31054]</label>
         </control>
         <control type="textbox" id="31053">
-			<visible>System.HasAddon(script.skin.helper.colorpicker)</visible>
+			<visible>true</visible>
             <description/>
             <width>1200</width>
             <align>left</align>
@@ -1989,15 +1989,15 @@
             <font>Reg26</font>
         </control>
 		<control type="label" id="6005">
-			<visible>System.HasAddon(script.skin.helper.colorpicker)</visible>
+			<visible>true</visible>
             <height>5</height>
         </control>
         <control type="button" id="31055">
-			<visible>System.HasAddon(script.skin.helper.colorpicker)</visible>
+			<visible>true</visible>
             <include>SkinSettings_Button</include>
             <label>$LOCALIZE[31055]</label>
             <label2>$INFO[Skin.String(defaultcolorpalette)]</label2>
-            <onclick>RunScript(script.bingie.toolbox,action=setskinsetting,setting=defaultcolorpalette,header=$LOCALIZE[31055])</onclick>
+            <onclick>ActivateWindow(1198)</onclick>
         </control>
     </include>
 
@@ -2019,7 +2019,7 @@
             <include>SkinSettings_Button</include>
             <label>$LOCALIZE[31069]</label>
             <label2>$INFO[Skin.String(trailersource.label)]</label2>
-            <onclick>RunScript(script.bingie.toolbox,action=setskinsetting,setting=trailersource,header=$LOCALIZE[31069])</onclick>
+            <onclick>ActivateWindow(1198)</onclick>
 			<visible>String.IsEqual(Skin.String(AutoYoutubeTrailer),true)</visible>
         </control>	
         <!-- allow youtube lookup -->
@@ -2058,7 +2058,7 @@
             <include>SkinSettings_Button</include>
             <label>      $LOCALIZE[31296]</label>
             <label2>$INFO[Skin.String(extrafanartdelay.label)]</label2>
-            <onclick>RunScript(script.bingie.toolbox,action=setskinsetting,setting=extrafanartdelay,header=$LOCALIZE[31296])</onclick>
+            <onclick>ActivateWindow(1198)</onclick>
             <visible>Skin.HasSetting(EnableNativeExtraFanart)</visible>
         </control>
 		<!-- Use Fake DiscArt When No DiscArt Exists For A Media Item -->
@@ -2072,14 +2072,14 @@
         <include content="SkinSettings_ActionButton">
 			<param name="id" value="31111" />
             <param name="label" value="31111" />
-            <param name="action" value="RunScript(script.bingie.toolbox,action=setskinsetting,setting=air_date,header=$LOCALIZE[31111])" />
+            <param name="action" value="ActivateWindow(1198)" />
         </include>
 		<!--Landscape sublabel-->
         <control type="button" id="31447">
             <include>SkinSettings_Button</include>
             <label>$LOCALIZE[31447]</label>
             <label2>$INFO[Skin.String(LandscapeSublabel.label)]</label2>
-            <onclick>RunScript(script.bingie.toolbox,action=setskinsetting,setting=LandscapeSublabel,header=$LOCALIZE[31447])</onclick>
+            <onclick>ActivateWindow(1198)</onclick>
         </control>	
         <!--thumbs label alignment-->
         <control type="radiobutton" id="31355">
@@ -2092,7 +2092,7 @@
             <include>SkinSettings_Button</include>
             <label>$LOCALIZE[31193]</label>
             <label2>$INFO[Skin.String(thumbsborder_focused.label)]</label2>
-            <onclick>RunScript(script.bingie.toolbox,action=setskinsetting,setting=thumbsborder_focused,header=$LOCALIZE[31193])</onclick>
+            <onclick>ActivateWindow(1198)</onclick>
         </control>
         <control type="radiobutton" id="31225">
             <description>Disable auto scroll for plots/descriptions</description>
@@ -2114,13 +2114,13 @@
             <include>SkinSettings_Button</include>
             <label>$LOCALIZE[31526]</label>
             <label2>$INFO[Skin.String(general_header.label)]</label2>
-            <onclick>RunScript(script.bingie.toolbox,action=setskinsetting,setting=general_header,header=$LOCALIZE[31526])</onclick>
+            <onclick>ActivateWindow(1198)</onclick>
         </control>
         <control type="button" id="31525">
             <include>SkinSettings_Button</include>
             <label>$LOCALIZE[31525]</label>
             <label2>$INFO[Skin.String(home_header.label)]</label2>
-            <onclick>RunScript(script.bingie.toolbox,action=setskinsetting,setting=home_header,header=$LOCALIZE[31525])</onclick>
+            <onclick>ActivateWindow(1198)</onclick>
         </control>
         <!--compact header-->
         <control type="radiobutton" id="31038">
@@ -2294,28 +2294,28 @@
             <include>SkinSettings_Button</include>
             <label>$LOCALIZE[31078]</label>
             <label2>$INFO[Skin.String(WeatherIconPack.name)]</label2>
-            <onclick>RunScript(script.bingie.toolbox,action=setresourceaddon,skinstring=WeatherIconPack,addontype=resource.images.weathericons)</onclick>
+            <onclick>ActivateWindow(1198)</onclick>
         </control>
         <control type="button" id="31052">
             <description>Weather FanArt</description>
             <include>SkinSettings_Button</include>
             <label>$LOCALIZE[31052]</label>
             <label2>$INFO[Skin.String(WeatherFanArtPack.name)]</label2>
-            <onclick>RunScript(script.bingie.toolbox,action=setresourceaddon,skinstring=WeatherFanArtPack,addontype=resource.images.weatherfanart)</onclick>
+            <onclick>ActivateWindow(1198)</onclick>
         </control>
         <control type="button" id="31181">
             <description>Movie Genre Icons</description>
             <include>SkinSettings_Button</include>
             <label>$LOCALIZE[31181]</label>
             <label2>$INFO[Skin.String(MovieGenreIconPack.name)]</label2>
-            <onclick>RunScript(script.bingie.toolbox,action=setresourceaddon,skinstring=MovieGenreIconPack,addontype=resource.images.moviegenreicons)</onclick>
+            <onclick>ActivateWindow(1198)</onclick>
         </control>
         <control type="button" id="31308">
             <description>Movie Genre Fanart</description>
             <include>SkinSettings_Button</include>
             <label>$LOCALIZE[31308]</label>
             <label2>$INFO[Skin.String(moviegenrefanart.name)]</label2>
-            <onclick>RunScript(script.bingie.toolbox,action=setresourceaddon,skinstring=moviegenrefanart,addontype=resource.images.moviegenrefanart)</onclick>
+            <onclick>ActivateWindow(1198)</onclick>
         </control>
     </include>
 
@@ -2330,7 +2330,7 @@
             <include>SkinSettings_Button</include>
             <label>$LOCALIZE[31154]</label>
             <label2>$INFO[Skin.String(splash_screen.label)]</label2>
-            <onclick>RunScript(script.bingie.toolbox,action=setskinsetting,setting=splash_screen,header=$LOCALIZE[31154])</onclick>
+            <onclick>ActivateWindow(1198)</onclick>
         </control>
 		<control type="radiobutton" id="31075">
             <!-- Enable 4k animations -->
@@ -2355,7 +2355,7 @@
             <include>SkinSettings_Button</include>
             <label>$LOCALIZE[31344]</label>
             <label2>$INFO[Skin.String(scrollbar_visibility.label)]</label2>
-            <onclick>RunScript(script.bingie.toolbox,action=setskinsetting,setting=scrollbar_visibility,header=$LOCALIZE[31344])</onclick>
+            <onclick>ActivateWindow(1198)</onclick>
         </control>
         <!-- Enable Bingie Logo on Home -->
         <control type="radiobutton" id="31275">

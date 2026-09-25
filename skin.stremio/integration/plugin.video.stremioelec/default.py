@@ -25,7 +25,7 @@ from metadata_bridge import (details as metadata_details, people as metadata_peo
                              trailer_rows as metadata_trailers, runtime_seconds)
 
 HANDLE = int(sys.argv[1])
-BASE = sys.argv[0]
+BASE = 'plugin://plugin.video.stremioelec/'
 ADDON = xbmcaddon.Addon('plugin.video.stremioelec')
 MANIFEST = ADDON.getSetting('manifest').strip()
 HOME_MANIFEST = 'https://v3-cinemeta.strem.io/manifest.json'
@@ -166,6 +166,10 @@ def item(meta):
 
     entry.setProperty('StremioID', identity)
     entry.setProperty('StremioType', str(meta.get('type', '')))
+    if media_type == 'tvshow' and identity:
+        entry.setProperty('StremioSeriesID', identity)
+        entry.setProperty('StremioMoreEpisodesPath',
+                          route(action='more_episodes', kind='series', id=identity))
     if meta.get('genres'):
         entry.setProperty('StremioGenre', str(meta['genres'][0]))
     if meta.get('director'):
@@ -243,10 +247,59 @@ def episode_item(video, series_meta=None):
         art.update({'thumb': thumb, 'landscape': thumb, 'poster': thumb})
     if isinstance(fanart, str) and fanart:
         art['fanart'] = fanart
+    show_poster = series_meta.get('poster')
+    show_fanart = series_meta.get('background')
+    show_logo = series_meta.get('logo')
+    if isinstance(show_poster, str) and show_poster:
+        art['tvshow.poster'] = show_poster
+    if isinstance(show_fanart, str) and show_fanart:
+        art['tvshow.fanart'] = show_fanart
+    if isinstance(show_logo, str) and show_logo:
+        art['tvshow.clearlogo'] = show_logo
     if art:
         entry.setArt(art)
+    series_id = str(series_meta.get('id') or identity.split(':', 1)[0])
     entry.setProperty('StremioID', identity)
     entry.setProperty('StremioType', 'series')
+    entry.setProperty('StremioSeriesID', series_id)
+    if series_id:
+        entry.setProperty('StremioMoreEpisodesPath',
+                          route(action='more_episodes', kind='series', id=series_id))
+    return entry
+
+
+def season_item(row, series_meta):
+    season = int(row.get('season', 0))
+    count = int(row.get('count', 0))
+    label = 'Specials' if season == 0 else 'Season {}'.format(season)
+    entry = xbmcgui.ListItem(label=label)
+    tag = entry.getVideoInfoTag()
+    tag.setMediaType('season')
+    tag.setTitle(label)
+    tag.setSeason(season)
+    series_id = str(series_meta.get('id', ''))
+    entry.setProperty('StremioID', series_id)
+    entry.setProperty('StremioType', 'series')
+    entry.setProperty('StremioSeriesID', series_id)
+    entry.setProperty('StremioSeason', str(season))
+    entry.setProperty('TotalEpisodes', str(count))
+    if series_id:
+        entry.setProperty('StremioMoreEpisodesPath',
+                          route(action='episodes', kind='series',
+                                id=series_id, season=str(season)))
+    art = {}
+    for key, value in {
+        'poster': series_meta.get('poster'),
+        'landscape': series_meta.get('background'),
+        'fanart': series_meta.get('background'),
+        'tvshow.poster': series_meta.get('poster'),
+        'tvshow.fanart': series_meta.get('background'),
+        'tvshow.clearlogo': series_meta.get('logo'),
+    }.items():
+        if isinstance(value, str) and value:
+            art[key] = value
+    if art:
+        entry.setArt(art)
     return entry
 
 
@@ -374,7 +427,7 @@ def run(params):
         xbmc.executebuiltin('Container.Refresh')
         return
     if action in ('details_cast', 'details_crew', 'details_recommendations',
-                  'details_trailers', 'seasons', 'episodes'):
+                  'details_trailers', 'seasons', 'episodes', 'more_episodes'):
         state = STORE.load()
         providers = list(active_addons(state))
         kind = params.get('kind', 'movie')
@@ -424,22 +477,26 @@ def run(params):
             xbmcplugin.setContent(HANDLE, 'seasons')
             for row in metadata_seasons(meta):
                 season = row['season']
-                label = 'Specials' if season == 0 else 'Season {}'.format(season)
-                entry = xbmcgui.ListItem(label=label)
-                entry.setProperty('StremioID', str(meta.get('id', '')))
-                entry.setProperty('StremioType', 'series')
-                entry.getVideoInfoTag().setMediaType('season')
+                entry = season_item(row, meta)
                 xbmcplugin.addDirectoryItem(
                     HANDLE, route(action='episodes', kind='series',
                                   id=meta.get('id', ''), season=str(season)), entry, True)
-        elif action == 'episodes':
+        elif action in ('episodes', 'more_episodes'):
             xbmcplugin.setContent(HANDLE, 'episodes')
-            for video in metadata_episodes(meta, params.get('season', '0')):
+            season = params.get('season')
+            if action == 'more_episodes' or season in (None, ''):
+                available = metadata_seasons(meta)
+                regular = [row['season'] for row in available if int(row['season']) > 0]
+                season = str(regular[0] if regular else
+                             (available[0]['season'] if available else 0))
+            for video in metadata_episodes(meta, season):
                 entry = episode_item(video, meta)
                 xbmcplugin.addDirectoryItem(
                     HANDLE, route(action='streams', kind='series',
                                   id=video.get('id', '')), entry, True)
         xbmcplugin.endOfDirectory(HANDLE)
+        if action in ('episodes', 'more_episodes'):
+            xbmc.executebuiltin('Container.SetViewMode(525)')
         return
 
     if action == 'trailer_unavailable':
@@ -471,7 +528,37 @@ def run(params):
         context.update(values)
         return route(**context)
 
-    if action == 'home_catalog':
+    if action == 'genres':
+        kind = params.get('kind', 'movie')
+        if kind not in ('movie', 'series'):
+            kind = 'movie'
+        manifest = fetch(HOME_MANIFEST)
+        genre_rows = []
+        seen = set()
+        for catalog in manifest.get('catalogs', []):
+            if not isinstance(catalog, dict) or catalog.get('type') != kind:
+                continue
+            catalog_id = catalog.get('id')
+            if not catalog_id:
+                continue
+            for extra in catalog.get('extra', []):
+                if not isinstance(extra, dict) or extra.get('name') != 'genre':
+                    continue
+                for genre in extra.get('options') or []:
+                    genre = str(genre)
+                    if not genre or genre.isdigit() or genre in seen:
+                        continue
+                    seen.add(genre)
+                    genre_rows.append((genre, catalog_id))
+            if genre_rows:
+                break
+        for genre, catalog_id in genre_rows:
+            xbmcplugin.addDirectoryItem(
+                HANDLE,
+                route(action='home_catalog', kind=kind, id=catalog_id, genre=genre),
+                xbmcgui.ListItem(label=genre),
+                True)
+    elif action == 'home_catalog':
         kind = params.get('kind', 'movie')
         catalog = params.get('id', 'top')
         extras = {}
@@ -607,20 +694,11 @@ def run(params):
             xbmcplugin.setContent(HANDLE, 'seasons')
             for row in metadata_seasons(meta):
                 season = row['season']
-                label = 'Specials' if season == 0 else 'Season {}'.format(season)
-                entry = xbmcgui.ListItem(label=label)
-                tag = entry.getVideoInfoTag()
-                tag.setMediaType('season')
-                entry.setProperty('StremioID', identity)
-                entry.setProperty('StremioType', 'series')
-                poster = meta.get('poster')
-                fanart = meta.get('background')
-                entry.setArt({k: v for k, v in {'poster': poster, 'fanart': fanart}.items()
-                              if isinstance(v, str) and v})
+                entry = season_item(row, meta)
                 xbmcplugin.addDirectoryItem(
                     HANDLE,
-                    provider_route(action='episodes', kind='series',
-                                   id=identity, season=str(season)),
+                    route(action='episodes', kind='series',
+                          id=identity, season=str(season)),
                     entry, True)
         else:
             xbmcplugin.addDirectoryItem(

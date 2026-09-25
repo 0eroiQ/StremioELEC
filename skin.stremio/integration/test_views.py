@@ -25,6 +25,32 @@ class HomeViewsTest(unittest.TestCase):
         self.assertIn('ActivateWindow(Videos,$INFO[Window(Home).Property(StremioContinueTarget)],return)', actions)
         self.assertEqual(sum(node.text == 'StremioContinuePlayButton' for node in root.findall('.//include')), 2)
 
+    def test_more_episodes_uses_stremio_native_bingie_episode_view(self):
+        info = (ROOT / '1080i/IncludesDialogVideoInfo.xml').read_text()
+        self.assertIn('ListItem.Property(StremioMoreEpisodesPath)', info)
+        self.assertIn('ActivateWindow(Videos,$ESCINFO[ListItem.Property(StremioMoreEpisodesPath)],return)', info)
+
+        episodes = (ROOT / '1080i/View_525_Bingie_Episodes.xml').read_text()
+        self.assertIn('plugin://plugin.video.stremioelec/?action=seasons&amp;kind=series&amp;id=', episodes)
+        self.assertIn('ListItem.Property(StremioSeriesID)', episodes)
+
+        core = (ROOT / 'integration/plugin.video.stremioelec/default.py').read_text()
+        self.assertIn("BASE = 'plugin://plugin.video.stremioelec/'", core)
+        self.assertIn("action in ('episodes', 'more_episodes')", core)
+        self.assertIn("Container.SetViewMode(525)", core)
+
+    def test_bingie_episode_airdate_layout_is_restored(self):
+        episodes = (ROOT / '1080i/View_525_Bingie_Episodes.xml').read_text()
+        self.assertIn(
+            '<include condition="Skin.HasSetting(View525_EnableAirDate)">View_525_Details_Defs_2</include>',
+            episodes)
+        self.assertIn(
+            '<include condition="Skin.HasSetting(View525_EnableAirDate)">View_525_Details_Defs_Focus_2</include>',
+            episodes)
+        defaults = (ROOT / '1080i/IncludesDefaultSkinSettings.xml').read_text()
+        self.assertIn('Skin.SetBool(View525_EnableAirDate)', defaults)
+        self.assertIn('StremioEpisodeAirDateDefault', defaults)
+
     def test_stremio_widget_picker_is_browsable_and_optional(self):
         root = ET.parse(ROOT / 'shortcuts/overrides.xml').getroot()
         node = root.find("widget-groupings/shortcut[@label='Stremio catalogs']")

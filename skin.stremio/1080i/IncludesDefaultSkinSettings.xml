@@ -9,6 +9,8 @@
     </include>
 
     <include name="startupskinsettingsvalues">
+        <onload condition="Skin.HasSetting(StremioView) + !Skin.HasSetting(StremioEpisodeAirDateDefault)">Skin.SetBool(View525_EnableAirDate)</onload>
+        <onload condition="Skin.HasSetting(StremioView) + !Skin.HasSetting(StremioEpisodeAirDateDefault)">Skin.SetBool(StremioEpisodeAirDateDefault)</onload>
         <onload>SetProperty(startupDone,loaded,Home)</onload>
     </include>
   
@@ -256,7 +258,7 @@
 		<onload condition="!Skin.String(SpinnerTexture.name)">Skin.SetString(SpinnerTextureColor.name,$LOCALIZE[13343])</onload>
 		<onload condition="!Skin.String(WidgetSpinnerTextureColor)">Skin.SetString(WidgetSpinnerTextureColor,ffffffff)</onload>
 		<onload condition="!Skin.String(WidgetSpinnerTexture.name)">Skin.SetString(WidgetSpinnerTextureColor.name,$LOCALIZE[742])</onload>
-		<onload condition="!Skin.String(defaultcolorpalette.label)">Skin.SetString(defaultcolorpalette.label,$ADDON[script.skin.helper.colorpicker 32142])</onload>
+		<onload condition="!Skin.String(defaultcolorpalette.label)">Skin.SetString(defaultcolorpalette.label,Basic)</onload>
         <onload condition="!Skin.String(defaultcolorpalette)">Skin.SetString(defaultcolorpalette,basic)</onload>
         <onload condition="!Skin.String(SideBladePanelColor)">Skin.SetString(SideBladePanelColor,fa0a0a0a)</onload>
         <onload condition="!Skin.String(SideBladePanelColor.name)">Skin.SetString(SideBladePanelColor.name,$LOCALIZE[353])</onload>

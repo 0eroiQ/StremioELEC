@@ -241,8 +241,10 @@ def refresh(force=False):
     if not loc or not lat or not lon:
         _set(window,'Current.Condition','Set a location in Weather settings'); _set(window,'Daily.IsFetched',''); _set(window,'Hourly.IsFetched',''); return
     try:
-        apply(forecast(float(lat),float(lon)),loc,window)
+        payload = forecast(float(lat),float(lon))
+        apply(payload,loc,window)
         _set(window,'Stremio.LastRefreshEpoch',time.time())
+        return payload
     except Exception:
         _set(window,'Current.Condition','Weather unavailable')
         xbmcgui.Dialog().notification('Weather','Unable to refresh weather. Check the network connection.')

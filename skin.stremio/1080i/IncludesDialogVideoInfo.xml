@@ -514,7 +514,7 @@
 
 							<!--More episodes-->
                             <control type="radiobutton" id="53">
-                                <visible>$EXP[IsTvShowDBTypeNoFallback]	| [$EXP[IsEpisodeDBTypeNoFallback] + !String.IsEmpty(ListItem.DBID)]</visible>
+                                <visible>$EXP[IsTvShowDBTypeNoFallback]	| [$EXP[IsEpisodeDBTypeNoFallback] + [!String.IsEmpty(ListItem.DBID) | !String.IsEmpty(ListItem.Property(StremioMoreEpisodesPath))]]</visible>
                                    <include content="Bingie_InfoDialog_Button_Texture">
                                     <param name="radiotexture" value="dialogs/videoinfo/info/more_episodes.png"/>
                                 </include>
@@ -539,6 +539,8 @@
 								<onclick condition="!String.IsEmpty(Window(Home).Property(FullImage))">SetProperty(EpisodesAnimation,1,Home)</onclick>
                                 <onclick condition="!Window.IsActive(Custom_1190_TMDbBingieHelperCast.xml)">Dialog.Close(movieinformation)</onclick>
                                 <!-- activate ALL EPISODES view -->
+                                <!-- Stremio-native series / season / episode -->
+                                <onclick condition="!String.IsEmpty(ListItem.Property(StremioMoreEpisodesPath))">ActivateWindow(Videos,$ESCINFO[ListItem.Property(StremioMoreEpisodesPath)],return)</onclick>
                                 <!-- from episode infodialog -->
                                 <onclick condition="String.IsEqual(ListItem.DBTYPE,episode) + !String.IsEmpty(ListItem.DBID) + !String.IsEmpty(Window(Home).Property(ListItem.TVShowID))">SetProperty(KeepTVShowID,1,Home)</onclick>
                                 <onclick condition="String.IsEqual(ListItem.DBTYPE,episode) + !String.IsEmpty(ListItem.DBID) + !String.IsEmpty(Window(Home).Property(ListItem.TVShowID))">ActivateWindow(Videos,videodb://tvshows/titles/$INFO[Window(Home).Property(ListItem.TVShowID)]/-2/,return)</onclick>
@@ -547,7 +549,7 @@
                                 <onclick condition="String.IsEqual(ListItem.DBTYPE,tvshow) + !String.IsEmpty(ListItem.DBID) + !Window.IsActive(Custom_1190_TMDbBingieHelperCast.xml)">SetProperty(KeepTVShowID,1,Home)</onclick>
 								<onclick condition="String.IsEqual(ListItem.DBTYPE,tvshow) + !String.IsEmpty(ListItem.DBID) + !Window.IsActive(Custom_1190_TMDbBingieHelperCast.xml)">ActivateWindow(Videos,videodb://tvshows/titles/$INFO[ListItem.DBID]/-2/,return)</onclick>
                                 <!-- from tvshow infodialog for non-library content -->
-								<onclick condition="String.IsEqual(ListItem.DBTYPE,tvshow) + String.IsEmpty(ListItem.DBID) + !Window.IsActive(Custom_1190_TMDbBingieHelperCast.xml)">ActivateWindow(Videos,$ESCINFO[ListItem.FileNameAndPath],return)</onclick>
+								<onclick condition="String.IsEqual(ListItem.DBTYPE,tvshow) + String.IsEmpty(ListItem.DBID) + String.IsEmpty(ListItem.Property(StremioMoreEpisodesPath)) + !Window.IsActive(Custom_1190_TMDbBingieHelperCast.xml)">ActivateWindow(Videos,$ESCINFO[ListItem.FileNameAndPath],return)</onclick>
                             </control>
 
 							<!-- Trailer -->
@@ -1743,7 +1745,7 @@
 
 							<!--More episodes-->
                             <control type="radiobutton" id="53">
-                                <visible>$EXP[IsTvShowDBTypeNoFallback] | $EXP[IsSeasonDBTypeNoFallback] | [$EXP[IsEpisodeDBTypeNoFallback] + !String.IsEmpty(ListItem.DBID)]</visible>
+                                <visible>$EXP[IsTvShowDBTypeNoFallback] | $EXP[IsSeasonDBTypeNoFallback] | [$EXP[IsEpisodeDBTypeNoFallback] + [!String.IsEmpty(ListItem.DBID) | !String.IsEmpty(ListItem.Property(StremioMoreEpisodesPath))]]</visible>
                                 <include>Bingie_InfoDialog_Button_Default_Defs</include>
                                 <include content="Bingie_InfoDialog_Button_Texture">
                                     <param name="radiotexture" value="dialogs/videoinfo/info/more_episodes.png"/>
@@ -1760,6 +1762,8 @@
 								<onclick condition="!String.IsEmpty(Window(Home).Property(FullImage))">SetProperty(EpisodesAnimation,1,Home)</onclick>
                                 <onclick condition="!Window.IsActive(Custom_1190_TMDbBingieHelperCast.xml)">Dialog.Close(movieinformation)</onclick>
                                 <!-- activate ALL EPISODES view -->
+                                <!-- Stremio-native series / season / episode -->
+                                <onclick condition="!String.IsEmpty(ListItem.Property(StremioMoreEpisodesPath))">ActivateWindow(Videos,$ESCINFO[ListItem.Property(StremioMoreEpisodesPath)],return)</onclick>
                                 <!-- from episode infodialog -->
                                 <onclick condition="String.IsEqual(ListItem.DBTYPE,episode) + !String.IsEmpty(ListItem.DBID) + !String.IsEmpty(Window(Home).Property(ListItem.TVShowID))">SetProperty(KeepTVShowID,1,Home)</onclick>
                                 <onclick condition="String.IsEqual(ListItem.DBTYPE,episode) + !String.IsEmpty(ListItem.DBID) + !String.IsEmpty(Window(Home).Property(ListItem.TVShowID))">ActivateWindow(Videos,videodb://tvshows/titles/$INFO[Window(Home).Property(ListItem.TVShowID)]/-2/,return)</onclick>
@@ -1770,8 +1774,8 @@
                                 <onclick condition="String.IsEqual(ListItem.DBTYPE,tvshow) + !String.IsEmpty(ListItem.DBID) + !Window.IsActive(Custom_1190_TMDbBingieHelperCast.xml)">SetProperty(KeepTVShowID,1,Home)</onclick>
 								<onclick condition="String.IsEqual(ListItem.DBTYPE,tvshow) + !String.IsEmpty(ListItem.DBID) + !Window.IsActive(Custom_1190_TMDbBingieHelperCast.xml)">ActivateWindow(Videos,videodb://tvshows/titles/$INFO[ListItem.DBID]/-2/,return)</onclick>
                                 <!-- from tvshow infodialog for non-library content -->
-								<onclick condition="String.IsEqual(ListItem.DBTYPE,tvshow) + String.IsEmpty(ListItem.DBID) + !Window.IsActive(Custom_1190_TMDbBingieHelperCast.xml)">ActivateWindow(Videos,$ESCINFO[ListItem.FileNameAndPath],return)</onclick>
-								<onclick condition="String.IsEqual(ListItem.DBTYPE,season) + String.IsEmpty(ListItem.DBID) + !Window.IsActive(Custom_1190_TMDbBingieHelperCast.xml)">ActivateWindow(Videos,$ESCINFO[ListItem.FolderPath],return)</onclick>
+								<onclick condition="String.IsEqual(ListItem.DBTYPE,tvshow) + String.IsEmpty(ListItem.DBID) + String.IsEmpty(ListItem.Property(StremioMoreEpisodesPath)) + !Window.IsActive(Custom_1190_TMDbBingieHelperCast.xml)">ActivateWindow(Videos,$ESCINFO[ListItem.FileNameAndPath],return)</onclick>
+								<onclick condition="String.IsEqual(ListItem.DBTYPE,season) + String.IsEmpty(ListItem.DBID) + String.IsEmpty(ListItem.Property(StremioMoreEpisodesPath)) + !Window.IsActive(Custom_1190_TMDbBingieHelperCast.xml)">ActivateWindow(Videos,$ESCINFO[ListItem.FolderPath],return)</onclick>
 							</control>
 
 							<!-- Trailer -->

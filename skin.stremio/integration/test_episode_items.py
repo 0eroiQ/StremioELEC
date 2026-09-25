@@ -29,6 +29,11 @@ class EpisodeItemTests(unittest.TestCase):
         self.argv.stop()
         self.patch.stop()
 
+    def test_routes_always_use_plugin_scheme_in_system_runtime(self):
+        self.assertEqual(
+            self.entry.route(action='episodes', kind='series', id='tt123', season='2'),
+            'plugin://plugin.video.stremioelec/?action=episodes&kind=series&id=tt123&season=2')
+
     def test_episode_metadata_and_artwork_are_populated(self):
         list_item = MagicMock()
         tag = list_item.getVideoInfoTag.return_value
@@ -59,7 +64,30 @@ class EpisodeItemTests(unittest.TestCase):
             'landscape': 'https://example.com/e2.jpg',
             'poster': 'https://example.com/e2.jpg',
             'fanart': 'https://example.com/show.jpg',
+            'tvshow.fanart': 'https://example.com/show.jpg',
         })
+        list_item.setProperty.assert_any_call('StremioSeriesID', 'tt1234567')
+        list_item.setProperty.assert_any_call(
+            'StremioMoreEpisodesPath',
+            'plugin://plugin.video.stremioelec/?action=more_episodes&kind=series&id=tt1234567')
+
+    def test_season_item_exposes_episode_count_for_bingie_view(self):
+        list_item = MagicMock()
+        tag = list_item.getVideoInfoTag.return_value
+        self.modules['xbmcgui'].ListItem.return_value = list_item
+        self.entry.season_item(
+            {'season': 1, 'count': 23},
+            {'id': 'tt3107288', 'poster': 'https://example.com/poster.jpg',
+             'background': 'https://example.com/fanart.jpg',
+             'logo': 'https://example.com/logo.png'})
+        self.modules['xbmcgui'].ListItem.assert_called_once_with(label='Season 1')
+        tag.setMediaType.assert_called_once_with('season')
+        tag.setSeason.assert_called_once_with(1)
+        list_item.setProperty.assert_any_call('TotalEpisodes', '23')
+        list_item.setProperty.assert_any_call('StremioSeriesID', 'tt3107288')
+        list_item.setProperty.assert_any_call(
+            'StremioMoreEpisodesPath',
+            'plugin://plugin.video.stremioelec/?action=episodes&kind=series&id=tt3107288&season=1')
 
     def test_episode_has_human_fallback_instead_of_unknown(self):
         list_item = MagicMock()
