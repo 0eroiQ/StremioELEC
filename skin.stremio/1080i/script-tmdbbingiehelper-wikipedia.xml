@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <window type="dialog">
     <defaultcontrol always="true">9902</defaultcontrol>
-	<onload>Skin.SetString(TMDbBingieHelper.Wikipedia.Format.Link,{})</onload>
-	<onload>Skin.SetString(TMDbBingieHelper.Wikipedia.Format.Emphasis,{})</onload>
-	<onload>Skin.SetString(TMDbBingieHelper.Wikipedia.Format.Superscript,{})</onload>
+	<onload>Skin.SetString(StremioLegacyWikipedia.Format.Link,{})</onload>
+	<onload>Skin.SetString(StremioLegacyWikipedia.Format.Emphasis,{})</onload>
+	<onload>Skin.SetString(StremioLegacyWikipedia.Format.Superscript,{})</onload>
     <controls>
     <control type="group">
 		<!--Global Background-->

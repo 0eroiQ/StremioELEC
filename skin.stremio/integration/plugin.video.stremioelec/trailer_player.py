@@ -4,8 +4,11 @@ import time
 import xbmc
 import xbmcaddon
 import xbmcgui
-from trailers import discover
+from trailers import discover, video_identity
 from slyguy_trailers import play
+from account import Store
+from addons_core import active_addons
+from metadata_bridge import details as metadata_details, trailer_rows as metadata_trailers
 
 
 def main():
@@ -21,7 +24,20 @@ def main():
     try:
         label = xbmc.getInfoLabel
         selected_clip = 'selected' in sys.argv[1:]
-        link = (label('Container(354).ListItem.FolderPath') or label('Container(354).ListItem.FileNameAndPath')) if selected_clip else label('ListItem.Trailer')
+        if selected_clip:
+            link = ''
+            for candidate in (
+                    label('Container(354).ListItem.Property(StremioTrailerURL)'),
+                    label('Container(354).ListItem.FolderPath'),
+                    label('Container(354).ListItem.FileNameAndPath')):
+                try:
+                    video_identity(candidate)
+                    link = candidate
+                    break
+                except (TypeError, ValueError):
+                    continue
+        else:
+            link = label('ListItem.Trailer')
         if link:
             title = label('Container(354).ListItem.Label') if selected_clip else label('ListItem.Title')
             if xbmc.Monitor().abortRequested():
@@ -30,21 +46,35 @@ def main():
             return
         if selected_clip:
             raise ValueError('Missing selected trailer')
+        import xbmcvfs
         addon = xbmcaddon.Addon('plugin.video.stremioelec')
-        helper = xbmcaddon.Addon('plugin.video.tmdb.bingie.helper')
+        label = xbmc.getInfoLabel
+        raw_kind = label('ListItem.Property(StremioType)') or label('ListItem.DBType') or label('ListItem.Property(DBTYPE)')
+        kind = 'series' if raw_kind in ('tv', 'tvshow', 'season', 'episode', 'series') else 'movie'
+        identity = (label('ListItem.Property(StremioID)') or
+                    label('ListItem.IMDBNumber') or label('ListItem.Property(imdb_id)'))
+        title = label('ListItem.Title')
+        store = Store(xbmcvfs.translatePath(addon.getAddonInfo('profile')))
+        meta = metadata_details(kind, identity, title, active_addons(store.load()))
+        stremio_rows = metadata_trailers(meta)
+        if stremio_rows:
+            selected = xbmcgui.Dialog().select(
+                'Stremio trailers', [r.get('name', 'Trailer') for r in stremio_rows])
+            if selected < 0 or xbmc.Monitor().abortRequested():
+                return
+            play('https://www.youtube.com/watch?v=' + stremio_rows[selected]['id'])
+            return
+
         key = addon.getSetting('tmdb_api_key').strip()
         if not key:
-            xbmcgui.Dialog().ok('StremioELEC trailers', 'Open Trailers & More to use the existing TMDb clips, or add your TMDb API key in Catalogs and artwork for a separate lookup.')
+            xbmcgui.Dialog().ok('StremioELEC trailers', 'No trailer was provided by the installed Stremio metadata addons.')
             return
-        label = xbmc.getInfoLabel
-        kind = label('ListItem.DBType') or label('ListItem.Property(DBTYPE)')
-        kind = 'tv' if kind in ('tvshow', 'season', 'episode', 'series') else 'movie'
         tmdb = label('ListItem.Property(tmdb_id)') or label('ListItem.UniqueID(tmdb)')
         imdb = label('ListItem.IMDBNumber') or label('ListItem.Property(imdb_id)')
-        title = label('ListItem.Title')
+        tmdb_kind = 'tv' if kind == 'series' else 'movie'
         progress = xbmcgui.DialogProgress()
         progress.create('StremioELEC trailers', 'Finding official trailers on TMDb…')
-        rows = discover(key, kind, tmdb, imdb, helper.getSetting('language') or 'en-US')
+        rows = discover(key, tmdb_kind, tmdb, imdb, 'en-US')
         if progress.iscanceled() or xbmc.Monitor().abortRequested():
             return
         progress.close()

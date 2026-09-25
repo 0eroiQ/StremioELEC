@@ -177,7 +177,7 @@
             <include>SideBladeMenuButton</include>
             <label>$LOCALIZE[21483]$INFO[Container.Viewmode,: ,]</label>
             <include>Items_LockUnlock</include>
-            <onclick>RunScript(script.bingie.toolbox,action=SETVIEW)</onclick>
+            <onclick>Container.NextViewMode</onclick>
             <visible>!Container.Content(episodes) + !Container.Content(seasons) + !Window.IsActive(tvguide) + !Window.IsActive(tvchannels) + !Window.IsActive(tvsearch) + !Window.IsActive(tvrecordings) + !Window.IsActive(tvtimers) + !Window.IsActive(favouritesbrowser)</visible>
         </control>
 
@@ -238,7 +238,7 @@
         <control type="button" id="364272">
             <include>SideBladeMenuButton</include>
             <label>$LOCALIZE[36427]: $INFO[Skin.String(View513_DisplayInfo.label)]</label>
-            <onclick>RunScript(script.bingie.toolbox,action=setskinsetting,id=View_DisplayInfo,setting=View513_DisplayInfo,header=$LOCALIZE[36427])</onclick>
+            <visible>false</visible>
             <visible>Control.IsVisible(513)</visible>
         </control>
 
@@ -246,7 +246,7 @@
         <control type="button" id="364273">
             <include>SideBladeMenuButton</include>
             <label>$LOCALIZE[36427]: $INFO[Skin.String(View514_DisplayInfo.label)]</label>
-            <onclick>RunScript(script.bingie.toolbox,action=setskinsetting,id=View_DisplayInfo,setting=View514_DisplayInfo,header=$LOCALIZE[36427])</onclick>
+            <visible>false</visible>
             <visible>Control.IsVisible(514)</visible>
         </control>
 
@@ -368,7 +368,7 @@
 			[Control.IsVisible(523) + Skin.HasSetting(View523_DetailsAutoTrailer)] |
 			[Control.IsVisible(526) + Skin.HasSetting(View526_DetailsAutoTrailer)] |
 			[Control.IsVisible(528) + Skin.HasSetting(View526_DetailsAutoTrailer)]</visible>
-            <onclick>RunScript(script.bingie.toolbox,action=setskinsetting,setting=details_auto_trailer_interval,header=$LOCALIZE[31163])</onclick>
+            <visible>false</visible>
         </control>
 
         <control type="radiobutton" id="31356">

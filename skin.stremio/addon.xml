@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<addon id="skin.stremio" version="3.1.0" name="StremioELEC" provider-name="0eroiQ, matke">
+<addon id="skin.stremio" version="3.1.1" name="StremioELEC" provider-name="0eroiQ, matke">
   <requires>
-        <import version="5.17.0" addon="xbmc.gui"/>
-        <import addon="plugin.video.stremioelec"/>
+        <import version="5.17.0" addon="xbmc.gui" />
+        <import addon="plugin.video.stremioelec" />
     </requires>
   <extension debugging="false" defaultthemename="Textures.xbt" effectslowdown="1" point="xbmc.gui.skin">
     <res aspect="16:9" default="true" folder="1080i" height="1080" width="1920" />

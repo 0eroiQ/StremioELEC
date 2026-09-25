@@ -63,14 +63,14 @@
 				<control type="button" id="1224">
                     <description>Weather Icons</description>
                     <label>$LOCALIZE[31078]</label>
-                    <onclick>RunScript(script.bingie.toolbox,action=setresourceaddon,skinstring=WeatherIconPack,addontype=resource.images.weathericons)</onclick>
+                    <visible>false</visible>
                     <include>SideBladeMenuButton</include>
                 </control>               
                 <control type="button" id="1225">
                     <!--Icons-->
                     <description>Weather FanArt</description>
                     <label>$LOCALIZE[31052]</label>
-                    <onclick>RunScript(script.bingie.toolbox,action=setresourceaddon,skinstring=WeatherFanArtPack,addontype=resource.images.weatherfanart)</onclick>
+                    <visible>false</visible>
                     <include>SideBladeMenuButton</include>
                 </control>				
 				<control type="radiobutton" id="88552200">

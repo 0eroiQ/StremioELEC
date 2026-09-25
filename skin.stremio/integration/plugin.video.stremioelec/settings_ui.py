@@ -15,6 +15,8 @@ from setup_profile import rpc, get_setting, prepare, replace_backed_up, home_xml
 ADDON = xbmcaddon.Addon('plugin.video.stremioelec')
 PROFILE = Path(xbmcvfs.translatePath(ADDON.getAddonInfo('profile')))
 DIALOG = xbmcgui.Dialog()
+HOME = 'special://profile/addon_data/script.skinshortcuts/skin.stremio-10000-1.DATA.xml'
+
 COLORS = [('White', 'FFFFFFFF'), ('Yellow', 'FFFFFF00'), ('Light gray', 'FFCCCCCC'),
           ('Black', 'FF000000'), ('Cyan', 'FF00FFFF'), ('Green', 'FF00FF00'),
           ('Red', 'FFFF0000'), ('Blue', 'FF0000FF'), ('Orange', 'FFFFA500'),
@@ -121,19 +123,71 @@ def display_value(value):
     return str(value)
 
 
+SETTINGS_WINDOW_PROPERTIES = {
+    'locale.country': 'Region',
+    'locale.timezone': 'Timezone',
+    'locale.keyboardlayouts': 'Keyboard',
+    'locale.use24hourclock': 'Clock24',
+    'locale.temperatureunit': 'TemperatureUnit',
+    'locale.speedunit': 'SpeedUnit',
+    'videoplayer.autoplaynextitem': 'AutoplayNext',
+    'videoplayer.seeksteps': 'SeekSteps',
+    'videoplayer.adjustrefreshrate': 'MatchRefresh',
+    'videoplayer.usedisplayasclock': 'SyncDisplay',
+    'audiooutput.audiodevice': 'AudioDevice',
+    'audiooutput.channels': 'AudioChannels',
+    'locale.audiolanguage': 'AudioLanguage',
+    'audiooutput.passthrough': 'Passthrough',
+    'audiooutput.guisoundmode': 'NavigationSounds',
+    'locale.subtitlelanguage': 'SubtitleLanguage',
+    'subtitles.languages': 'SubtitleDownloads',
+    'subtitles.downloadfirst': 'SubtitleAuto',
+    'videoscreen.resolution': 'Resolution',
+    'videoscreen.screenmode': 'ScreenMode',
+    'videoscreen.blankdisplays': 'BlankDisplays',
+    'videoscreen.delayrefreshchange': 'RefreshDelay',
+    'powermanagement.displaysoff': 'DisplayOff',
+    'screensaver.time': 'ScreensaverTime',
+}
+
+
+def setting_summary(setting):
+    value = setting.get('value')
+    text = next((str(o['label']) for o in setting_options(setting)
+                 if o.get('value') == value), display_value(value))
+    return text + (' (Unavailable)' if not setting.get('enabled', True) else '')
+
+
+def sync_window():
+    window = xbmcgui.Window(1198)
+    definitions = {s['id']: s for s in rpc('Settings.GetSettings', {'level': 'expert'}).get('settings', [])}
+    for key, prop in SETTINGS_WINDOW_PROPERTIES.items():
+        setting = definitions.get(key)
+        window.setProperty('StremioSettings.' + prop,
+                           setting_summary(setting) if setting and setting.get('value') is not None else 'Unavailable')
+    try:
+        connected = bool(Store(PROFILE).load().get('token'))
+    except Exception:
+        connected = False
+    window.setProperty('StremioSettings.Account', 'Connected' if connected else 'Not connected')
+    window.setProperty('StremioSettings.Weather', ADDON.getSetting('weather_location').strip() or 'Not set')
+    manifest = ADDON.getSetting('manifest').strip() or 'https://v3-cinemeta.strem.io/manifest.json'
+    window.setProperty('StremioSettings.CatalogSource',
+                       'Official Cinemeta' if manifest == 'https://v3-cinemeta.strem.io/manifest.json' else 'Custom')
+    window.setProperty('StremioSettings.KodiVersion', xbmc.getInfoLabel('System.BuildVersion'))
+    window.setProperty('StremioSettings.Runtime',
+                       'Portable Kodi' if xbmc.getCondVisibility('System.HasAddon(service.stremioelec.portable)') else 'StremioELEC OS')
+
+
 def helper_menu():
-    selection = choose('Catalogs & Artwork', [
-        'Stremio Addons',
-        'TMDb trailer API key',
-        'Ratings display',
-    ])
+    selection = choose('Catalogs & artwork', ['Catalog source', 'TMDb trailer API key', 'Ratings'])
     if selection < 0:
         return
-    if selection == 0:
-        xbmc.executebuiltin('ActivateWindow(1196)')
-    elif selection == 1:
-        action = choose('TMDb trailer API key',
-                        ['Replace key (stored locally)', 'Remove key'])
+    if selection == 2:
+        ratings_menu()
+        return
+    if selection == 1:
+        action = choose('TMDb trailer API key', ['Replace key (stored locally)', 'Remove key'])
         if action == 0:
             value = DIALOG.input('TMDb API key', type=xbmcgui.INPUT_ALPHANUM,
                                  option=xbmcgui.ALPHANUM_HIDE_INPUT)
@@ -141,33 +195,44 @@ def helper_menu():
                 ADDON.setSetting('tmdb_api_key', value.strip())
         elif action == 1:
             ADDON.setSetting('tmdb_api_key', '')
-    elif selection == 2:
-        ratings_menu()
+        return
+    current = ADDON.getSetting('manifest').strip() or 'https://v3-cinemeta.strem.io/manifest.json'
+    action = choose('Catalog source', ['Use official Cinemeta', 'Change manifest URL', 'Current: ' + current])
+    if action == 0:
+        ADDON.setSetting('manifest', 'https://v3-cinemeta.strem.io/manifest.json')
+    elif action == 1:
+        value = DIALOG.input('Stremio catalog manifest URL', defaultt=current,
+                             type=xbmcgui.INPUT_ALPHANUM)
+        if value.strip():
+            from protocol import base_url
+            try:
+                base_url(value.strip())
+            except Exception:
+                DIALOG.ok('Catalog source', 'Use an HTTP(S) URL ending in /manifest.json.')
+                return
+            ADDON.setSetting('manifest', value.strip())
+
 
 def ratings_menu():
-    toggles = [
-        ('EnableRatings', 'Show ratings'),
-        ('EnableStudioLogo', 'Show available studio logos'),
-        ('details_row_rating', 'Rating in details row'),
-        ('DisableRatingsPlotCritics', 'Hide ratings / critics in plot'),
-    ]
+    toggles = [('EnableRatings', 'Show ratings'),
+               ('EnableTop250WhiteLabel', 'White Top 250 label'),
+               ('details_row_rating', 'Rating in details row'),
+               ('DisableRatingsPlotCritics', 'Hide ratings / critics in plot'),
+               ('videoinfo_button_myrating', 'My rating button in info')]
     while True:
-        values = [xbmc.getCondVisibility('Skin.HasSetting(' + key + ')')
-                  for key, _ in toggles]
-        labels = [label + ': ' + display_value(value)
-                  for (_, label), value in zip(toggles, values)]
-        index = choose('Ratings display', labels + ['Details rating color'])
+        values = [xbmc.getCondVisibility('Skin.HasSetting(' + key + ')') for key, _ in toggles]
+        labels = [label + ': ' + display_value(value) for (_, label), value in zip(toggles, values)]
+        index = choose('Ratings', labels + ['Details rating color'])
         if index < 0:
             return
         if index < len(toggles):
             key = toggles[index][0]
-            xbmc.executebuiltin(
-                ('Skin.Reset(' if values[index] else 'Skin.SetBool(') + key + ')')
+            xbmc.executebuiltin(('Skin.Reset(' if values[index] else 'Skin.SetBool(') + key + ')')
         else:
             color = choose('Details rating color', [label for label, _ in COLORS])
             if color >= 0:
-                xbmc.executebuiltin(
-                    'Skin.SetString(BingieRatingInDetailsColor,' + COLORS[color][1] + ')')
+                xbmc.executebuiltin('Skin.SetString(BingieRatingInDetailsColor,' + COLORS[color][1] + ')')
+
 
 def weather_menu():
     """Configure the built-in StremioELEC weather provider."""
@@ -206,25 +271,33 @@ def weather_menu():
 
 
 def home_menu():
-    while True:
-        style = xbmc.getInfoLabel('Skin.String(widgetstyle)') or 'poster'
-        index = choose('Home & Appearance', [
-            'Appearance',
-            'Card layout: ' + style.title(),
-            'Refresh Home',
-        ])
-        if index < 0:
-            return
-        if index == 0:
-            appearance_menu()
-        elif index == 1:
-            selected = choose('Card layout', ['Posters', 'Landscape'])
-            if selected >= 0:
-                xbmc.executebuiltin(
-                    'Skin.SetString(widgetstyle,' + ('poster' if selected == 0 else 'landscape') + ')')
-                xbmc.executebuiltin('ReloadSkin()')
-        elif index == 2:
-            xbmc.executebuiltin('Container.Refresh')
+    from setup_profile import HOME_ROWS
+    current = [not xbmc.getCondVisibility('Skin.HasSetting(StremioHideHomeRow{})'.format(i))
+               for i in range(len(HOME_ROWS))]
+    selected = DIALOG.multiselect('Visible Home rows', [label for label, _ in HOME_ROWS],
+                                  preselect=[i for i, enabled in enumerate(current) if enabled])
+    if selected is None:
+        return
+    if not selected:
+        DIALOG.ok('Home', 'Keep at least one Home row visible.')
+        return
+    chosen = set(selected)
+    for i in range(len(HOME_ROWS)):
+        xbmc.executebuiltin(('Skin.Reset(' if i in chosen else 'Skin.SetBool(') +
+                            'StremioHideHomeRow{})'.format(i))
+    xbmc.executebuiltin('ReloadSkin()')
+
+
+def card_layout_menu():
+    values = [('Landscape', 'landscape'), ('Posters', 'poster'), ('Square', 'square')]
+    current = xbmc.getInfoLabel('Skin.String(widgetstyle)') or 'landscape'
+    index = DIALOG.select('Card layout', [label for label, _ in values],
+                          preselect=next((i for i, (_, value) in enumerate(values)
+                                          if value == current), 0))
+    if index >= 0:
+        xbmc.executebuiltin('Skin.SetString(widgetstyle,' + values[index][1] + ')')
+        xbmc.executebuiltin('ReloadSkin()')
+
 
 def appearance_menu():
     while True:
@@ -345,7 +418,12 @@ def advanced_playback_enabled():
 
 
 def playback_menu():
-    entries = [('videoplayer.usedisplayasclock', 'Sync playback to display')]
+    entries = [
+        ('videoplayer.autoplaynextitem', 'Autoplay next item'),
+        ('videoplayer.seeksteps', 'Skip / seek steps'),
+        ('videoplayer.adjustrefreshrate', 'Match display refresh rate'),
+        ('videoplayer.usedisplayasclock', 'Sync playback to display'),
+    ]
     if advanced_playback_enabled():
         entries += [
             ('videoplayer.usevtb', 'VideoToolbox hardware decoding'),
@@ -374,10 +452,50 @@ def audio_menu():
         ])
 
 
+def region_menu():
+    kodi_menu('Region & Location', [
+        ('locale.country', 'Country / region'),
+        ('locale.timezonecountry', 'Time zone country'),
+        ('locale.timezone', 'Time zone'),
+        ('locale.keyboardlayouts', 'Keyboard layouts'),
+        ('locale.use24hourclock', '24-hour clock'),
+        ('locale.timeformat', 'Time format'),
+        ('locale.shortdateformat', 'Short date format'),
+        ('locale.longdateformat', 'Long date format'),
+        ('locale.temperatureunit', 'Temperature unit'),
+        ('locale.speedunit', 'Speed unit'),
+    ])
+
+
+def accessibility_menu():
+    kodi_menu('Accessibility', [
+        ('accessibility.audiovisual', 'Audio description'),
+        ('accessibility.audiohearing', 'Hearing-impaired audio'),
+        ('accessibility.subhearing', 'Hearing-impaired subtitles'),
+        ('subtitles.parsecaptions', 'Parse closed captions'),
+    ])
+
+
+def power_menu():
+    kodi_menu('Power & Screensaver', [
+        ('powermanagement.displaysoff', 'Turn display off after'),
+        ('powermanagement.shutdowntime', 'Shutdown timer'),
+        ('powermanagement.shutdownstate', 'Shutdown action'),
+        ('powermanagement.waitfornetwork', 'Wait for network on startup'),
+        ('powermanagement.wakeonaccess', 'Wake on network access'),
+        ('screensaver.time', 'Screensaver delay'),
+        ('screensaver.disableforaudio', 'Disable screensaver during audio'),
+        ('screensaver.usedimonpause', 'Dim screen when paused'),
+    ])
+
+
 def display_menu():
     kodi_menu('Display', [
+        ('videoscreen.monitor', 'Display / monitor'),
         ('videoscreen.resolution', 'Resolution'),
         ('videoscreen.screenmode', 'Display mode'),
+        ('videoscreen.blankdisplays', 'Blank other displays'),
+        ('videoscreen.delayrefreshchange', 'Refresh-rate change delay'),
         ('videoplayer.adjustrefreshrate', 'Match display refresh rate'),
     ])
 
@@ -432,6 +550,7 @@ def system_updates_menu():
     actions.append(('os_updates', 'System Updates') if os_updater else ('component_updates', 'Component Updates'))
     if os_settings:
         actions.append(('network', 'Network & Bluetooth'))
+    actions.append(('power_settings', 'Power & Screensaver'))
     actions.append(('restart', 'Restart StremioELEC'))
     actions.append(('restore', 'Restore previous interface') if portable else ('power', 'Power off device'))
     index = choose('System & Updates', [label for _, label in actions])
@@ -448,6 +567,8 @@ def system_updates_menu():
         DIALOG.notification('StremioELEC', 'Checking component updates')
     elif action == 'network':
         xbmc.executebuiltin('RunScript(special://xbmc/addons/service.libreelec.settings/default.py)')
+    elif action == 'power_settings':
+        power_menu()
     elif action == 'restart' and DIALOG.yesno('Restart StremioELEC?', 'Stop playback and restart the application now?'):
         xbmc.executebuiltin('RestartApp')
     elif action == 'restore':
@@ -489,9 +610,15 @@ def advanced_menu():
             xbmc.executebuiltin('ActivateWindow(1199)')
 
 
-def run(section):
-    if section == 'account':
+def run(section, *args):
+    if section == 'sync':
+        sync_window()
+    elif section == 'setting' and len(args) >= 2:
+        edit_kodi(args[0], args[1])
+        sync_window()
+    elif section == 'account':
         account_menu()
+        sync_window()
     elif section == 'home':
         index = choose('Home & Appearance', ['Visible Home rows', 'Card layout', 'Appearance'])
         if index == 0:
@@ -500,10 +627,25 @@ def run(section):
             card_layout_menu()
         elif index == 2:
             appearance_menu()
+    elif section == 'home_rows':
+        home_menu()
+    elif section == 'card_layout':
+        card_layout_menu()
+    elif section == 'appearance':
+        appearance_menu()
     elif section == 'catalogs':
         helper_menu()
     elif section == 'weather':
         weather_menu()
+        sync_window()
+    elif section == 'region':
+        region_menu()
+    elif section == 'accessibility':
+        accessibility_menu()
+    elif section == 'power':
+        power_menu()
+    elif section == 'diagnostics':
+        diagnostics_menu()
     elif section == 'playback':
         playback_menu()
     elif section == 'audio':
@@ -513,15 +655,19 @@ def run(section):
     elif section == 'remote':
         remote_tv_menu()
     elif section == 'subtitles':
-        kodi_menu('Subtitles', [
-            ('locale.subtitlelanguage', 'Preferred language'), ('subtitles.languages', 'Download languages'),
-            ('subtitles.downloadfirst', 'Automatically download first subtitle'),
-            ('subtitles.fontsize', 'Text size'), ('subtitles.fontname', 'Font'),
-            ('subtitles.style', 'Text style'), ('subtitles.colorpick', 'Subtitle color'),
-            ('subtitles.align', 'Position'), ('subtitles.backgroundtype', 'Background style'),
-            ('subtitles.bordercolorpick', 'Border color'), ('subtitles.bgcolorpick', 'Background color'),
-            ('subtitles.shadowcolor', 'Shadow color'), ('subtitles.overridestyles', 'Override subtitle styles'),
-        ])
+        index = choose('Subtitles & Accessibility', ['Subtitle settings', 'Accessibility'])
+        if index == 0:
+            kodi_menu('Subtitles', [
+                ('locale.subtitlelanguage', 'Preferred language'), ('subtitles.languages', 'Download languages'),
+                ('subtitles.downloadfirst', 'Automatically download first subtitle'),
+                ('subtitles.fontsize', 'Text size'), ('subtitles.fontname', 'Font'),
+                ('subtitles.style', 'Text style'), ('subtitles.colorpick', 'Subtitle color'),
+                ('subtitles.align', 'Position'), ('subtitles.backgroundtype', 'Background style'),
+                ('subtitles.bordercolorpick', 'Border color'), ('subtitles.bgcolorpick', 'Background color'),
+                ('subtitles.shadowcolor', 'Shadow color'), ('subtitles.overridestyles', 'Override subtitle styles'),
+            ])
+        elif index == 1:
+            accessibility_menu()
     elif section == 'system':
         system_updates_menu()
     elif section == 'advanced':
@@ -537,6 +683,6 @@ def run(section):
 
 if __name__ == '__main__':
     try:
-        run(sys.argv[1] if len(sys.argv) > 1 else 'account')
+        run(sys.argv[1] if len(sys.argv) > 1 else 'account', *sys.argv[2:])
     except Exception:
         DIALOG.ok('StremioELEC', 'The change could not be completed. Your current setup has been kept where possible. Please retry.')

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- BINGIE -->
 <includes>
-	<include name="BingieAltInfo">	
-			<control type="group"> 				
+	<include name="BingieAltInfo">
+			<control type="group">
 				<!-- background -->
 				<control type="group">
 					<control type="image">
@@ -17,10 +17,10 @@
 						<texture background="true">$VAR[fanartBackground]</texture>
 					</control>
 				</control>
-				
+
 				<!-- Now Playing -->
 				<include condition="!$EXP[IsPlayingUnrecognizedContent]">NowPlayingBackground</include>
-		
+
 				<!-- trailer video preview -->
 				<control type="group">
 					<include>FullscreenDimensions</include>
@@ -38,7 +38,7 @@
 						<param name="onback">8000</param>
 					</include>
 				</control>
-				
+
 				<!-- hiddenlist to get first/next episode -->
 				<control type="list" id="5050">
 					<visible>Skin.HasSetting(videoinfo_button_play_next)</visible>
@@ -50,11 +50,11 @@
 					<focusedlayout/>
 					<content sortorder="ascending" sortby="playcount" limit="1">$VAR[InfoDialogNextUpContent]</content>
 				</control>
-				
+
 				<!-- hiddenlist to get first/next episode with tmdb helper -->
 				<control type="list" id="1234">
 					<visible>Skin.HasSetting(videoinfo_button_play_next_tmdb)</visible>
-					<visible>String.IsEqual(ListItem.dbtype,tvshow) + String.IsEmpty(ListItem.DBID) + String.IsEqual(ListItem.Path,plugin://plugin.video.tmdb.bingie.helper/)</visible>
+					<visible>String.IsEqual(ListItem.dbtype,tvshow) + String.IsEmpty(ListItem.DBID) + !String.IsEmpty(ListItem.Property(StremioID))</visible>
 					<visible>!String.IsEmpty(ListItem.UniqueID(tmdb))</visible>
 					<top>0</top>
 					<left>0</left>
@@ -64,15 +64,15 @@
 					<focusedlayout>-</focusedlayout>
 					<content limit="1">$VAR[InfoDialogTMDbBingieHelperNextUpContent]</content>
 				</control>
-				
-        <control type="group">  
+
+        <control type="group">
 			<visible>!String.IsEqual(ListItem.Property(tmdb_type),person)</visible>
 			<animation effect="fade" start="100" end="0" time="500" delay="0" condition="[Player.HasVideo + ![VideoPlayer.Content(movies) | VideoPlayer.Content(episodes) | VideoPlayer.Content(musicvideos) | VideoPlayer.Content(livetv) | Pvr.IsPlayingRecording]] + Control.HasFocus(70011)">Conditional</animation>
-			<animation effect="fade" start="100" end="0" condition="!String.IsEmpty(Window(Home).Property(TMDbBingieHelper.Recommendations.HideInfo))">Conditional</animation>
+			<animation effect="fade" start="100" end="0" condition="!String.IsEmpty(Window(Home).Property(StremioRecommendations.HideInfo))">Conditional</animation>
 			<animation effect="fade" start="100" end="0" time="200" condition="Window.IsVisible(script-tmdbbingiehelper-wikipedia.xml)">Conditional</animation>
 			<animation effect="fade" start="0" end="100" time="200">Visible</animation>
 			<visible>String.IsEmpty(Window(Home).Property(Recommendations.IsLoading))</visible>
-		<control type="group">	
+		<control type="group">
 			<!-- additional info header -->
 			<control type="label">
 				<visible>!String.IsEmpty(Window.Property(AdditionalInfo))</visible>
@@ -85,14 +85,14 @@
 				<align>right</align>
 				<textcolor>$INFO[Skin.String(BingieHeaderTextColor)]</textcolor>
 				<label>$INFO[Window.Property(subtitle)]</label>
-			</control>		
+			</control>
 			<!-- dialog info details -->
 			<control type="grouplist">
 					<include>BingieLeftDefs</include>
 					<top>10</top>
 					<width>1200</width>
 					<usecontrolcoords>true</usecontrolcoords>
-					<orientation>vertical</orientation>					
+					<orientation>vertical</orientation>
 				<control type="grouplist">
 					<include>Animation_Right_Delay_2</include>
 					<usecontrolcoords>true</usecontrolcoords>
@@ -110,7 +110,7 @@
 						<top>-199</top>
 						<height>194</height>
 						<width max="650">auto</width>
-						<font>title</font> 
+						<font>title</font>
 						<align>left</align>
 						<aligny>center</aligny>
 						<textcolor>$INFO[Skin.String(BingieLabelTextColor)]</textcolor>
@@ -125,15 +125,15 @@
 						<include>SpotlightRowDetails</include>
 					</control>
 				</control>
-				
+
 				<control type="grouplist">
 					<top>223</top>
 					<include>Animation_Right_Delay</include>
 					<usecontrolcoords>true</usecontrolcoords>
 					<orientation>vertical</orientation>
-					
+
 					<!-- Bingie Top 250/Sublabel/watch xx Now -->
-					<control type="grouplist">						
+					<control type="grouplist">
 						<visible>String.IsEmpty(Control.GetLabel(823))</visible>
 						<visible>![Skin.HasSetting(ShowEpisodePlotInfoDialog) + String.IsEqual(ListItem.DBTYPE,tvshow)]</visible>
 						<orientation>vertical</orientation>
@@ -141,10 +141,10 @@
 						<width>800</width>
 						<itemgap>0</itemgap>
 						<include condition="Skin.HasSetting(videoinfo_details_cast)">More_Details_Top250</include>
-					</control>	
+					</control>
 
 					<!-- Sublabel -->
-					<control type="label" id="823">						
+					<control type="label" id="823">
 						<visible>!String.IsEmpty(Control.GetLabel(823))</visible>
 						<visible>!$EXP[IsMovieDBType]</visible>
 						<animation effect="fade" start="100" end="0" time="200" condition="!String.IsEmpty(Window.Property(AdditionalInfo))">Conditional</animation>
@@ -169,7 +169,7 @@
 						<font>Plots</font>
 						<label>$VAR[BingieDialogInfoPlot]</label>
 					</control>
-					
+
                     <!-- more details -->
 					<control type="grouplist">
 						<animation effect="fade" start="100" end="0" time="200">Conditional</animation>
@@ -194,7 +194,7 @@
 					<top>720</top>
 					<width>1670</width>
 					<height>340</height>
-                    <left>131</left>					
+                    <left>131</left>
 					<onleft>50</onleft>
 					<onright>50</onright>
 					<onup>8000</onup>
@@ -203,8 +203,8 @@
 					<orientation>horizontal</orientation>
 					<focusposition>0</focusposition>
 					<onclick>SetProperty(CloseInfoDialog,1,Home)</onclick>
-					<onclick>RunScript(plugin.video.tmdb.bingie.helper,add_path=$INFO[ListItem.FolderPath],call_auto=1190)</onclick>
-					<animation effect="fade" start="100" end="0" time="0" condition="Container(50).IsUpdating + ![Integer.IsGreater(Container(50).NumItems,0) + $EXP[IsPlayingUnrecognizedContent]]">Conditional</animation>	
+					<onclick>ActivateWindow(Videos,$ESCINFO[ListItem.FolderPath],return)</onclick>
+					<animation effect="fade" start="100" end="0" time="0" condition="Container(50).IsUpdating + ![Integer.IsGreater(Container(50).NumItems,0) + $EXP[IsPlayingUnrecognizedContent]]">Conditional</animation>
 					<animation effect="fade" start="0" end="100" time="400" condition="!Container(50).IsUpdating | $EXP[IsPlayingUnrecognizedContent]">Conditional</animation>
 					<itemlayout height="347" width="238">
 			        <control type="group">
@@ -231,9 +231,9 @@
 						<include>PosterTagOverlayBingieNoOverride</include>
 					</control>
 					</focusedlayout>
-					<content>plugin://plugin.video.tmdb.bingie.helper?info=cast&amp;nextpage=true&amp;aggregate=true$VAR[Path_Param_Type,&amp;,]$VAR[Path_Param_Query]$VAR[Path_Param_EpisodeSpecific]</content>
+					<content>$VAR[Path_Cast]</content>
                 </control>
-				
+
 				<!-- Fixed Frame -->
 				<control type="group">
 				<include>Animation_Right_Delay_3</include>
@@ -250,9 +250,9 @@
 					<param name="visibility" value="$EXP[UseOriginalFixedFocus]" />
 				</include>
 				</control>
-			
-				<!-- end -->  
-				
+
+				<!-- end -->
+
 				<!--Similar List-->
 				<control type="fixedlist" id="352">
 					<include>Animation_Right_Delay_3</include>
@@ -261,8 +261,8 @@
 					<height>340</height>
                     <left>131</left>
 					<onclick condition="String.IsEmpty(Window(Home).Property(SetCustomAddon))">Close</onclick>
-					<onclick condition="String.IsEmpty(Window(Home).Property(SetCustomAddon))">SetProperty(CloseInfoDialog,1,Home)</onclick>			
-                    <onclick condition="String.IsEmpty(Window(Home).Property(SetCustomAddon))">RunScript(plugin.video.tmdb.bingie.helper,add_path=$INFO[ListItem.FolderPath],call_auto=1190)</onclick>
+					<onclick condition="String.IsEmpty(Window(Home).Property(SetCustomAddon))">SetProperty(CloseInfoDialog,1,Home)</onclick>
+                    <onclick condition="String.IsEmpty(Window(Home).Property(SetCustomAddon))">ActivateWindow(Videos,$ESCINFO[ListItem.FolderPath],return)</onclick>
 					<onclick condition="!String.IsEmpty(Window(Home).Property(SetCustomAddon))">SetProperty(osdheader,$ESCINFO[Container($PARAM[id]).ListItem.Label],1122)</onclick>
 					<onclick condition="!String.IsEmpty(Window(Home).Property(SetCustomAddon))">SetProperty(osdtextbox,$ESCINFO[Container($PARAM[id]).ListItem.Plot],1122)</onclick>
 					<onclick condition="!String.IsEmpty(Window(Home).Property(SetCustomAddon))">SetProperty(osdrating,$ESCINFO[Container($PARAM[id]).ListItem.Rating],1122)</onclick>
@@ -275,7 +275,7 @@
 					<scrolltime tween="quadratic">500</scrolltime>
 					<preloaditems>4</preloaditems>
 					<orientation>horizontal</orientation>
-					<focusposition>0</focusposition>					
+					<focusposition>0</focusposition>
 					<visible allowhiddenfocus="true">String.IsEqual(Window.Property(AdditionalInfo),similar)</visible>
 					<animation effect="fade" start="0" end="100" time="400">Visible</animation>
                     <animation effect="fade" start="100" end="0" time="0" condition="Container(352).IsUpdating">Conditional</animation>
@@ -300,7 +300,7 @@
 						</focusedlayout>
 					<content>$VAR[Path_Similar]</content>
 				</control>
-				
+
 				<!-- Fixed Frame -->
 				<control type="group">
 				<include>Animation_Right_Delay_3</include>
@@ -321,12 +321,12 @@
 					<param name="visibility" value="$EXP[UseOriginalFixedFocus]" />
 				</include>
 				</control>
-				
+
 				<!-- hidden my rating button -->
 				<control type="button" id="7">
 					<include>HiddenObject</include>
 				</control>
-				
+
 				<control type="button" id="452">
 					<include>HiddenObject</include>
 					<onfocus>SetFocus($VAR[MenuFocus])</onfocus>
@@ -348,7 +348,7 @@
 							<onleft condition="String.IsEqual(Window.Property(AdditionalInfo), similar)">SetFocus(352)</onleft>
 							<onback condition="!String.IsEmpty(Window(Home).Property(FadeFanart))">ClearProperty(FadeFanart,home)</onback>
 							<onback>452</onback>
-							<onback condition="!String.IsEmpty(Window(Home).Property(AnimationRight))">ClearProperty(AnimationRight,home)</onback>						
+							<onback condition="!String.IsEmpty(Window(Home).Property(AnimationRight))">ClearProperty(AnimationRight,home)</onback>
 							<!-- Play/Resume via 5050 Container (next episode) -->
                             <control type="radiobutton" id="51">
                                 <visible>Skin.HasSetting(videoinfo_button_play_next)</visible>
@@ -365,7 +365,7 @@
 								<aligny>center</aligny>
 								<align>left</align>
 								<textoffsetx>52</textoffsetx>
-								<textoffsety>7</textoffsety>							
+								<textoffsety>7</textoffsety>
                                 <label>$VAR[PlayOrResumeSeasonEpisodeLabel2]</label>
 								<textwidth>163</textwidth>
                                 <radioposx>13</radioposx>
@@ -373,14 +373,13 @@
                                 <radioheight>22</radioheight>
                                 <onclick condition="Integer.IsGreater(Container(5050).NumItems,0) + !Container(5050).IsUpdating + !Window.IsActive(Custom_1190_TMDbBingieHelperCast.xml)">Dialog.Close(movieinformation)</onclick>
 								<onclick condition="Integer.IsGreater(Container(5050).NumItems,0) + !Container(5050).IsUpdating + !Window.IsActive(Custom_1190_TMDbBingieHelperCast.xml)">AlarmClock(PlayMovie,PlayMedia($ESCINFO[Container(5050).ListItem.FileNameAndPath],resume),00:01,silent)</onclick>
-								<onclick condition="Integer.IsGreater(Container(5050).NumItems,0) + !Container(5050).IsUpdating + Window.IsActive(Custom_1190_TMDbBingieHelperCast.xml)">RunScript(plugin.video.tmdb.bingie.helper,close_dialog=1190)</onclick>
                                 <onclick condition="Integer.IsGreater(Container(5050).NumItems,0) + !Container(5050).IsUpdating + Window.IsActive(Custom_1190_TMDbBingieHelperCast.xml)">AlarmClock(PlayMovie,PlayMedia($ESCINFO[Container(5050).ListItem.FileNameAndPath],resume),00:04,silent)</onclick>
                             </control>
-							
+
 							<!-- Play Next Episode with TMDB Helper -->
                             <control type="radiobutton" id="8181">
 								<visible>Skin.HasSetting(videoinfo_button_play_next_tmdb)</visible>
-								<visible>Control.IsVisible(1234) + String.IsEqual(ListItem.dbtype,tvshow) + String.IsEqual(ListItem.Path,plugin://plugin.video.tmdb.bingie.helper/)</visible>
+								<visible>Control.IsVisible(1234) + String.IsEqual(ListItem.dbtype,tvshow) + !String.IsEmpty(ListItem.Property(StremioID))</visible>
 								<visible>!String.IsEmpty(ListItem.UniqueID(tmdb))</visible>
                                 <include content="Bingie_InfoDialog_Button_Texture">
                                     <param name="radiotexture" value="dialogs/videoinfo/info/play2.png"/>
@@ -395,14 +394,13 @@
 								<align>left</align>
 								<textoffsetx>52</textoffsetx>
 								<textoffsety>7</textoffsety>
-								<textwidth>163</textwidth>								
+								<textwidth>163</textwidth>
                                 <label>$VAR[PlayOrResumeSeasonEpisodeLabel4]</label>
                                 <radioposx>13</radioposx>
                                 <radiowidth>22</radiowidth>
                                 <radioheight>22</radioheight>
                                 <onclick condition="Integer.IsGreater(Container(5050).NumItems,0) + !Container(5050).IsUpdating + !Window.IsActive(Custom_1190_TMDbBingieHelperCast.xml)">Dialog.Close(movieinformation)</onclick>
 								<onclick condition="Integer.IsGreater(Container(5050).NumItems,0) + !Container(5050).IsUpdating + !Window.IsActive(Custom_1190_TMDbBingieHelperCast.xml)">AlarmClock(PlayMovie,PlayMedia($ESCINFO[Container(1234).ListItem.FileNameAndPath],resume),00:01,silent)</onclick>
-								<onclick condition="Integer.IsGreater(Container(5050).NumItems,0) + !Container(5050).IsUpdating + Window.IsActive(Custom_1190_TMDbBingieHelperCast.xml)">RunScript(plugin.video.tmdb.bingie.helper,close_dialog=1190)</onclick>
                                 <onclick condition="Integer.IsGreater(Container(5050).NumItems,0) + !Container(5050).IsUpdating + Window.IsActive(Custom_1190_TMDbBingieHelperCast.xml)">AlarmClock(PlayMovie,PlayMedia($ESCINFO[Container(1234).ListItem.FileNameAndPath],resume),00:04,silent)</onclick>
                             </control>
 
@@ -424,7 +422,7 @@
 								<align>left</align>
 								<textoffsetx>52</textoffsetx>
 								<textoffsety>7</textoffsety>
-								<textwidth>163</textwidth>								
+								<textwidth>163</textwidth>
                                 <label>$LOCALIZE[208]$INFO[ListItem.Season, $LOCALIZE[31000],]$INFO[ListItem.Episode,: $LOCALIZE[31001],]</label>
                                 <radioposx>13</radioposx>
                                 <radiowidth>22</radiowidth>
@@ -432,10 +430,9 @@
 								<onclick condition="!Window.IsActive(Custom_1190_TMDbBingieHelperCast.xml)">Dialog.Close(movieinformation)</onclick>
 								<onclick condition="!String.IsEmpty(ListItem.FileNameAndPath) + !Window.IsActive(Custom_1190_TMDbBingieHelperCast.xml)">AlarmClock(PlayMovie,PlayMedia($ESCINFO[ListItem.FileNameAndPath]),00:01,silent)</onclick>
 								<onclick condition="String.IsEmpty(ListItem.FileNameAndPath) + !Window.IsActive(Custom_1190_TMDbBingieHelperCast.xml)">AlarmClock(PlayMovie,PlayMedia($ESCINFO[ListItem.FolderPath]),00:01,silent)</onclick>
-								<onclick condition="Window.IsActive(Custom_1190_TMDbBingieHelperCast.xml)">RunScript(plugin.video.tmdb.bingie.helper,close_dialog=1190)</onclick>
 								<onclick condition="!ListItem.IsFolder + !String.IsEmpty(ListItem.FileNameAndPath) + Window.IsActive(Custom_1190_TMDbBingieHelperCast.xml)">AlarmClock(PlayMovie,PlayMedia($ESCINFO[ListItem.FileNameAndPath]),00:04,silent)</onclick>
 								<onclick condition="!ListItem.IsFolder + String.IsEmpty(ListItem.FileNameAndPath) + Window.IsActive(Custom_1190_TMDbBingieHelperCast.xml)">AlarmClock(PlayMovie,PlayMedia($ESCINFO[ListItem.FolderPath]),00:04,silent)</onclick>
-                            </control>						
+                            </control>
 
                             <!-- Resume -->
                             <control type="radiobutton" id="90">
@@ -453,7 +450,7 @@
 								<align>left</align>
 								<textoffsetx>52</textoffsetx>
 								<textoffsety>7</textoffsety>
-								<textwidth>163</textwidth>											
+								<textwidth>163</textwidth>
                                 <label>$LOCALIZE[13404]$INFO[ListItem.Season, $LOCALIZE[31000],: ]$INFO[ListItem.Episode,$LOCALIZE[31001],]</label>
                                 <radioposx>13</radioposx>
                                 <radiowidth>22</radiowidth>
@@ -461,11 +458,10 @@
 								<onclick condition="!Window.IsActive(Custom_1190_TMDbBingieHelperCast.xml)">Dialog.Close(movieinformation)</onclick>
 								<onclick condition="!String.IsEmpty(ListItem.FileNameAndPath) + !Window.IsActive(Custom_1190_TMDbBingieHelperCast.xml)">AlarmClock(PlayMovie,PlayMedia($ESCINFO[ListItem.FileNameAndPath],resume),00:01,silent)</onclick>
 								<onclick condition="String.IsEmpty(ListItem.FileNameAndPath) + !Window.IsActive(Custom_1190_TMDbBingieHelperCast.xml)">AlarmClock(PlayMovie,PlayMedia($ESCINFO[ListItem.FolderPath],resume),00:01,silent)</onclick>
-								<onclick condition="Window.IsActive(Custom_1190_TMDbBingieHelperCast.xml)">RunScript(plugin.video.tmdb.bingie.helper,close_dialog=1190)</onclick>
 								<onclick condition="!ListItem.IsFolder + !String.IsEmpty(ListItem.FileNameAndPath) + Window.IsActive(Custom_1190_TMDbBingieHelperCast.xml)">AlarmClock(PlayMovie,PlayMedia($ESCINFO[ListItem.FileNameAndPath],resume),00:04,silent)</onclick>
 								<onclick condition="!ListItem.IsFolder + String.IsEmpty(ListItem.FileNameAndPath) + Window.IsActive(Custom_1190_TMDbBingieHelperCast.xml)">AlarmClock(PlayMovie,PlayMedia($ESCINFO[ListItem.FolderPath],resume),00:04,silent)</onclick>
                             </control>
-							
+
 							<!-- Play from beginning -->
                             <control type="radiobutton" id="52">
 								<visible>Skin.HasSetting(videoinfo_button_play_beginning)</visible>
@@ -483,7 +479,7 @@
 								<align>left</align>
 								<textoffsetx>52</textoffsetx>
 								<textoffsety>7</textoffsety>
-								<textwidth>163</textwidth>											
+								<textwidth>163</textwidth>
                                 <label>[CAPITALIZE]$LOCALIZE[31195][/CAPITALIZE]</label>
                                 <radioposx>13</radioposx>
                                 <radiowidth>22</radiowidth>
@@ -502,7 +498,6 @@
 								<!-- play episode with tmdb helper -->
 								<onclick condition="Control.IsVisible(1234) + String.IsEqual(ListItem.dbtype,tvshow) + !Window.IsActive(Custom_1190_TMDbBingieHelperCast.xml)">AlarmClock(PlayMovie,PlayMedia($INFO[Container(1234).ListItemAbsolute(0).FolderPath],noresume),00:01,silent)</onclick>
 								<!-- close custom 1190 -->
-								<onclick condition="Window.IsActive(Custom_1190_TMDbBingieHelperCast.xml)">RunScript(plugin.video.tmdb.bingie.helper,close_dialog=1190)</onclick>
 								<!-- play episode -->
                                 <onclick condition="!Control.IsVisible(5050) + String.IsEqual(ListItem.DBTYPE,episode) + !String.IsEmpty(ListItem.DBID) + Window.IsActive(Custom_1190_TMDbBingieHelperCast.xml)">AlarmClock(PlayMovie,PlayMedia(videodb://tvshows/$INFO[ListItem.DBID]),00:04,silent)</onclick>
                                 <!-- play movie -->
@@ -532,12 +527,12 @@
 								<aligny>center</aligny>
 								<align>left</align>
 								<textoffsetx>57</textoffsetx>
-								<textoffsety>7</textoffsety>	
+								<textoffsety>7</textoffsety>
                                 <label>$LOCALIZE[20360]</label>
                                 <radioposx>15</radioposx>
                                 <radiowidth>24</radiowidth>
                                 <radioheight>24</radioheight>
-								<textwidth>158</textwidth>			
+								<textwidth>158</textwidth>
                                 <onclick>SetProperty(BaseWindow,1,Home)</onclick>
 								<onclick>SetProperty(NoFadeOut,1,Home)</onclick>
 								<onclick>SetProperty(AnimationRight,1,Home)</onclick>
@@ -551,10 +546,8 @@
                                 <onclick condition="String.IsEqual(ListItem.DBTYPE,tvshow) + !String.IsEmpty(ListItem.DBID) + !Window.IsActive(Custom_1190_TMDbBingieHelperCast.xml)">SetProperty(ListItem.TVShowID,$INFO[ListItem.DBID],Home)</onclick>
                                 <onclick condition="String.IsEqual(ListItem.DBTYPE,tvshow) + !String.IsEmpty(ListItem.DBID) + !Window.IsActive(Custom_1190_TMDbBingieHelperCast.xml)">SetProperty(KeepTVShowID,1,Home)</onclick>
 								<onclick condition="String.IsEqual(ListItem.DBTYPE,tvshow) + !String.IsEmpty(ListItem.DBID) + !Window.IsActive(Custom_1190_TMDbBingieHelperCast.xml)">ActivateWindow(Videos,videodb://tvshows/titles/$INFO[ListItem.DBID]/-2/,return)</onclick>
-								<onclick condition="ListItem.IsFolder + !Window.IsVisible(MyVideoNav.xml) + !String.IsEmpty(ListItem.DBID) + String.IsEqual(ListItem.DBType,tvshow) + Window.IsActive(Custom_1190_TMDbBingieHelperCast.xml)">RunScript(plugin.video.tmdb.bingie.helper,close_dialog=1190,call_path=$INFO[ListItem.DBID,videodb://tvshows/titles/,/-2/return])</onclick>
                                 <!-- from tvshow infodialog for non-library content -->
 								<onclick condition="String.IsEqual(ListItem.DBTYPE,tvshow) + String.IsEmpty(ListItem.DBID) + !Window.IsActive(Custom_1190_TMDbBingieHelperCast.xml)">ActivateWindow(Videos,$ESCINFO[ListItem.FileNameAndPath],return)</onclick>
-								<onclick condition="String.IsEqual(ListItem.DBTYPE,tvshow) + String.IsEmpty(ListItem.DBID) + Window.IsActive(Custom_1190_TMDbBingieHelperCast.xml)">RunScript(plugin.video.tmdb.bingie.helper,close_dialog=1190,call_path=$INFO[ListItem.FolderPath])</onclick>
                             </control>
 
 							<!-- Trailer -->
@@ -576,18 +569,18 @@
 								<align>left</align>
 								<textoffsetx>55</textoffsetx>
 								<textoffsety>7</textoffsety>
-								<textwidth>160</textwidth>											
+								<textwidth>160</textwidth>
                                 <radioposx>11</radioposx>
                                 <radiowidth>27</radiowidth>
                                 <radioheight>27</radioheight>
 								<!-- movie trailer local -->
 								<!-- plugin with fallback -->
-								<!-- tvshow trailer local/youtube -->	
+								<!-- tvshow trailer local/youtube -->
 
 <onclick>RunScript(special://skin/extras/stremio_dispatch.py,trailer_player.py)</onclick>
 </control>
 
-							<!--Similar Button	-->	
+							<!--Similar Button	-->
                             <control type="radiobutton" id="62">
                                 <visible>Skin.HasSetting(videoinfo_button_similar)</visible>
 								<visible>!$EXP[IsSetDBType] + !Window.IsActive(1116) + !Window.IsActive(tvrecordings)</visible>
@@ -603,8 +596,8 @@
 								<textoffsetx>56</textoffsetx>
 								<textoffsety>7</textoffsety>
 								<height>52</height>
-								<width>224</width>	
-								<textwidth>159</textwidth>			
+								<width>224</width>
+								<textwidth>159</textwidth>
                                 <label>$LOCALIZE[31479]</label>
                                 <radioposx>13</radioposx>
                                 <radiowidth>24</radiowidth>
@@ -612,7 +605,7 @@
                                 <onclick>SetProperty(AdditionalInfo, similar)</onclick>
 								<onclick>SetProperty(subtitle, $LOCALIZE[31479])</onclick>
                                 <onclick>SetFocus(352)</onclick>
-                            </control> 
+                            </control>
 
 							<!-- add to my list -->
                             <control type="radiobutton" id="56">
@@ -630,16 +623,15 @@
 								<texturenofocus/>
                                 <label>[CAPITALIZE]$LOCALIZE[31534][/CAPITALIZE]</label>
                              	<height>52</height>
-								<width>224</width>	
-								<textwidth>161</textwidth>			
+								<width>224</width>
+								<textwidth>161</textwidth>
                                 <aligny>center</aligny>
 								<align>left</align>
 								<textoffsetx>54</textoffsetx>
-								<textoffsety>7</textoffsety>	
+								<textoffsety>7</textoffsety>
                                 <radioposx>14</radioposx>
                                 <radiowidth>22</radiowidth>
                                 <radioheight>22</radioheight>
-                                <onclick>RunScript(script.bingie.helper,action=togglemylist)</onclick>
                             </control>
 
 							<!-- remove from my list -->
@@ -658,18 +650,17 @@
 								<texturenofocus/>
                                 <label>[CAPITALIZE]$LOCALIZE[31534][/CAPITALIZE]</label>
 								<height>52</height>
-								<width>224</width>								
+								<width>224</width>
                                 <aligny>center</aligny>
 								<align>left</align>
 								<textoffsetx>54</textoffsetx>
 								<textoffsety>7</textoffsety>
-								<textwidth>161</textwidth>			
+								<textwidth>161</textwidth>
                                 <radioposx>14</radioposx>
                                 <radiowidth>22</radiowidth>
                                 <radioheight>22</radioheight>
-                                <onclick>RunScript(script.bingie.helper,action=togglemylist)</onclick>
                             </control>
-							
+
 							<!-- Add/Remove Favorites -->
                             <control type="radiobutton" id="561">
 <visible>$EXP[IsTvShowDBTypeNoFallback] | $EXP[IsMovieDBTypeNoFallback]</visible>
@@ -694,7 +685,7 @@
                                 <radiowidth>22</radiowidth>
                                 <radioheight>22</radioheight>
 </control>
-							
+
 							<!-- Trakt Manager -->
                             <control type="radiobutton" id="562">
 								<visible>!$EXP[IsEpisodeDBType]</visible>
@@ -710,22 +701,20 @@
 								<texturenofocus/>
                                 <label>$LOCALIZE[31153]</label>
                              	<height>52</height>
-								<width>224</width>	
-								<textwidth>161</textwidth>			
+								<width>224</width>
+								<textwidth>161</textwidth>
                                 <aligny>center</aligny>
 								<align>left</align>
 								<textoffsetx>55</textoffsetx>
-								<textoffsety>7</textoffsety>	
+								<textoffsety>7</textoffsety>
                                 <radioposx>12</radioposx>
                                 <radiowidth>26</radiowidth>
                                 <radioheight>26</radioheight>
-                                <onclick condition="!String.IsEmpty(ListItem.Property(tmdb_id))">RunScript(plugin.video.tmdb.bingie.helper,sync_trakt,tmdb_id=$INFO[ListItem.Property(tmdb_id)],$VAR[Path_Param_Type],cache_refresh)</onclick>
-								<onclick condition="String.IsEmpty(ListItem.Property(tmdb_id))">RunScript(plugin.video.tmdb.bingie.helper,sync_trakt,tmdb_id=$INFO[Container(17195).ListItem.Property(tmdb_id)],$VAR[Path_Param_Type],cache_refresh)</onclick>
                             </control>
-							
+
 							<!--Credit & More Info Button-->
                             <control type="radiobutton" id="63">
-                                <visible>Skin.HasSetting(videoinfo_button_moreinfo)</visible>
+                                <visible>Skin.HasSetting(videoinfo_button_moreinfo) + False</visible>
 								<visible>!$EXP[IsSetDBType] + !Window.IsActive(1116) + !Window.IsActive(tvrecordings)</visible>
                                 <include content="Bingie_InfoDialog_Button_Texture">
                                     <param name="radiotexture" value="dialogs/videoinfo/info/cast.png"/>
@@ -736,8 +725,8 @@
 								<texturenofocus/>
                                 <label>[CAPITALIZE]$LOCALIZE[31187][/CAPITALIZE]</label>
 								<height>52</height>
-								<width>224</width>	
-								<textwidth>174</textwidth>			
+								<width>224</width>
+								<textwidth>174</textwidth>
                                 <aligny>center</aligny>
 								<align>left</align>
 								<textoffsetx>53</textoffsetx>
@@ -749,9 +738,9 @@
 								<onfocus>SetProperty(Path.Crew,"$VAR[Path_Crew]")</onfocus>
 								<onclick>SetProperty(AdditionalInfo, cast)</onclick>
 								<onclick>SetProperty(subtitle, [CAPITALIZE]$LOCALIZE[31246][/CAPITALIZE])</onclick>
-                                <onclick>SetFocus(8999,0)</onclick>	
+                                <onclick>SetFocus(8999,0)</onclick>
 							</control>
-							
+
 							<!-- Wikipedia -->
                             <control type="radiobutton" id="631">
                                 <visible>Skin.HasSetting(videoinfo_button_wikipedia)</visible>
@@ -764,8 +753,8 @@
 								<texturenofocus/>
                                 <label>$LOCALIZE[31094]</label>
 								<height>52</height>
-								<width>224</width>	
-								<textwidth>174</textwidth>			
+								<width>224</width>
+								<textwidth>174</textwidth>
                                 <aligny>center</aligny>
 								<align>left</align>
 								<textoffsetx>54</textoffsetx>
@@ -774,12 +763,11 @@
                                 <radiowidth>25</radiowidth>
                                 <radioheight>25</radioheight>
 								<onclick condition="String.IsEmpty(Window(Home).Property(BusyInfoDialogTrailer)) + Window.IsActive(1190)">SetProperty(BusyInfoDialogTrailer,1,Home)</onclick>
-								<onclick>runscript(plugin.video.tmdb.bingie.helper,wikipedia=$VAR[Path_Wikipedia_Title],tmdb_type=$VAR[Path_Wikipedia_Type])</onclick>
 							</control>
-							
+
 							<!-- Get Thumb Artwork Downloader -->
 							<control type="radiobutton" id="10">
-								<visible>Skin.HasSetting(videoinfo_button_artwork) + !String.IsEqual(ListItem.Path,plugin://plugin.video.tmdb.bingie.helper/)</visible>
+								<visible>Skin.HasSetting(videoinfo_button_artwork) + False + String.IsEmpty(ListItem.Property(StremioID))</visible>
 								<visible>String.IsEmpty(Window.Property(AdditionalInfo)) + [String.IsEqual(ListItem.DBType,tvshow) | String.IsEqual(ListItem.DBType,movie) | String.IsEqual(ListItem.DBType,musicvideo) | String.IsEqual(ListItem.DBType,episode)] + !String.IsEmpty(ListItem.DBID)</visible>
 								<include content="Bingie_InfoDialog_Button_Texture">
 								<param name="radiotexture" value="dialogs/videoinfo/info/artwork.png"/>
@@ -793,18 +781,18 @@
 								<aligny>center</aligny>
 								<align>left</align>
 								<textoffsetx>57</textoffsetx>
-								<textoffsety>7</textoffsety>	
-								<textwidth>158</textwidth>			
+								<textoffsety>7</textoffsety>
+								<textwidth>158</textwidth>
 								<label>$LOCALIZE[39123]</label>
 								<radioposx>15</radioposx>
 								<radiowidth>25</radiowidth>
-								<radioheight>25</radioheight>								
-							</control> 						
-							
+								<radioheight>25</radioheight>
+							</control>
+
 							<!-- TMDB Helper Artwork -->
 							<control type="radiobutton" id="1040">
-								<visible>Skin.HasSetting(videoinfo_button_artwork)</visible>
-								<visible>String.IsEmpty(Window.Property(AdditionalInfo)) + String.IsEqual(ListItem.Path,plugin://plugin.video.tmdb.bingie.helper/)</visible>
+								<visible>Skin.HasSetting(videoinfo_button_artwork) + False</visible>
+								<visible>String.IsEmpty(Window.Property(AdditionalInfo)) + !String.IsEmpty(ListItem.Property(StremioID))</visible>
 								<visible>!$EXP[IsSetDBType]</visible>
 								<include content="Bingie_InfoDialog_Button_Texture">
 								<param name="radiotexture" value="dialogs/videoinfo/info/artwork.png"/>
@@ -818,20 +806,17 @@
 								<aligny>center</aligny>
 								<align>left</align>
 								<textoffsetx>57</textoffsetx>
-								<textoffsety>7</textoffsety>	
-								<textwidth>158</textwidth>			
+								<textoffsety>7</textoffsety>
+								<textwidth>158</textwidth>
 								<label>$LOCALIZE[39123]</label>
 								<radioposx>15</radioposx>
 								<radiowidth>25</radiowidth>
 								<radioheight>25</radioheight>
-								<onclick condition="$EXP[IsTvShowDBType]">Runscript(plugin.video.tmdb.bingie.helper,select_artwork,tmdb_id=$INFO[ListItem.UniqueID(tmdb)],tmdb_type=tv)</onclick>
-								<onclick condition="$EXP[IsMovieDBType]">Runscript(plugin.video.tmdb.bingie.helper,select_artwork,tmdb_id=$INFO[ListItem.UniqueID(tmdb)],tmdb_type=movie)</onclick>
-								<onclick condition="$EXP[IsEpisodeDBType]">Runscript(plugin.video.tmdb.bingie.helper,select_artwork,type=tv,tmdb_id=$INFO[ListItem.UniqueID(tvshow.tmdb)],query=$INFO[ListItem.TVShowTitle],season=$INFO[ListItem.Season],episode=$INFO[ListItem.Episode])</onclick>
 							</control>
-							
+
 							<!-- Refresh -->
 							<control type="radiobutton" id="6">
-								<visible>Skin.HasSetting(videoinfo_button_refresh)</visible>
+								<visible>Skin.HasSetting(videoinfo_button_refresh) + False</visible>
 								<visible>Control.IsEnabled(6)</visible>
 								<include content="Bingie_InfoDialog_Button_Texture">
 								<param name="radiotexture" value="dialogs/videoinfo/info/refresh.png"/>
@@ -845,18 +830,18 @@
 								<aligny>center</aligny>
 								<align>left</align>
 								<textoffsetx>54</textoffsetx>
-								<textoffsety>7</textoffsety>	
-								<textwidth>158</textwidth>			
+								<textoffsety>7</textoffsety>
+								<textwidth>158</textwidth>
 								<label>$LOCALIZE[184]</label>
 								<radioposx>14</radioposx>
 								<radiowidth>22</radiowidth>
 								<radioheight>22</radioheight>
 							</control>
-							
+
 							<!-- Refresh TMDB Helper -->
 							<control type="radiobutton" id="612">
-								<visible>Skin.HasSetting(videoinfo_button_refresh)</visible>
-								<visible>String.IsEqual(ListItem.Path,plugin://plugin.video.tmdb.bingie.helper/)</visible>
+								<visible>Skin.HasSetting(videoinfo_button_refresh) + False</visible>
+								<visible>!String.IsEmpty(ListItem.Property(StremioID))</visible>
 								<visible>!$EXP[IsSetDBType]</visible>
 								<include content="Bingie_InfoDialog_Button_Texture">
 								<param name="radiotexture" value="dialogs/videoinfo/info/refresh.png"/>
@@ -870,19 +855,16 @@
 								<aligny>center</aligny>
 								<align>left</align>
 								<textoffsetx>54</textoffsetx>
-								<textoffsety>7</textoffsety>	
-								<textwidth>158</textwidth>			
+								<textoffsety>7</textoffsety>
+								<textwidth>158</textwidth>
 								<label>$LOCALIZE[184]</label>
 								<radioposx>14</radioposx>
 								<radiowidth>22</radiowidth>
 								<radioheight>22</radioheight>
-								<onclick condition="$EXP[IsTvShowDBType]">Runscript(plugin.video.tmdb.bingie.helper,refresh_details,tmdb_id=$INFO[ListItem.UniqueID(tmdb)],tmdb_type=tv)</onclick>
-								<onclick condition="$EXP[IsMovieDBType]">Runscript(plugin.video.tmdb.bingie.helper,refresh_details,tmdb_id=$INFO[ListItem.UniqueID(tmdb)],tmdb_type=movie)</onclick>
-								<onclick condition="$EXP[IsEpisodeDBType]">Runscript(plugin.video.tmdb.bingie.helper,refresh_details,type=tv,tmdb_id=$INFO[ListItem.UniqueID(tvshow.tmdb)],query=$INFO[ListItem.TVShowTitle],season=$INFO[ListItem.Season],episode=$INFO[ListItem.Episode])</onclick>
-							</control> 							
-							
+							</control>
+
 						</control>
-						
+
 						<!-- fixed frame -->
 						<control type="group">
 							<include>Animation_Right_Delay</include>
@@ -921,13 +903,13 @@
 								<align>left</align>
 								<textoffsetx>55</textoffsetx>
 								<textoffsety>7</textoffsety>
-								<textwidth>160</textwidth>											
+								<textwidth>160</textwidth>
                                 <radioposx>11</radioposx>
                                 <radiowidth>27</radiowidth>
                                 <radioheight>27</radioheight>
                              </control>
 						</control>
-																		
+
     <control type="list" id="8999">
 		<include>Animation_Right_Delay_3</include>
 		<visible allowhiddenfocus="true">String.IsEqual(Window.Property(AdditionalInfo),cast)</visible>
@@ -935,7 +917,7 @@
 		<onback>8000</onback>
 		<onleft>8999</onleft>
 		<onback>SetFocus(63)</onback>
-        <ondown>9000</ondown>	
+        <ondown>9000</ondown>
 		<onleft>ClearProperty(DisablePosterFade)</onleft>
 		<onback>ClearProperty(DisablePosterFade)</onback>
         <orientation>horizontal</orientation>
@@ -986,11 +968,11 @@
             </control>
         </focusedlayout>
         <content>
-		  
+
 			<item id="1">
 				<label>$LOCALIZE[31089]</label> <!-- Crew -->
 			</item>
-			
+
 			<item id="2">
 				<label>$LOCALIZE[20339]</label> <!-- Director -->
 				<visible>String.IsEqual(ListItem.DBType,movie) | String.IsEqual(ListItem.DBType,episode)</visible>
@@ -999,17 +981,17 @@
 			<item id="3">
 				<label>$LOCALIZE[31488]</label> <!-- Writer -->
 				<visible>String.IsEqual(ListItem.DBType,movie)</visible>
-			</item>	
+			</item>
 
 			<item id="4">
 				<label>$LOCALIZE[31530]</label> <!-- Creator -->
 				<visible>String.IsEqual(ListItem.DBType,tvshow) | String.IsEqual(ListItem.DBType,episode)</visible>
-			</item>	
+			</item>
 
 			<item id="5">
 				<label>$LOCALIZE[572]</label> <!-- Studio -->
 				<visible>String.IsEqual(ListItem.DBType,movie)</visible>
-			</item>	
+			</item>
 
 			<item id="6">
 				<label>$LOCALIZE[705]</label> <!-- Network -->
@@ -1018,19 +1000,19 @@
 
 			<item id="7">
 				<label>$LOCALIZE[135]</label> <!-- Genre -->
-			</item>		
-			
+			</item>
+
 			<item id="8">
 				<label>$LOCALIZE[345]</label> <!-- Year -->
-			</item>	
+			</item>
 
 			<item id="9">
 				<label>$LOCALIZE[31529]</label> <!-- Posters -->
-			</item>				
+			</item>
 
 		</content>
     </control>
-	
+
 	<control type="group" id="9000">
 		<include>Animation_Right_Delay_3</include>
         <scrolltime tween="sine" easing="out">500</scrolltime>
@@ -1039,8 +1021,8 @@
         <left>131</left>
         <width>1900</width>
         <height>1040</height>
-        <animation effect="fade" start="0" end="100" time="400">Visible</animation>	
-		
+        <animation effect="fade" start="0" end="100" time="400">Visible</animation>
+
 		<include content="InfoResultWidgetPoster3">
           <param name="id" value="53002" />
 		  <param name="groupid" value="530022" />
@@ -1052,7 +1034,7 @@
 		  <param name="layout">PosterPanelBingie</param>
           <param name="visible" value="String.IsEqual(Container(8999).ListItem.Label,$LOCALIZE[31089])" /> <!-- Crew -->
         </include>
-		
+
 		<include content="InfoResultWidgetPoster3">
           <param name="id" value="53005" />
 		  <param name="groupid" value="530055" />
@@ -1064,7 +1046,7 @@
 		  <param name="layout">PosterPanelBingie</param>
           <param name="visible" value="String.IsEqual(Container(8999).ListItem.Label,$LOCALIZE[20339])" /> <!-- Director -->
         </include>
-		
+
 		<include content="InfoResultWidgetPoster3">
           <param name="id" value="53007" />
 		  <param name="groupid" value="530077" />
@@ -1076,7 +1058,7 @@
 		  <param name="layout">PosterPanelBingie</param>
           <param name="visible" value="String.IsEqual(Container(8999).ListItem.Label,$LOCALIZE[31488])" /> <!-- Writer -->
         </include>
-		
+
 		<include content="InfoResultWidgetPoster3">
           <param name="id" value="53009" />
 		  <param name="groupid" value="530099" />
@@ -1088,7 +1070,7 @@
 		  <param name="layout">PosterPanelBingie</param>
           <param name="visible" value="String.IsEqual(Container(8999).ListItem.Label,$LOCALIZE[31530])" /> <!-- Creator -->
         </include>
-		
+
 		<include content="InfoResultWidgetPoster3">
           <param name="id" value="53008" />
 		  <param name="groupid" value="530088" />
@@ -1100,7 +1082,7 @@
 		  <param name="layout">PosterPanelBingie</param>
           <param name="visible" value="[String.IsEqual(Container(8999).ListItem.Label,$LOCALIZE[572]) | String.IsEqual(Container(8999).ListItem.Label,$LOCALIZE[705])]" /> <!-- Studio -->
         </include>
-		
+
 		<include content="InfoResultWidgetPoster3">
           <param name="id" value="53003" />
 		  <param name="groupid" value="530033" />
@@ -1112,7 +1094,7 @@
 		  <param name="layout">PosterPanelBingie</param>
           <param name="visible" value="String.IsEqual(Container(8999).ListItem.Label,$LOCALIZE[135])" /> <!-- Genre -->
         </include>
-		
+
 		<include content="InfoResultWidgetPoster3">
           <param name="id" value="53006" />
 		  <param name="groupid" value="530066" />
@@ -1124,7 +1106,7 @@
 		  <param name="layout">PosterPanelBingie</param>
           <param name="visible" value="String.IsEqual(Container(8999).ListItem.Label,$LOCALIZE[345])" /> <!-- Year -->
         </include>
-		
+
 		<include content="InfoResultWidgetPoster3">
           <param name="id" value="53004" />
 		  <param name="groupid" value="530044" />
@@ -1137,9 +1119,9 @@
           <param name="visible" value="String.IsEqual(Container(8999).ListItem.Label,$LOCALIZE[31529])" /> <!-- Poster -->
 		  <onfocus>SetProperty(DisablePosterFade,1)</onfocus>
         </include>
-		    
+
 	</control>
-	
+
 		<control type="label">
 			<animation effect="fade" start="0" end="100" time="400">Visible</animation>
 			<include>Animation_Right_Delay</include>
@@ -1151,18 +1133,18 @@
             <wrapmultiline>true</wrapmultiline>
             <textcolor>$INFO[Skin.String(BingiePrimaryTextColor)]</textcolor>
             <label>$LOCALIZE[31558]</label>
-            <visible>String.IsEqual(Window.Property(AdditionalInfo),cast) + [[!Container(53001).IsUpdating + !Integer.IsGreater(Container(53001).NumItems,0) + String.IsEqual(Container(8999).ListItem.Label,$LOCALIZE[206])] | [!Container(53002).IsUpdating + !Integer.IsGreater(Container(53002).NumItems,0) + String.IsEqual(Container(8999).ListItem.Label,$LOCALIZE[31089])] | [!Container(53003).IsUpdating + !Integer.IsGreater(Container(53003).NumItems,0) + String.IsEqual(Container(8999).ListItem.Label,$LOCALIZE[135])] | [!Container(53004).IsUpdating + !Integer.IsGreater(Container(53004).NumItems,0) + String.IsEqual(Container(8999).ListItem.Label,$LOCALIZE[31529])] | 
+            <visible>String.IsEqual(Window.Property(AdditionalInfo),cast) + [[!Container(53001).IsUpdating + !Integer.IsGreater(Container(53001).NumItems,0) + String.IsEqual(Container(8999).ListItem.Label,$LOCALIZE[206])] | [!Container(53002).IsUpdating + !Integer.IsGreater(Container(53002).NumItems,0) + String.IsEqual(Container(8999).ListItem.Label,$LOCALIZE[31089])] | [!Container(53003).IsUpdating + !Integer.IsGreater(Container(53003).NumItems,0) + String.IsEqual(Container(8999).ListItem.Label,$LOCALIZE[135])] | [!Container(53004).IsUpdating + !Integer.IsGreater(Container(53004).NumItems,0) + String.IsEqual(Container(8999).ListItem.Label,$LOCALIZE[31529])] |
 					 [!Container(53005).IsUpdating + !Integer.IsGreater(Container(53005).NumItems,0) + String.IsEqual(Container(8999).ListItem.Label,$LOCALIZE[20339])] | [!Container(53006).IsUpdating + !Integer.IsGreater(Container(53006).NumItems,0) + String.IsEqual(Container(8999).ListItem.Label,$LOCALIZE[345])] | [!Container(53007).IsUpdating + !Integer.IsGreater(Container(53007).NumItems,0) + String.IsEqual(Container(8999).ListItem.Label,$LOCALIZE[31488])] | [!Container(53008).IsUpdating + !Integer.IsGreater(Container(53008).NumItems,0) + [String.IsEqual(Container(8999).ListItem.Label,$LOCALIZE[705]) | String.IsEqual(Container(8999).ListItem.Label,$LOCALIZE[572])]] |
 					 [!Container(53009).IsUpdating + !Integer.IsGreater(Container(53009).NumItems,0) + String.IsEqual(Container(8999).ListItem.Label,$LOCALIZE[31530])]] + !Player.HasVideo | [!Container(50).IsUpdating + !Integer.IsGreater(Container(50).NumItems,0) + !Player.HasVideo] | [!Container(352).IsUpdating + !Integer.IsGreater(Container(352).NumItems,0) + String.IsEqual(Window.Property(AdditionalInfo),similar) + !Player.HasVideo]</visible>
         </control>
-			
+
 		<control type="group">
 			<animation effect="fade" start="0" end="100" time="400">Visible</animation>
 			<include>Animation_Right_Delay_3</include>
 			<visible>[Container(50).IsUpdating + !String.IsEqual(Window.Property(AdditionalInfo),similar) + !String.IsEqual(Window.Property(AdditionalInfo),cast) + !Player.HasVideo] | [Container(352).IsUpdating + String.IsEqual(Window.Property(AdditionalInfo),similar) + !Player.HasVideo] | String.IsEqual(Window.Property(AdditionalInfo),cast) + [[Container(53001).IsUpdating + String.IsEqual(Container(8999).ListItem.Label,$LOCALIZE[206])] | [Container(53002).IsUpdating + String.IsEqual(Container(8999).ListItem.Label,$LOCALIZE[31089])] | [Container(53003).IsUpdating + String.IsEqual(Container(8999).ListItem.Label,$LOCALIZE[135])] |
 			[Container(53004).IsUpdating + String.IsEqual(Container(8999).ListItem.Label,$LOCALIZE[31529])] + String.IsEmpty(Window.Property(DisablePosterFade)) | [Container(53005).IsUpdating + String.IsEqual(Container(8999).ListItem.Label,$LOCALIZE[20339])] | [Container(53006).IsUpdating + String.IsEqual(Container(8999).ListItem.Label,$LOCALIZE[345])] |
 			[Container(53007).IsUpdating + String.IsEqual(Container(8999).ListItem.Label,$LOCALIZE[31488])] | [Container(53008).IsUpdating + [[String.IsEqual(Container(8999).ListItem.Label,$LOCALIZE[572])] | String.IsEqual(Container(8999).ListItem.Label,$LOCALIZE[705])]] | [Container(53009).IsUpdating + String.IsEqual(Container(8999).ListItem.Label,$LOCALIZE[31530])]] + !Player.HasVideo</visible>
-				<control type="label">					
+				<control type="label">
 					<bottom>120</bottom>
 					<height>120</height>
 					<align>center</align>
@@ -1172,8 +1154,8 @@
 					<scroll>true</scroll>
 				</control>
 		</control>
-	</control>	      
-</control>	
+	</control>
+</control>
 		<!-- Snow Effect -->
         <include condition="Skin.HasSetting(EnableSnowAnimation)">SnowAnimation</include>
 	</include>
@@ -1194,14 +1176,14 @@
 				<aspectratio>keep</aspectratio>
 				<animation effect="fade" start="0" end="100" time="500" condition="String.IsEmpty(Window(Home).Property(FullImage))">Visible</animation>
 				<animation effect="fade" start="100" end="0" time="300">Hidden</animation>
-			</control>			
+			</control>
 			<!-- Dialog Info -->
 			<control type="group">
-				<animation effect="fade" start="100" end="0" condition="!String.IsEmpty(Window(Home).Property(TMDbBingieHelper.Recommendations.HideInfo))">Conditional</animation>
+				<animation effect="fade" start="100" end="0" condition="!String.IsEmpty(Window(Home).Property(StremioRecommendations.HideInfo))">Conditional</animation>
 				<animation effect="fade" start="100" end="0" time="200" condition="Window.IsVisible(script-tmdbbingiehelper-wikipedia.xml)">Conditional</animation>
 				<animation effect="fade" start="0" end="100" time="200">Visible</animation>
 				<visible>!ControlGroup(6000).HasFocus()</visible>
-				<visible>String.IsEmpty(Window(Home).Property(Recommendations.IsLoading))</visible>								
+				<visible>String.IsEmpty(Window(Home).Property(Recommendations.IsLoading))</visible>
 				<!-- hidden my rating button -->
 				<control type="button" id="7">
 					<include>HiddenObject</include>
@@ -1218,11 +1200,11 @@
 					<focusedlayout/>
 					<content sortorder="ascending" sortby="playcount" limit="1">$VAR[InfoDialogNextUpContent]</content>
 				</control>
-				
+
 				<!-- hiddenlist to get first/next episode with tmdb helper -->
 				<control type="list" id="1234">
 					<visible>Skin.HasSetting(videoinfo_button_play_next_tmdb)</visible>
-					<visible>String.IsEqual(ListItem.dbtype,tvshow) + String.IsEmpty(ListItem.DBID) + String.IsEqual(ListItem.Path,plugin://plugin.video.tmdb.bingie.helper/)</visible>
+					<visible>String.IsEqual(ListItem.dbtype,tvshow) + String.IsEmpty(ListItem.DBID) + !String.IsEmpty(ListItem.Property(StremioID))</visible>
 					<visible>!String.IsEmpty(ListItem.UniqueID(tmdb))</visible>
 					<top>0</top>
 					<left>0</left>
@@ -1231,8 +1213,8 @@
 					<itemlayout>-</itemlayout>
 					<focusedlayout>-</focusedlayout>
 					<content limit="1">$VAR[InfoDialogTMDbBingieHelperNextUpContent]</content>
-				</control>				
-				
+				</control>
+
 				<!-- normal cast details as hidden list -->
 				<control type="list" id="50">
 					<posx>1</posx>
@@ -1244,7 +1226,7 @@
 					<onup>8000</onup>
 					<onleft>8000</onleft>
 					<onright>8000</onright>
-					<ondown>8000</ondown>					
+					<ondown>8000</ondown>
 					<visible allowhiddenfocus="true">false</visible>
 				</control>
 
@@ -1265,7 +1247,7 @@
 					<include content="DialogInfo_VideoTrailerControl">
 						<param name="onback">8000</param>
 					</include>
-				</control>						
+				</control>
 
 				<!-- fanart background image -->
 				<include content="BingieSpotlightCornerImage">
@@ -1274,13 +1256,13 @@
 					<param name="image" value="$VAR[fanartBackground]" />
 					<param name="fadetime" default="0"/>
 				</include>
-				
+
 				<!-- spotlight fanart background image -->
 				<include content="BingieSpotlightFullImage">
 					<param name="visibility" value="![Player.HasVideo + ![VideoPlayer.Content(movies) | VideoPlayer.Content(episodes) | VideoPlayer.Content(musicvideos) | VideoPlayer.Content(livetv) | Pvr.IsPlayingRecording] | String.IsEmpty(Window(Home).Property(FullImage)) | String.IsEqual(ListItem.Property(tmdb_type),person)]" />
 					<param name="image" value="$VAR[fanartBackground]" />
 				</include>
-							
+
 				<!-- additional info overlay -->
 				<control type="image">
 					<visible>!String.IsEmpty(Window.Property(AdditionalInfo)) + !String.IsEqual(Window.Property(AdditionalInfo),set)</visible>
@@ -1292,14 +1274,14 @@
 				</control>
 
 				<!-- Now Playing -->
-				<include condition="!$EXP[IsPlayingUnrecognizedContent]">NowPlayingBackground</include>				
+				<include condition="!$EXP[IsPlayingUnrecognizedContent]">NowPlayingBackground</include>
 
 				<!-- dialog info details -->
 				<control type="grouplist">
 					<visible>!String.IsEqual(ListItem.Property(tmdb_type),person)</visible>
                     <width>1500</width>
                     <include>BingieLeftDefs</include>
-                    <top>10</top>  
+                    <top>10</top>
                     <orientation>vertical</orientation>
                     <usecontrolcoords>true</usecontrolcoords>
                     <itemgap>10</itemgap>
@@ -1321,7 +1303,7 @@
 						<top>-199</top>
 						<height>194</height>
 						<width max="650">auto</width>
-						<font>title</font> 
+						<font>title</font>
 						<align>left</align>
 						<aligny>center</aligny>
 						<textcolor>$INFO[Skin.String(BingieLabelTextColor)]</textcolor>
@@ -1351,10 +1333,10 @@
 						<width>800</width>
 						<itemgap>0</itemgap>
 						<include condition="Skin.HasSetting(videoinfo_details_cast)">More_Details_Top250</include>
-					</control>	
+					</control>
 
 					<!-- Sublabel -->
-					<control type="label" id="823">						
+					<control type="label" id="823">
 						<visible>!String.IsEmpty(Control.GetLabel(823))</visible>
 						<visible>!$EXP[IsMovieDBType]</visible>
 						<animation effect="fade" start="100" end="0" time="300" condition="!String.IsEmpty(Window.Property(AdditionalInfo))">Conditional</animation>
@@ -1380,7 +1362,7 @@
 						<font>Plots</font>
 						<label>$VAR[BingieDialogInfoPlot]</label>   <!-- BingieInfoDialogPlot -->
 					</control>
-					
+
 					<control type="textbox">
 						<visible>[!String.IsEmpty(ListItem.Set) + !Skin.HasSetting(VideoInfoButtonCollection)]</visible>
 						<animation effect="fade" start="100" end="0" time="300" condition="String.IsEqual(Window.Property(AdditionalInfo), trailers) | String.IsEqual(Window.Property(AdditionalInfo),similar) | String.IsEqual(Window.Property(AdditionalInfo),cast) | String.IsEqual(Window.Property(AdditionalInfo),plot)">Conditional</animation>
@@ -1407,15 +1389,15 @@
                         <include condition="Skin.HasSetting(videoinfo_details_creator)">More_Details_Creator</include>
                         <include condition="Skin.HasSetting(videoinfo_details_genre)">More_Details_Genre</include>
                         <include condition="Skin.HasSetting(videoinfo_details_awards)">More_Details_Awards</include>
-					</control>					
+					</control>
 
 					<!-- buttons -->
 					<control type="group">
 						<top>38</top>
 						<width>550</width>
-						<posx>1</posx>						
+						<posx>1</posx>
 						<animation effect="fade" start="100" end="0" time="300" condition="String.IsEqual(Window.Property(AdditionalInfo), trailers) | String.IsEqual(Window.Property(AdditionalInfo), plot) | String.IsEqual(Window.Property(AdditionalInfo),similar) | String.IsEqual(Window.Property(AdditionalInfo),cast)">Conditional</animation>
-						<animation effect="slide" start="0,0" end="0,41" time="0" delay="0" condition="String.IsEqual(Window.Property(AdditionalInfo),set)">Conditional</animation>												
+						<animation effect="slide" start="0,0" end="0,41" time="0" delay="0" condition="String.IsEqual(Window.Property(AdditionalInfo),set)">Conditional</animation>
 						<animation type="WindowClose" reversible="false" condition="String.IsEmpty(Window(Home).Property(NoFadeOut))">
 						  <effect type="fade" start="100" end="0" time="0" tween="sine" easing="out" />
 						  <effect type="slide" start="0" end="-150" time="300" tween="cubic" easing="out" />
@@ -1425,7 +1407,7 @@
 							<onfocus>SetFocus($VAR[MenuFocus])</onfocus>
 							<onfocus>Dialog.Close(movieinformation)</onfocus>
 						</control>
-						
+
 						<control type="image">
 							<visible>ControlGroup(700).HasFocus() + Control.HasFocus(7001) + Window.IsVisible(1151)</visible>
 							<width>64</width>
@@ -1452,7 +1434,7 @@
 							<left>94</left>
 							<texture background="true" colordiffuse="$INFO[Skin.String(ViewDetailsBorderFocusColor)]">bingie/border/circle_focus.png</texture>
 						</control>
-				
+
 						<control type="grouplist" id="8000">
 							<width>550</width>
 							<height>320</height>
@@ -1468,10 +1450,10 @@
 							<onback condition="!String.IsEmpty(Window.Property(TrailerClipIcon))">ClearProperty(TrailerClipIcon)</onback>
 							<onback condition="!String.IsEmpty(Window(Home).Property(BusyInfoDialogTrailer))">ClearProperty(BusyInfoDialogTrailer,Home)</onback>
 							<onback condition="!String.IsEmpty(Window(Home).Property(SetCustomAddon))">ClearProperty(SetCustomAddon,Home)</onback>
-                            <scrolltime tween="sine" easing="inout">200</scrolltime>							
+                            <scrolltime tween="sine" easing="inout">200</scrolltime>
 							<control type="grouplist" id="700">
 								<visible>!String.IsEmpty(ListItem.DBID)</visible>
-                                <visible>Skin.HasSetting(videoinfo_button_myrating) + Control.IsEnabled(7)</visible>
+                                <visible>Skin.HasSetting(videoinfo_button_myrating) + False + Control.IsEnabled(7)</visible>
 								<visible>!Skin.HasSetting(AddRaitingTrakt)</visible>
 								<height>64</height>
 								<width>800</width>
@@ -1497,11 +1479,10 @@
 									<textureradioonnofocus colordiffuse="$INFO[Skin.String(BingieButtonTextColor)]">bingie/rate/thumbs_up.png</textureradioonnofocus>
 									<textureradiooffnofocus colordiffuse="$INFO[Skin.String(BingieButtonTextColor)]">bingie/rate/thumbs_up.png</textureradiooffnofocus>
 									<selected>Window.IsVisible(1151)</selected>
-									<onclick>RunScript(script.bingie.helper,action=ratetitle,rateaction=like)</onclick>
 									<onclick>SetProperty(ratelike,1,Home)</onclick>
 									<ondown>51</ondown>
 								</control>
-								
+
 								<control type="radiobutton" id="7002">
 									<include>ThumbsUp</include>
 									<width>64</width>
@@ -1520,7 +1501,6 @@
 									<textureradioonnofocus colordiffuse="$INFO[Skin.String(BingieButtonTextColor)]">bingie/rate/thumbs_up_2.png</textureradioonnofocus>
 									<textureradiooffnofocus colordiffuse="$INFO[Skin.String(BingieButtonTextColor)]">bingie/rate/thumbs_up_2.png</textureradiooffnofocus>
 									<selected>Window.IsVisible(1151)</selected>
-									<onclick>RunScript(script.bingie.helper,action=ratetitle,rateaction=reset)</onclick>
 									<onclick>SetProperty(ratelike,1,Home)</onclick>
 									<ondown>51</ondown>
 								</control>
@@ -1544,11 +1524,10 @@
 									<textureradioonnofocus flipy="true" colordiffuse="$INFO[Skin.String(BingieButtonTextColor)]">bingie/rate/thumbs_up.png</textureradioonnofocus>
 									<textureradiooffnofocus flipy="true" colordiffuse="$INFO[Skin.String(BingieButtonTextColor)]">bingie/rate/thumbs_up.png</textureradiooffnofocus>
 									<selected>Window.IsVisible(1152)</selected>
-									<onclick>RunScript(script.bingie.helper,action=ratetitle,rateaction=dislike)</onclick>
 									<onclick>SetProperty(ratedislike,1,Home)</onclick>
 									<ondown>51</ondown>
 								</control>
-								
+
 								<control type="radiobutton" id="7004">
 									<include>ThumbsDown</include>
 									<left>30</left>
@@ -1568,15 +1547,14 @@
 									<textureradioonnofocus flipy="true" colordiffuse="$INFO[Skin.String(BingieButtonTextColor)]">bingie/rate/thumbs_up_2.png</textureradioonnofocus>
 									<textureradiooffnofocus flipy="true" colordiffuse="$INFO[Skin.String(BingieButtonTextColor)]">bingie/rate/thumbs_up_2.png</textureradiooffnofocus>
 									<selected>Window.IsVisible(1152)</selected>
-									<onclick>RunScript(script.bingie.helper,action=ratetitle,rateaction=reset)</onclick>
 									<onclick>SetProperty(ratedislike,1,Home)</onclick>
 									<ondown>51</ondown>
 								</control>
-								
+
 							</control>
-							
+
 							<control type="grouplist" id="701">
-								<visible>Skin.HasSetting(videoinfo_button_myrating) + [Skin.HasSetting(AddRaitingTrakt) | String.IsEmpty(ListItem.DBID)] + !$EXP[IsSeasonDBType]</visible>
+								<visible>Skin.HasSetting(videoinfo_button_myrating) + False + [Skin.HasSetting(AddRaitingTrakt) | String.IsEmpty(ListItem.DBID)] + !$EXP[IsSeasonDBType]</visible>
 								<visible>!$EXP[IsSetDBType] + !Window.IsActive(1116) + !Window.IsActive(tvrecordings)</visible>
 								<height>64</height>
 								<width>800</width>
@@ -1600,8 +1578,6 @@
 									<textureradioofffocus colordiffuse="$INFO[Skin.String(BingieSecondaryButtonFocusTextColor)]">bingie/rate/thumbs_up.png</textureradioofffocus>
 									<textureradioonnofocus colordiffuse="$INFO[Skin.String(BingieButtonTextColor)]">bingie/rate/thumbs_up.png</textureradioonnofocus>
 									<textureradiooffnofocus colordiffuse="$INFO[Skin.String(BingieButtonTextColor)]">bingie/rate/thumbs_up.png</textureradiooffnofocus>
-								    <onclick condition="String.IsEqual(ListItem.DBType,movie) | String.IsEqual(ListItem.DBType,tvshow)">RunScript(plugin.video.tmdb.bingie.helper,sync_trakt,tmdb_id=$INFO[Container(17195).ListItem.Property(tmdb_id)],$VAR[Path_Param_Type],sync_type=like)</onclick>
-									<onclick condition="String.IsEqual(ListItem.DBType,episode)">RunScript(plugin.video.tmdb.bingie.helper,sync_trakt,tmdb_id=$INFO[Container(17195).ListItem.Property(tmdb_id)],type=tv,tmdb_id=$INFO[ListItem.UniqueID(tvshow.tmdb)],query=$INFO[ListItem.TVShowTitle],season=$INFO[ListItem.Season],episode=$INFO[ListItem.Episode],sync_type=like)</onclick>									
 									<ondown>51</ondown>
 								</control>
 
@@ -1622,8 +1598,6 @@
 									<textureradioofffocus flipy="true" colordiffuse="$INFO[Skin.String(BingieSecondaryButtonFocusTextColor)]">bingie/rate/thumbs_up.png</textureradioofffocus>
 									<textureradioonnofocus flipy="true" colordiffuse="$INFO[Skin.String(BingieButtonTextColor)]">bingie/rate/thumbs_up.png</textureradioonnofocus>
 									<textureradiooffnofocus flipy="true" colordiffuse="$INFO[Skin.String(BingieButtonTextColor)]">bingie/rate/thumbs_up.png</textureradiooffnofocus>
-								    <onclick condition="String.IsEqual(ListItem.DBType,movie) | String.IsEqual(ListItem.DBType,tvshow)">RunScript(plugin.video.tmdb.bingie.helper,sync_trakt,tmdb_id=$INFO[Container(17195).ListItem.Property(tmdb_id)],$VAR[Path_Param_Type],sync_type=dislike)</onclick>
-									<onclick condition="String.IsEqual(ListItem.DBType,episode)">RunScript(plugin.video.tmdb.bingie.helper,sync_trakt,tmdb_id=$INFO[Container(17195).ListItem.Property(tmdb_id)],type=tv,tmdb_id=$INFO[ListItem.UniqueID(tvshow.tmdb)],query=$INFO[ListItem.TVShowTitle],season=$INFO[ListItem.Season],episode=$INFO[ListItem.Episode],sync_type=dislike)</onclick>									
 									<ondown>51</ondown>
 								</control>
 
@@ -1643,14 +1617,12 @@
 									<textureradioonfocus colordiffuse="$INFO[Skin.String(BingieSecondaryButtonFocusTextColor)]">bingie/rate/remove.png</textureradioonfocus>
 									<textureradioofffocus colordiffuse="$INFO[Skin.String(BingieSecondaryButtonFocusTextColor)]">bingie/rate/remove.png</textureradioofffocus>
 									<textureradioonnofocus colordiffuse="$INFO[Skin.String(BingieButtonTextColor)]">bingie/rate/remove.png</textureradioonnofocus>
-									<textureradiooffnofocus colordiffuse="$INFO[Skin.String(BingieButtonTextColor)]">bingie/rate/remove.png</textureradiooffnofocus>								    
-									<onclick condition="String.IsEqual(ListItem.DBType,movie) | String.IsEqual(ListItem.DBType,tvshow)">RunScript(plugin.video.tmdb.bingie.helper,sync_trakt,tmdb_id=$INFO[Container(17195).ListItem.Property(tmdb_id)],$VAR[Path_Param_Type],sync_type=reset)</onclick>
-									<onclick condition="String.IsEqual(ListItem.DBType,episode)">RunScript(plugin.video.tmdb.bingie.helper,sync_trakt,tmdb_id=$INFO[Container(17195).ListItem.Property(tmdb_id)],type=tv,tmdb_id=$INFO[ListItem.UniqueID(tvshow.tmdb)],query=$INFO[ListItem.TVShowTitle],season=$INFO[ListItem.Season],episode=$INFO[ListItem.Episode],sync_type=reset)</onclick>
+									<textureradiooffnofocus colordiffuse="$INFO[Skin.String(BingieButtonTextColor)]">bingie/rate/remove.png</textureradiooffnofocus>
 									<ondown>51</ondown>
-								</control>										
-								
-							</control>														
-							
+								</control>
+
+							</control>
+
 							<!-- Play/Resume via 5050 Container (next episode) -->
                             <control type="radiobutton" id="51">
                                 <visible>Skin.HasSetting(videoinfo_button_play_next)</visible>
@@ -1666,14 +1638,13 @@
                                 <radioheight>22</radioheight>
                                 <onclick condition="Integer.IsGreater(Container(5050).NumItems,0) + !Container(5050).IsUpdating + !Window.IsActive(Custom_1190_TMDbBingieHelperCast.xml)">Dialog.Close(movieinformation)</onclick>
 								<onclick condition="Integer.IsGreater(Container(5050).NumItems,0) + !Container(5050).IsUpdating + !Window.IsActive(Custom_1190_TMDbBingieHelperCast.xml)">AlarmClock(PlayMovie,PlayMedia($ESCINFO[Container(5050).ListItem.FileNameAndPath],resume),00:01,silent)</onclick>
-								<onclick condition="Integer.IsGreater(Container(5050).NumItems,0) + !Container(5050).IsUpdating + Window.IsActive(Custom_1190_TMDbBingieHelperCast.xml)">RunScript(plugin.video.tmdb.bingie.helper,close_dialog=1190)</onclick>
                                 <onclick condition="Integer.IsGreater(Container(5050).NumItems,0) + !Container(5050).IsUpdating + Window.IsActive(Custom_1190_TMDbBingieHelperCast.xml)">AlarmClock(PlayMovie,PlayMedia($ESCINFO[Container(5050).ListItem.FileNameAndPath],resume),00:04,silent)</onclick>
                             </control>
-							
+
 							<!-- Play Next Episode with TMDB Helper -->
                             <control type="radiobutton" id="8181">
                                 <visible>Skin.HasSetting(videoinfo_button_play_next_tmdb)</visible>
-								<visible>Control.IsVisible(1234) + String.IsEqual(ListItem.dbtype,tvshow) + String.IsEqual(ListItem.Path,plugin://plugin.video.tmdb.bingie.helper/)</visible>
+								<visible>Control.IsVisible(1234) + String.IsEqual(ListItem.dbtype,tvshow) + !String.IsEmpty(ListItem.Property(StremioID))</visible>
 								<visible>!String.IsEmpty(ListItem.UniqueID(tmdb))</visible>
                                 <include>Bingie_InfoDialog_Button_Default_Defs</include>
                                 <include content="Bingie_InfoDialog_Button_Texture">
@@ -1686,7 +1657,6 @@
                                 <radioheight>22</radioheight>
                                 <onclick condition="!Container(1234).IsUpdating + !Integer.IsEqual(Container(1234).NumItems,0) + !Window.IsActive(Custom_1190_TMDbBingieHelperCast.xml)">Dialog.Close(movieinformation)</onclick>
 								<onclick condition="!Container(1234).IsUpdating + !Integer.IsEqual(Container(1234).NumItems,0) + !Window.IsActive(Custom_1190_TMDbBingieHelperCast.xml)">AlarmClock(PlayMovie,PlayMedia($ESCINFO[Container(1234).ListItem.FileNameAndPath],resume),00:01,silent)</onclick>
-								<onclick condition="!Container(1234).IsUpdating + !Integer.IsEqual(Container(1234).NumItems,0) + Window.IsActive(Custom_1190_TMDbBingieHelperCast.xml)">RunScript(plugin.video.tmdb.bingie.helper,close_dialog=1190)</onclick>
                                 <onclick condition="!Container(1234).IsUpdating + !Integer.IsEqual(Container(1234).NumItems,0) + Window.IsActive(Custom_1190_TMDbBingieHelperCast.xml)">AlarmClock(PlayMovie,PlayMedia($ESCINFO[Container(1234).ListItem.FileNameAndPath],resume),00:04,silent)</onclick>
                             </control>
 
@@ -1707,10 +1677,9 @@
 								<onclick condition="!Window.IsActive(Custom_1190_TMDbBingieHelperCast.xml)">Dialog.Close(movieinformation)</onclick>
 								<onclick condition="!String.IsEmpty(ListItem.FileNameAndPath) + !Window.IsActive(Custom_1190_TMDbBingieHelperCast.xml)">AlarmClock(PlayMovie,PlayMedia($ESCINFO[ListItem.FileNameAndPath]),00:01,silent)</onclick>
 								<onclick condition="String.IsEmpty(ListItem.FileNameAndPath) + !Window.IsActive(Custom_1190_TMDbBingieHelperCast.xml)">AlarmClock(PlayMovie,PlayMedia($ESCINFO[ListItem.FolderPath]),00:01,silent)</onclick>
-								<onclick condition="Window.IsActive(Custom_1190_TMDbBingieHelperCast.xml)">RunScript(plugin.video.tmdb.bingie.helper,close_dialog=1190)</onclick>
 								<onclick condition="!ListItem.IsFolder + !String.IsEmpty(ListItem.FileNameAndPath) + Window.IsActive(Custom_1190_TMDbBingieHelperCast.xml)">AlarmClock(PlayMovie,PlayMedia($ESCINFO[ListItem.FileNameAndPath]),00:04,silent)</onclick>
 								<onclick condition="!ListItem.IsFolder + String.IsEmpty(ListItem.FileNameAndPath) + Window.IsActive(Custom_1190_TMDbBingieHelperCast.xml)">AlarmClock(PlayMovie,PlayMedia($ESCINFO[ListItem.FolderPath]),00:04,silent)</onclick>
-							</control>							
+							</control>
 
                             <!-- Resume -->
                             <control type="radiobutton" id="90">
@@ -1727,7 +1696,6 @@
 								<onclick condition="!Window.IsActive(Custom_1190_TMDbBingieHelperCast.xml)">Dialog.Close(movieinformation)</onclick>
 								<onclick condition="!String.IsEmpty(ListItem.FileNameAndPath) + !Window.IsActive(Custom_1190_TMDbBingieHelperCast.xml)">AlarmClock(PlayMovie,PlayMedia($ESCINFO[ListItem.FileNameAndPath],resume),00:01,silent)</onclick>
 								<onclick condition="String.IsEmpty(ListItem.FileNameAndPath) + !Window.IsActive(Custom_1190_TMDbBingieHelperCast.xml)">AlarmClock(PlayMovie,PlayMedia($ESCINFO[ListItem.FolderPath],resume),00:01,silent)</onclick>
-								<onclick condition="Window.IsActive(Custom_1190_TMDbBingieHelperCast.xml)">RunScript(plugin.video.tmdb.bingie.helper,close_dialog=1190)</onclick>
 								<onclick condition="!ListItem.IsFolder + !String.IsEmpty(ListItem.FileNameAndPath) + Window.IsActive(Custom_1190_TMDbBingieHelperCast.xml)">AlarmClock(PlayMovie,PlayMedia($ESCINFO[ListItem.FileNameAndPath],resume),00:04,silent)</onclick>
 								<onclick condition="!ListItem.IsFolder + String.IsEmpty(ListItem.FileNameAndPath) + Window.IsActive(Custom_1190_TMDbBingieHelperCast.xml)">AlarmClock(PlayMovie,PlayMedia($ESCINFO[ListItem.FolderPath],resume),00:04,silent)</onclick>
                             </control>
@@ -1759,7 +1727,6 @@
 								<!-- play episode with tmdb helper -->
 								<onclick condition="Control.IsVisible(1234) + String.IsEqual(ListItem.dbtype,tvshow) + !Window.IsActive(Custom_1190_TMDbBingieHelperCast.xml)">AlarmClock(PlayMovie,PlayMedia($INFO[Container(1234).ListItemAbsolute(0).FolderPath],noresume),00:01,silent)</onclick>
 								<!-- close custom 1190 -->
-								<onclick condition="Window.IsActive(Custom_1190_TMDbBingieHelperCast.xml)">RunScript(plugin.video.tmdb.bingie.helper,close_dialog=1190)</onclick>
 								<!-- play episode -->
                                 <onclick condition="!Control.IsVisible(5050) + String.IsEqual(ListItem.DBTYPE,episode) + !String.IsEmpty(ListItem.DBID) + Window.IsActive(Custom_1190_TMDbBingieHelperCast.xml)">AlarmClock(PlayMovie,PlayMedia(videodb://tvshows/$INFO[ListItem.DBID]),00:04,silent)</onclick>
                                 <!-- play movie -->
@@ -1802,12 +1769,10 @@
                                 <onclick condition="String.IsEqual(ListItem.DBTYPE,tvshow) + !String.IsEmpty(ListItem.DBID) + !Window.IsActive(Custom_1190_TMDbBingieHelperCast.xml)">SetProperty(ListItem.TVShowID,$INFO[ListItem.DBID],Home)</onclick>
                                 <onclick condition="String.IsEqual(ListItem.DBTYPE,tvshow) + !String.IsEmpty(ListItem.DBID) + !Window.IsActive(Custom_1190_TMDbBingieHelperCast.xml)">SetProperty(KeepTVShowID,1,Home)</onclick>
 								<onclick condition="String.IsEqual(ListItem.DBTYPE,tvshow) + !String.IsEmpty(ListItem.DBID) + !Window.IsActive(Custom_1190_TMDbBingieHelperCast.xml)">ActivateWindow(Videos,videodb://tvshows/titles/$INFO[ListItem.DBID]/-2/,return)</onclick>
-								<onclick condition="ListItem.IsFolder + !Window.IsVisible(MyVideoNav.xml) + !String.IsEmpty(ListItem.DBID) + String.IsEqual(ListItem.DBType,tvshow) + Window.IsActive(Custom_1190_TMDbBingieHelperCast.xml)">RunScript(plugin.video.tmdb.bingie.helper,close_dialog=1190,call_path=$INFO[ListItem.DBID,videodb://tvshows/titles/,/-2/return])</onclick>
                                 <!-- from tvshow infodialog for non-library content -->
 								<onclick condition="String.IsEqual(ListItem.DBTYPE,tvshow) + String.IsEmpty(ListItem.DBID) + !Window.IsActive(Custom_1190_TMDbBingieHelperCast.xml)">ActivateWindow(Videos,$ESCINFO[ListItem.FileNameAndPath],return)</onclick>
 								<onclick condition="String.IsEqual(ListItem.DBTYPE,season) + String.IsEmpty(ListItem.DBID) + !Window.IsActive(Custom_1190_TMDbBingieHelperCast.xml)">ActivateWindow(Videos,$ESCINFO[ListItem.FolderPath],return)</onclick>
-								<onclick condition="String.IsEqual(ListItem.DBTYPE,tvshow) + String.IsEmpty(ListItem.DBID) + Window.IsActive(Custom_1190_TMDbBingieHelperCast.xml)">RunScript(plugin.video.tmdb.bingie.helper,close_dialog=1190,call_path=$INFO[ListItem.FolderPath])</onclick>
-							</control>						
+							</control>
 
 							<!-- Trailer -->
                             <control type="radiobutton" id="54">
@@ -1822,14 +1787,14 @@
 								<radioposx>19</radioposx>
 								<radioposy>22</radioposy>
                                 <radiowidth>22</radiowidth>
-                                <radioheight>22</radioheight>								
+                                <radioheight>22</radioheight>
 								<!-- movie trailer local -->
 								<!-- plugin with fallback -->
-								<!-- tvshow trailer local/youtube -->	
+								<!-- tvshow trailer local/youtube -->
 
 <onclick>RunScript(special://skin/extras/stremio_dispatch.py,trailer_player.py)</onclick>
 </control>
-							
+
 							<!--Trailers Button-->
                             <control type="radiobutton" id="541">
                                 <visible>Skin.HasSetting(videoinfo_button_trailersandmore)</visible>
@@ -1846,8 +1811,8 @@
                                 <onclick>SetProperty(AdditionalInfo, trailers)</onclick>
                                 <onclick>SetFocus(354)</onclick>
 								<onfocus>ClearProperty(TrailerPlayIcon)</onfocus>
-								<onclick>SetProperty(PlaySearchTrailer,1)</onclick>		
-								<onclick condition="[Control.IsVisible(51) + Control.IsVisible(5050) + Container(5050).ListItem.IsResumable] | [Control.IsVisible(8181) + Control.IsVisible(1234) + Container(1234).ListItem.IsResumable]">SetProperty(ShowPlayBeginning,1)</onclick>								
+								<onclick>SetProperty(PlaySearchTrailer,1)</onclick>
+								<onclick condition="[Control.IsVisible(51) + Control.IsVisible(5050) + Container(5050).ListItem.IsResumable] | [Control.IsVisible(8181) + Control.IsVisible(1234) + Container(1234).ListItem.IsResumable]">SetProperty(ShowPlayBeginning,1)</onclick>
                             </control>
 
 							<!-- add to my list -->
@@ -1866,7 +1831,6 @@
 								<radioposy>22</radioposy>
                                 <radiowidth>22</radiowidth>
                                 <radioheight>22</radioheight>
-                                <onclick>RunScript(script.bingie.helper,action=togglemylist)</onclick>
                             </control>
 
 							<!-- remove from my list -->
@@ -1885,9 +1849,8 @@
 								<radioposy>22</radioposy>
                                 <radiowidth>22</radiowidth>
                                 <radioheight>22</radioheight>
-                                <onclick>RunScript(script.bingie.helper,action=togglemylist)</onclick>
                             </control>
-							
+
 							<!-- Add/Remove Favorites -->
                             <control type="radiobutton" id="561">
 <visible>$EXP[IsTvShowDBTypeNoFallback] | $EXP[IsMovieDBTypeNoFallback]</visible>
@@ -1903,7 +1866,7 @@
                                 <radiowidth>22</radiowidth>
                                 <radioheight>22</radioheight>
 </control>
-							
+
 							<!-- Trakt Manager -->
                             <control type="radiobutton" id="562">
                                 <visible>Skin.HasSetting(videoinfo_button_trakt)</visible>
@@ -1917,12 +1880,6 @@
 								<radioposy>21</radioposy>
                                 <radiowidth>26</radiowidth>
                                 <radioheight>26</radioheight>
-                                <onclick condition="[String.IsEqual(ListItem.DBType,movie) | String.IsEqual(ListItem.DBType,tvshow)] + !String.IsEmpty(ListItem.Property(tmdb_id))">RunScript(plugin.video.tmdb.bingie.helper,sync_trakt,tmdb_id=$INFO[ListItem.Property(tmdb_id)],$VAR[Path_Param_Type],cache_refresh)</onclick>
-								<onclick condition="[String.IsEqual(ListItem.DBType,movie) | String.IsEqual(ListItem.DBType,tvshow)] + String.IsEmpty(ListItem.Property(tmdb_id))">RunScript(plugin.video.tmdb.bingie.helper,sync_trakt,tmdb_id=$INFO[Container(17195).ListItem.Property(tmdb_id)],$VAR[Path_Param_Type],cache_refresh)</onclick>
-								<onclick condition="String.IsEqual(ListItem.DBType,season) + !String.IsEmpty(ListItem.Property(tmdb_id))">RunScript(plugin.video.tmdb.bingie.helper,sync_trakt,tmdb_id=$INFO[ListItem.Property(tmdb_id)],$VAR[Path_Param_Type],season=$INFO[ListItem.Season],cache_refresh)</onclick>
-								<onclick condition="String.IsEqual(ListItem.DBType,season) + String.IsEmpty(ListItem.Property(tmdb_id))">RunScript(plugin.video.tmdb.bingie.helper,sync_trakt,tmdb_id=$INFO[Container(17195).ListItem.Property(tmdb_id)],$VAR[Path_Param_Type],season=$INFO[ListItem.Season],cache_refresh)</onclick>
-								<onclick condition="String.IsEqual(ListItem.DBType,episode) + !String.IsEmpty(ListItem.Property(tmdb_id))">RunScript(plugin.video.tmdb.bingie.helper,sync_trakt,tmdb_id=$INFO[ListItem.Property(tmdb_id)],$VAR[Path_Param_Type],season=$INFO[ListItem.Season],episode=$INFO[ListItem.Episode],cache_refresh)</onclick>
-								<onclick condition="String.IsEqual(ListItem.DBType,episode) + String.IsEmpty(ListItem.Property(tmdb_id))">RunScript(plugin.video.tmdb.bingie.helper,sync_trakt,tmdb_id=$INFO[Container(17195).ListItem.Property(tmdb_id)],$VAR[Path_Param_Type],season=$INFO[ListItem.Season],episode=$INFO[ListItem.Episode],cache_refresh)</onclick>
                             </control>
 
 							<!--Plot & Critics-->
@@ -1941,8 +1898,8 @@
                                 <radioheight>24</radioheight>
                                 <onclick>SetProperty(AdditionalInfo, plot)</onclick>
 								<onclick>AlarmClock(FocusText,SetFocus(1050),00:01,silent)</onclick>
-                            </control>						
-							
+                            </control>
+
 							<!--Credit & More Info Button-->
                             <control type="radiobutton" id="61">
                                 <visible>Skin.HasSetting(videoinfo_button_cast)</visible>
@@ -1957,9 +1914,9 @@
                                 <radiowidth>26</radiowidth>
                                 <radioheight>24</radioheight>
 								<onclick>SetProperty(AdditionalInfo, cast)</onclick>
-                                <onclick>SetFocus(8999,0)</onclick>									
-                            </control>														
-							
+                                <onclick>SetFocus(8999,0)</onclick>
+                            </control>
+
 							<!--Wikipedia-->
                             <control type="radiobutton" id="611">
                                 <visible>Skin.HasSetting(videoinfo_button_wikipedia)</visible>
@@ -1973,7 +1930,6 @@
                                 <radiowidth>25</radiowidth>
                                 <radioheight>25</radioheight>
 								<onclick condition="String.IsEmpty(Window(Home).Property(BusyInfoDialogTrailer)) + Window.IsActive(1190)">SetProperty(BusyInfoDialogTrailer,1,Home)</onclick>
-								<onclick>runscript(plugin.video.tmdb.bingie.helper,wikipedia=$VAR[Path_Wikipedia_Title],tmdb_type=$VAR[Path_Wikipedia_Type])</onclick>								
                             </control>
 
 							<!--Similar Button-->
@@ -1991,7 +1947,7 @@
                                 <radioheight>24</radioheight>
                                 <onclick>SetProperty(AdditionalInfo, similar)</onclick>
                                 <onclick>SetFocus(352)</onclick>
-                            </control>	
+                            </control>
 
 							<!--Video Versions-->
 							<control type="radiobutton" id="14">
@@ -2006,11 +1962,11 @@
 								<radioposx>17</radioposx>
 								<radiowidth>26</radiowidth>
 								<radioheight>26</radioheight>
-							</control>							
-							
+							</control>
+
 							<!-- Get Thumb Artwork Downloader -->
 							<control type="radiobutton" id="10">
-								<visible>Skin.HasSetting(videoinfo_button_artwork) + !String.IsEqual(ListItem.Path,plugin://plugin.video.tmdb.bingie.helper/)</visible>	
+								<visible>Skin.HasSetting(videoinfo_button_artwork) + False + String.IsEmpty(ListItem.Property(StremioID))</visible>
 								<visible>[String.IsEqual(ListItem.DBType,tvshow) | String.IsEqual(ListItem.DBType,movie) | String.IsEqual(ListItem.DBType,musicvideo) | String.IsEqual(ListItem.DBType,episode)] + !String.IsEmpty(ListItem.DBID)</visible>
 								<include>Bingie_InfoDialog_Button_Default_Defs</include>
 								<include content="Bingie_InfoDialog_Button_Texture">
@@ -2020,13 +1976,13 @@
 								<radioposx>17</radioposx>
 								<radioposy>22</radioposy>
 								<radiowidth>25</radiowidth>
-								<radioheight>25</radioheight>						        
-							</control>							
-							
+								<radioheight>25</radioheight>
+							</control>
+
 							<!-- TMDB Helper Artwork -->
 							<control type="radiobutton" id="1040">
-								<visible>Skin.HasSetting(videoinfo_button_artwork)</visible>
-								<visible>String.IsEqual(ListItem.Path,plugin://plugin.video.tmdb.bingie.helper/)</visible>
+								<visible>Skin.HasSetting(videoinfo_button_artwork) + False</visible>
+								<visible>!String.IsEmpty(ListItem.Property(StremioID))</visible>
 								<visible>!$EXP[IsSetDBType]</visible>
 								<include>Bingie_InfoDialog_Button_Default_Defs</include>
 								<include content="Bingie_InfoDialog_Button_Texture">
@@ -2037,15 +1993,12 @@
 								<radioposy>22</radioposy>
 								<radiowidth>25</radiowidth>
 								<radioheight>25</radioheight>
-								<onclick condition="$EXP[IsTvShowDBType]">Runscript(plugin.video.tmdb.bingie.helper,select_artwork,tmdb_id=$INFO[ListItem.UniqueID(tmdb)],tmdb_type=tv)</onclick>
-								<onclick condition="$EXP[IsMovieDBType]">Runscript(plugin.video.tmdb.bingie.helper,select_artwork,tmdb_id=$INFO[ListItem.UniqueID(tmdb)],tmdb_type=movie)</onclick>
-								<onclick condition="$EXP[IsEpisodeDBType] | $EXP[IsSeasonDBType]">Runscript(plugin.video.tmdb.bingie.helper,select_artwork,type=tv,tmdb_id=$INFO[ListItem.UniqueID(tvshow.tmdb)],query=$INFO[ListItem.TVShowTitle],season=$INFO[ListItem.Season],episode=$INFO[ListItem.Episode])</onclick>
 							</control>
 
 							<!--Refresh-->
 							<control type="radiobutton" id="6">
-								<visible>Skin.HasSetting(videoinfo_button_refresh)</visible>
-								<visible>!String.IsEqual(ListItem.Path,plugin://plugin.video.tmdb.bingie.helper/)</visible>
+								<visible>Skin.HasSetting(videoinfo_button_refresh) + False</visible>
+								<visible>String.IsEmpty(ListItem.Property(StremioID))</visible>
 								<visible>Control.IsEnabled(6)</visible>
 								<include>Bingie_InfoDialog_Button_Default_Defs</include>
 								<include content="Bingie_InfoDialog_Button_Texture">
@@ -2057,11 +2010,11 @@
 								<radiowidth>22</radiowidth>
 								<radioheight>22</radioheight>
 							</control>
-							
+
 							<!--Refresh TMDB Helper-->
 							<control type="radiobutton" id="612">
-								<visible>Skin.HasSetting(videoinfo_button_refresh)</visible>
-								<visible>String.IsEqual(ListItem.Path,plugin://plugin.video.tmdb.bingie.helper/)</visible>
+								<visible>Skin.HasSetting(videoinfo_button_refresh) + False</visible>
+								<visible>!String.IsEmpty(ListItem.Property(StremioID))</visible>
 								<visible>!$EXP[IsSetDBType]</visible>
 								<include>Bingie_InfoDialog_Button_Default_Defs</include>
 								<include content="Bingie_InfoDialog_Button_Texture">
@@ -2072,10 +2025,6 @@
 								<radioposx>18</radioposx>
 								<radiowidth>22</radiowidth>
 								<radioheight>22</radioheight>
-								<onclick condition="$EXP[IsTvShowDBType]">Runscript(plugin.video.tmdb.bingie.helper,refresh_details,tmdb_id=$INFO[ListItem.UniqueID(tmdb)],tmdb_type=tv)</onclick>
-								<onclick condition="$EXP[IsMovieDBType]">Runscript(plugin.video.tmdb.bingie.helper,refresh_details,tmdb_id=$INFO[ListItem.UniqueID(tmdb)],tmdb_type=movie)</onclick>
-								<onclick condition="$EXP[IsSeasonDBType]">Runscript(plugin.video.tmdb.bingie.helper,refresh_details,type=tv,tmdb_id=$INFO[ListItem.UniqueID(tvshow.tmdb)],query=$INFO[ListItem.TVShowTitle],season=$INFO[ListItem.Season])</onclick>
-								<onclick condition="$EXP[IsEpisodeDBType]">Runscript(plugin.video.tmdb.bingie.helper,refresh_details,type=tv,tmdb_id=$INFO[ListItem.UniqueID(tvshow.tmdb)],query=$INFO[ListItem.TVShowTitle],season=$INFO[ListItem.Season],episode=$INFO[ListItem.Episode])</onclick>
 							</control>
 						</control>
 						<!-- progress bar for resume buttons -->
@@ -2122,7 +2071,7 @@
 								<righttexture/>
 								<info>Container(1234).ListItem.PercentPlayed</info>
 							</control>
-						</control>	
+						</control>
 							<!-- fixed frame -->
 							<control type="group">
 								<visible>Control.HasFocus(70011) | Control.HasFocus(70012)</visible>
@@ -2130,11 +2079,11 @@
 								<animation effect="slide" end="0,64" time="150" tween="sine" easing="out" condition="Integer.IsGreater(Container(8000).Position, 1)">Conditional</animation>
 								<animation effect="slide" end="0,64" time="150" tween="sine" easing="out" condition="Integer.IsGreater(Container(8000).Position, 2)">Conditional</animation>
 								<animation effect="slide" end="0,64" time="150" tween="sine" easing="out" condition="Integer.IsGreater(Container(8000).Position, 3)">Conditional</animation>
-								<control type="image">						
+								<control type="image">
 									<width>550</width>
 									<height>64</height>
 									<texture border="10" background="true" colordiffuse="$INFO[Skin.String(ViewDetailsBorderFocusColor)]">bingie/border/default_button_focus.png</texture>
-								</control>								
+								</control>
 								<!-- Trailer -->
 								<control type="radiobutton">
 									<visible>!String.IsEmpty(Window.Property(TrailerPlayIcon))</visible>
@@ -2147,10 +2096,10 @@
 									<radioposx>19</radioposx>
 									<radioposy>22</radioposy>
 									<radiowidth>22</radiowidth>
-									<radioheight>22</radioheight>							
-								</control>								
+									<radioheight>22</radioheight>
+								</control>
 								<!--Trailers Button-->
-								<control type="radiobutton">									
+								<control type="radiobutton">
 									<visible>!String.IsEmpty(Window.Property(TrailerClipIcon))</visible>
 									<visible>Skin.HasSetting(videoinfo_button_trailersandmore)</visible>
 									<include>Bingie_InfoDialog_Trailer_Button_Default_Defs</include>
@@ -2162,11 +2111,11 @@
 									<radioposx>15</radioposx>
 									<radiowidth>27</radiowidth>
 									<radioheight>27</radioheight>
-								</control>	
-							</control>								
+								</control>
+							</control>
 					</control>
 				</control>
-			</control>	
+			</control>
 			<!--Collection List-->
 			<control type="group">
 			<animation effect="fade" start="100" end="0" time="500" delay="0" condition="[Player.HasVideo + ![VideoPlayer.Content(movies) | VideoPlayer.Content(episodes) | VideoPlayer.Content(musicvideos) | VideoPlayer.Content(livetv) | Pvr.IsPlayingRecording]] + Control.HasFocus(70011)">Conditional</animation>
@@ -2189,7 +2138,7 @@
                     <width>100%</width>
 					<aspectratio>scale</aspectratio>
 					<texture>colors/color_black.png</texture>
-				</control>	
+				</control>
 				</control>
 				<!--Collection Button-->
 				<control type="group">
@@ -2197,7 +2146,7 @@
 					<top>966</top>
                     <posx>139</posx>
                     <height>65</height>
-                    <width>auto</width>			
+                    <width>auto</width>
                 <control type="radiobutton" id="622">
                     <include>Bingie_InfoDialog_Button_Default_Defs2</include>
                     <include content="Bingie_InfoDialog_Button_Texture2">
@@ -2219,8 +2168,8 @@
                     <height>340</height>
 					<width>1775</width>
 					<onclick condition="String.IsEmpty(Window(Home).Property(SetCustomAddon))">Close</onclick>
-					<onclick condition="String.IsEmpty(Window(Home).Property(SetCustomAddon))">SetProperty(CloseInfoDialog,1,Home)</onclick>					
-                    <onclick condition="String.IsEmpty(Window(Home).Property(SetCustomAddon))">RunScript(plugin.video.tmdb.bingie.helper,add_path=$INFO[ListItem.FolderPath],call_auto=1190)</onclick>
+					<onclick condition="String.IsEmpty(Window(Home).Property(SetCustomAddon))">SetProperty(CloseInfoDialog,1,Home)</onclick>
+                    <onclick condition="String.IsEmpty(Window(Home).Property(SetCustomAddon))">ActivateWindow(Videos,$ESCINFO[ListItem.FolderPath],return)</onclick>
 					<onclick condition="!String.IsEmpty(Window(Home).Property(SetCustomAddon))">SetProperty(osdheader,$ESCINFO[Container($PARAM[id]).ListItem.Label],1122)</onclick>
 					<onclick condition="!String.IsEmpty(Window(Home).Property(SetCustomAddon))">SetProperty(osdtextbox,$ESCINFO[Container($PARAM[id]).ListItem.Plot],1122)</onclick>
 					<onclick condition="!String.IsEmpty(Window(Home).Property(SetCustomAddon))">SetProperty(osdrating,$ESCINFO[Container($PARAM[id]).ListItem.Rating],1122)</onclick>
@@ -2263,9 +2212,9 @@
 						</control>
 					</focusedlayout>
 					<content>$VAR[Path_Collection]</content>
-				</control>								
+				</control>
 			</control>
-			
+
 			<!-- studio logo -->
 			<control type="group">
 				<visible>String.IsEqual(Container(17195).ListItem.Property(folderpath),ListItem.FolderPath)</visible>
@@ -2277,16 +2226,16 @@
 				<animation effect="fade" start="100" end="0" time="100">WindowClose</animation>
 				<animation effect="fade" start="100" end="0" time="300" condition="Player.HasVideo">Conditional</animation>
 				<control type="image" id="6990">
-					<visible>!String.IsEmpty(Control.GetLabel(6990)) + !Skin.HasSetting(EnableStudioLogoInfoDialog)</visible>					
+					<visible>!String.IsEmpty(Control.GetLabel(6990)) + !Skin.HasSetting(EnableStudioLogoInfoDialog)</visible>
 					<right>40</right>
 					<width>161</width>
 					<height>109</height>
 					<bottom>10</bottom>
 					<aspectratio aligny="center" align="right">keep</aspectratio>
-					<texture background="true">$VAR[StudioLogoImg]</texture>					
+					<texture background="true">$VAR[StudioLogoImg]</texture>
 				</control>
 				<control type="image" id="69901">
-					<visible>!String.IsEmpty(Control.GetLabel(69901)) + String.IsEmpty(Control.GetLabel(6990)) + !Skin.HasSetting(EnableStudioLogoInfoDialog)</visible>					
+					<visible>!String.IsEmpty(Control.GetLabel(69901)) + String.IsEmpty(Control.GetLabel(6990)) + !Skin.HasSetting(EnableStudioLogoInfoDialog)</visible>
 					<right>40</right>
 					<width>161</width>
 					<height>109</height>
@@ -2295,7 +2244,7 @@
 					<texture background="true">$VAR[StudioLogoImg2]</texture>
 				</control>
 			</control>
-			
+
 			<!--Similar List-->
 				<control type="fixedlist" id="352">
 					<top>-153</top>
@@ -2303,8 +2252,8 @@
                     <height>1280</height>
                     <width>1100</width>
 					<onclick condition="String.IsEmpty(Window(Home).Property(SetCustomAddon))">Close</onclick>
-					<onclick condition="String.IsEmpty(Window(Home).Property(SetCustomAddon))">SetProperty(CloseInfoDialog,1,Home)</onclick>					
-                    <onclick condition="String.IsEmpty(Window(Home).Property(SetCustomAddon))">RunScript(plugin.video.tmdb.bingie.helper,add_path=$INFO[ListItem.FolderPath],call_auto=1190)</onclick>
+					<onclick condition="String.IsEmpty(Window(Home).Property(SetCustomAddon))">SetProperty(CloseInfoDialog,1,Home)</onclick>
+                    <onclick condition="String.IsEmpty(Window(Home).Property(SetCustomAddon))">ActivateWindow(Videos,$ESCINFO[ListItem.FolderPath],return)</onclick>
 					<onclick condition="!String.IsEmpty(Window(Home).Property(SetCustomAddon))">SetProperty(osdheader,$ESCINFO[Container($PARAM[id]).ListItem.Label],1122)</onclick>
 					<onclick condition="!String.IsEmpty(Window(Home).Property(SetCustomAddon))">SetProperty(osdtextbox,$ESCINFO[Container($PARAM[id]).ListItem.Plot],1122)</onclick>
 					<onclick condition="!String.IsEmpty(Window(Home).Property(SetCustomAddon))">SetProperty(osdrating,$ESCINFO[Container($PARAM[id]).ListItem.Rating],1122)</onclick>
@@ -2348,13 +2297,13 @@
                     </focusedlayout>
 					<content>$VAR[Path_Similar]</content>
 				</control>
-		
-			<!-- Similar -->	
+
+			<!-- Similar -->
 			<control type="group">
 				<visible>String.IsEqual(Window.Property(AdditionalInfo),similar)</visible>
 				<include>Animation_Right_DialogInfo</include>
-				
-				<!--Similar List Button-->	
+
+				<!--Similar List Button-->
 				<control type="list" id="3522">
 					<onleft>ClearProperty(AdditionalInfo)</onleft>
 					<onback>ClearProperty(AdditionalInfo)</onback>
@@ -2374,7 +2323,7 @@
 						<textoffsety>8</textoffsety>
 						<label>$INFO[ListItem.Label]</label>
 						<textcolor>$INFO[Skin.String(BingieButtonTextColor)]</textcolor>
-					</control>			
+					</control>
 					</itemlayout>
 					<focusedlayout width="550" height="70">
 					<control type="image">
@@ -2410,7 +2359,7 @@
 						<textoffsety>8</textoffsety>
 						<label>$INFO[ListItem.Label]</label>
 						<textcolor>$INFO[Skin.String(BingieButtonTextColor)]</textcolor>
-					</control>							
+					</control>
 					</focusedlayout>
 					<content>
 					 <item id="1">
@@ -2418,10 +2367,10 @@
 					</item>
 					</content>
 				</control>
-				
+
 				<control type="group">
 					<top>346</top>
-					<width>688</width>			
+					<width>688</width>
 				<control type="label">
 					<visible>Control.HasFocus(3522)</visible>
 					<height>63</height>
@@ -2445,7 +2394,7 @@
 					<label>$INFO[Container(352).NumItems] titles</label>
 				</control>
 				</control>
-								
+
 				<!-- fixed border moving with screen -->
                 <control type="image">
                     <visible>$EXP[UseOriginalFixedFocus] + Integer.IsGreater(Container(352).NumItems,0) + Control.HasFocus(352)</visible>
@@ -2475,16 +2424,16 @@
 					<visible>!Container(352).IsUpdating + !Integer.IsGreater(Container(352).NumItems,0)</visible>
 				</control>
 
-				<!--Similar Busy Spinner-->	
+				<!--Similar Busy Spinner-->
 				<include content="Busy_Spinner">
 					<param name="centerleft" value="67%"/>
 					<param name="centertop" value="50%"/>
 					<param name="visibility" value="Container(352).IsUpdating + String.IsEqual(Window.Property(AdditionalInfo),similar)"/>
 					<param name="size" value="100"/>
 				</include>
-				
+
 			</control>
-			
+
 				<!--Trailers List-->
 				<control type="fixedlist" id="354">
                     <onclick>RunScript(special://skin/extras/stremio_dispatch.py,trailer_player.py,selected)</onclick>
@@ -2530,12 +2479,12 @@
                     </focusedlayout>
 					<content limit="20">$VAR[Path_Videos]</content>
 				</control>
-		
+
 			<!-- Trailers & more -->
-			<control type="group">	
+			<control type="group">
 				<visible>String.IsEqual(Window.Property(AdditionalInfo),trailers)</visible>
-				<include>Animation_Right_DialogInfo</include>			
-				<!--Trailers List Button-->	
+				<include>Animation_Right_DialogInfo</include>
+				<!--Trailers List Button-->
 				<control type="list" id="3541">
 					<onleft>ClearProperty(AdditionalInfo)</onleft>
 					<onback>ClearProperty(AdditionalInfo)</onback>
@@ -2555,7 +2504,7 @@
 						<textoffsety>8</textoffsety>
 						<label>$INFO[ListItem.Label]</label>
 						<textcolor>$INFO[Skin.String(BingieButtonTextColor)]</textcolor>
-					</control>			
+					</control>
 					</itemlayout>
 					<focusedlayout width="550" height="70">
 					<control type="image">
@@ -2591,7 +2540,7 @@
 						<textoffsety>8</textoffsety>
 						<label>$INFO[ListItem.Label]</label>
 						<textcolor>$INFO[Skin.String(BingieButtonTextColor)]</textcolor>
-					</control>							
+					</control>
 					</focusedlayout>
 					<content>
 					 <item id="1">
@@ -2601,7 +2550,7 @@
 				</control>
 				<control type="group">
 					<top>346</top>
-					<width>688</width>		
+					<width>688</width>
 					<control type="label">
 						<visible>Control.HasFocus(3541)</visible>
 						<height>63</height>
@@ -2653,8 +2602,8 @@
 					<label>$LOCALIZE[31558]</label>
 					<visible>!Container(354).IsUpdating + !Integer.IsGreater(Container(354).NumItems,0)</visible>
 				</control>
-				
-				<!--Trailers Busy Spinner-->	
+
+				<!--Trailers Busy Spinner-->
 				<include content="Busy_Spinner">
 					<param name="centerleft" value="67%"/>
 					<param name="centertop" value="50%"/>
@@ -2662,17 +2611,17 @@
 					<param name="size" value="100"/>
 				</include>
 			</control>
-			
-				<!-- plot & critics additional info -->			
+
+				<!-- plot & critics additional info -->
 				<control type="grouplist">
-				<include>Animation_Right_DialogInfo</include>	
+				<include>Animation_Right_DialogInfo</include>
 					<include>BingieLeftDefs</include>
 					<top>263</top>
 					<width>1700</width>
 					<height>100%</height>
 					<orientation>vertical</orientation>
-					<visible>String.IsEqual(Window.Property(AdditionalInfo),plot)</visible>					
-					
+					<visible>String.IsEqual(Window.Property(AdditionalInfo),plot)</visible>
+
 					<!-- tag -->
 					<control type="label">
 						<visible>!String.IsEmpty(ListItem.Tagline)</visible>
@@ -2683,7 +2632,7 @@
 						<align>justify</align>
 						<font>Bold29</font>
 					</control>
-					
+
 					<!--large plot -->
 					<control type="textbox">
 						<visible>!String.IsEmpty(ListItem.Plot)</visible>
@@ -2694,17 +2643,17 @@
 						<align>justify</align>
 						<font>Plots</font>
 					</control>
-				
+
 					<!--New Ratings Footer-->
 					<include condition="Skin.HasSetting(EnableRatings) + !Skin.HasSetting(DisableRatingsPlotCritics)">new_footer_VD</include>
-					
+
 					<!-- reviews -->
 					<control type="group">
                         <height>392</height>
 						<control type="group">
 							<animation effect="fade" start="0" end="100" time="400">Visible</animation>
-								<control type="label">	
-									<visible>Container(1050).IsUpdating + String.IsEqual(Window.Property(AdditionalInfo),plot)</visible>								
+								<control type="label">
+									<visible>Container(1050).IsUpdating + String.IsEqual(Window.Property(AdditionalInfo),plot)</visible>
 									<bottom>158</bottom>
 									<height>120</height>
 									<align>center</align>
@@ -2724,10 +2673,10 @@
 									<scroll>true</scroll>
 									<visible>!Container(1050).IsUpdating + !Integer.IsGreater(Container(1050).NumItems,0)</visible>
 								</control>
-						</control>	
+						</control>
                         <control type="fixedlist" id="1050">
 							<animation effect="fade" start="100" end="0" time="0" condition="Container(1050).IsUpdating">Conditional</animation>
-							<animation effect="fade" start="0" end="100" time="400" condition="!Container(1050).IsUpdating">Conditional</animation>	
+							<animation effect="fade" start="0" end="100" time="400" condition="!Container(1050).IsUpdating">Conditional</animation>
                             <posy>45</posy>
                             <width>1686</width>
                             <height>320</height>
@@ -2736,18 +2685,18 @@
 							<movement>1</movement>
                             <orientation>horizontal</orientation>
                             <preloaditems>2</preloaditems>
-							<itemgap>50</itemgap>	
+							<itemgap>50</itemgap>
 							<onleft>ClearProperty(AdditionalInfo)</onleft>
 							<onback>ClearProperty(AdditionalInfo)</onback>
 							<onback>8000</onback>
-							<onleft>SetFocus(8000)</onleft>	
+							<onleft>SetFocus(8000)</onleft>
 							<onclick>SetProperty(header,$ESCINFO[Container(1050).ListItem.Label],1121)</onclick>
 							<onclick>SetProperty(textbox,$ESCINFO[Container(1050).ListItem.Plot],1121)</onclick>
 							<onclick>ActivateWindow(1121)</onclick>
 							<itemlayout height="270" width="850">
                                 <control type="group">
 									<animation effect="fade" start="100" end="30" time="0" condition="true">Conditional</animation>
-                                    <control type="image">										
+                                    <control type="image">
 										<width>836</width>
                                         <texture border="10" background="true" colordiffuse="$INFO[Skin.String(ViewDetailsBorderFocusColor)]">$INFO[Skin.String(thumbsborder_focused),bingie/border/default_button_fo_,.png]</texture>
                                     </control>
@@ -2756,7 +2705,7 @@
 										<left>23</left>
 										<width>792</width>
 										<height>238</height>
-										<align>left</align>										
+										<align>left</align>
 										<textcolor>$INFO[Skin.String(BingiePrimaryTextColor)]</textcolor>
 										<font>critics</font>
 										<label>[B]$INFO[ListItem.Label][/B][CR]$INFO[ListItem.Plot]</label>
@@ -2775,7 +2724,7 @@
 										<left>23</left>
 										<width>792</width>
 										<height>238</height>
-										<align>left</align>										
+										<align>left</align>
 										<textcolor>$INFO[Skin.String(BingiePrimaryTextColor)]</textcolor>
 										<font>critics</font>
 										<label>[B]$INFO[ListItem.Label][/B][CR]$INFO[ListItem.Plot]</label>
@@ -2786,12 +2735,12 @@
 							<content>$VAR[Path_Reviews]</content>
 						</control>
                     </control>
-				</control>				
+				</control>
 
 	<!-- Credits & More Info -->
-	<control type="group">		
-		<visible>String.IsEqual(Window.Property(AdditionalInfo),cast)</visible>	
-		<include>Animation_Right_DialogInfo</include>	
+	<control type="group">
+		<visible>String.IsEqual(Window.Property(AdditionalInfo),cast)</visible>
+		<include>Animation_Right_DialogInfo</include>
 		<control type="label">
 			<animation effect="fade" start="0" end="100" time="400" delay="300">Visible</animation>
             <top>280</top>
@@ -2804,10 +2753,10 @@
             <wrapmultiline>true</wrapmultiline>
             <textcolor>$INFO[Skin.String(BingiePrimaryTextColor)]</textcolor>
             <label>$LOCALIZE[31558]</label>
-            <visible>[!Container(53001).IsUpdating + !Integer.IsGreater(Container(53001).NumItems,0) + String.IsEqual(Container(8999).ListItem.Label,$LOCALIZE[206])] | [!Container(53002).IsUpdating + !Integer.IsGreater(Container(53002).NumItems,0) + String.IsEqual(Container(8999).ListItem.Label,$LOCALIZE[31089])] | [!Container(53003).IsUpdating + !Integer.IsGreater(Container(53003).NumItems,0) + String.IsEqual(Container(8999).ListItem.Label,$LOCALIZE[135])] | [!Container(53004).IsUpdating + !Integer.IsGreater(Container(53004).NumItems,0) + String.IsEqual(Container(8999).ListItem.Label,$LOCALIZE[31529])] | 
+            <visible>[!Container(53001).IsUpdating + !Integer.IsGreater(Container(53001).NumItems,0) + String.IsEqual(Container(8999).ListItem.Label,$LOCALIZE[206])] | [!Container(53002).IsUpdating + !Integer.IsGreater(Container(53002).NumItems,0) + String.IsEqual(Container(8999).ListItem.Label,$LOCALIZE[31089])] | [!Container(53003).IsUpdating + !Integer.IsGreater(Container(53003).NumItems,0) + String.IsEqual(Container(8999).ListItem.Label,$LOCALIZE[135])] | [!Container(53004).IsUpdating + !Integer.IsGreater(Container(53004).NumItems,0) + String.IsEqual(Container(8999).ListItem.Label,$LOCALIZE[31529])] |
 					 [!Container(53005).IsUpdating + !Integer.IsGreater(Container(53005).NumItems,0) + String.IsEqual(Container(8999).ListItem.Label,$LOCALIZE[20339])] | [!Container(53006).IsUpdating + !Integer.IsGreater(Container(53006).NumItems,0) + String.IsEqual(Container(8999).ListItem.Label,$LOCALIZE[345])] | [!Container(53007).IsUpdating + !Integer.IsGreater(Container(53007).NumItems,0) + String.IsEqual(Container(8999).ListItem.Label,$LOCALIZE[31488])] | [!Container(53008).IsUpdating + !Integer.IsGreater(Container(53008).NumItems,0) + [String.IsEqual(Container(8999).ListItem.Label,$LOCALIZE[705]) | String.IsEqual(Container(8999).ListItem.Label,$LOCALIZE[572])]] |
 					 [!Container(53009).IsUpdating + !Integer.IsGreater(Container(53009).NumItems,0) + String.IsEqual(Container(8999).ListItem.Label,$LOCALIZE[31530])]</visible>
-        </control>		
+        </control>
 		<control type="list" id="8999">
 			<onleft>ClearProperty(AdditionalInfo)</onleft>
 			<onback>ClearProperty(AdditionalInfo)</onback>
@@ -2816,7 +2765,7 @@
 			<onback>8000</onback>
 			<onleft>SetFocus(8000)</onleft>
 			<ondown>8999</ondown>
-			<onright>9000</onright>		
+			<onright>9000</onright>
 			<orientation>vertical</orientation>
 			<top>346</top>
 			<left>139</left>
@@ -2871,11 +2820,11 @@
 				<item id="1">
 					<label>$LOCALIZE[206]</label> <!-- Cast -->
 				</item>
-				  
+
 				<item id="2">
 					<label>$LOCALIZE[31089]</label> <!-- Crew -->
 				</item>
-				
+
 				<item id="3">
 					<label>$LOCALIZE[20339]</label> <!-- Director -->
 					<visible>String.IsEqual(ListItem.DBType,movie) | String.IsEqual(ListItem.DBType,episode)</visible>
@@ -2884,17 +2833,17 @@
 				<item id="4">
 					<label>$LOCALIZE[31488]</label> <!-- Writer -->
 					<visible>String.IsEqual(ListItem.DBType,movie)</visible>
-				</item>	
+				</item>
 
 				<item id="5">
 					<label>$LOCALIZE[31530]</label> <!-- Creator -->
 					<visible>String.IsEqual(ListItem.DBType,tvshow) | String.IsEqual(ListItem.DBType,episode)</visible>
-				</item>	
+				</item>
 
 				<item id="6">
 					<label>$LOCALIZE[572]</label> <!-- Studio -->
 					<visible>String.IsEqual(ListItem.DBType,movie)</visible>
-				</item>	
+				</item>
 
 				<item id="7">
 					<label>$LOCALIZE[705]</label> <!-- Network -->
@@ -2903,19 +2852,19 @@
 
 				<item id="8">
 					<label>$LOCALIZE[135]</label> <!-- Genre -->
-				</item>		
-				
+				</item>
+
 				<item id="9">
 					<label>$LOCALIZE[345]</label> <!-- Year -->
-				</item>	
+				</item>
 
 				<item id="10">
 					<label>$LOCALIZE[31529]</label> <!-- Posters -->
-				</item>				
+				</item>
 
 			</content>
 		</control>
-	  
+
 		<control type="group" id="9000">
 			<scrolltime tween="sine" easing="out">500</scrolltime>
 			<orientation>vertical</orientation>
@@ -2935,7 +2884,7 @@
 			  <param name="width" value="300" />
 			  <param name="visible" value="String.IsEqual(Container(8999).ListItem.Label,$LOCALIZE[206])" /> <!-- Cast -->
 			</include>
-			
+
 			<include content="InfoResultWidgetPoster" condition="Skin.HasSetting(CastCrewImages)">
 			  <param name="id" value="53001" />
 			  <param name="groupid" value="530011" />
@@ -2947,7 +2896,7 @@
 			  <param name="layout">PosterPanelBingie</param>
 			  <param name="visible" value="String.IsEqual(Container(8999).ListItem.Label,$LOCALIZE[206])" /> <!-- Cast -->
 			</include>
-					
+
 			<include content="InfoResultWidget" condition="!Skin.HasSetting(CastCrewImages)">
 			  <param name="id" value="53002" />
 			  <param name="groupid" value="530022" />
@@ -2957,7 +2906,7 @@
 			  <param name="width" value="300" />
 			  <param name="visible" value="String.IsEqual(Container(8999).ListItem.Label,$LOCALIZE[31089])" /> <!-- Crew -->
 			</include>
-			
+
 			<include content="InfoResultWidgetPoster" condition="Skin.HasSetting(CastCrewImages)">
 			  <param name="id" value="53002" />
 			  <param name="groupid" value="530022" />
@@ -2969,7 +2918,7 @@
 			  <param name="layout">PosterPanelBingie</param>
 			  <param name="visible" value="String.IsEqual(Container(8999).ListItem.Label,$LOCALIZE[31089])" /> <!-- Crew -->
 			</include>
-			
+
 			<include content="InfoResultWidgetPoster">
 			  <param name="id" value="53005" />
 			  <param name="groupid" value="530055" />
@@ -2981,7 +2930,7 @@
 			  <param name="layout">PosterPanelBingie</param>
 			  <param name="visible" value="String.IsEqual(Container(8999).ListItem.Label,$LOCALIZE[20339])" /> <!-- Director -->
 			</include>
-			
+
 			<include content="InfoResultWidgetPoster">
 			  <param name="id" value="53007" />
 			  <param name="groupid" value="530077" />
@@ -2993,7 +2942,7 @@
 			  <param name="layout">PosterPanelBingie</param>
 			  <param name="visible" value="String.IsEqual(Container(8999).ListItem.Label,$LOCALIZE[31488])" /> <!-- Writer -->
 			</include>
-			
+
 			<include content="InfoResultWidgetPoster">
 			  <param name="id" value="53009" />
 			  <param name="groupid" value="530099" />
@@ -3005,7 +2954,7 @@
 			  <param name="layout">PosterPanelBingie</param>
 			  <param name="visible" value="String.IsEqual(Container(8999).ListItem.Label,$LOCALIZE[31530])" /> <!-- Creator -->
 			</include>
-			
+
 			<include content="InfoResultWidgetPoster">
 			  <param name="id" value="53008" />
 			  <param name="groupid" value="530088" />
@@ -3017,7 +2966,7 @@
 			  <param name="layout">PosterPanelBingie</param>
 			  <param name="visible" value="[String.IsEqual(Container(8999).ListItem.Label,$LOCALIZE[572]) | String.IsEqual(Container(8999).ListItem.Label,$LOCALIZE[705])]" /> <!-- Studio -->
 			</include>
-			
+
 			<include content="InfoResultWidgetPoster">
 			  <param name="id" value="53003" />
 			  <param name="groupid" value="530033" />
@@ -3029,7 +2978,7 @@
 			  <param name="layout">PosterPanelBingie</param>
 			  <param name="visible" value="String.IsEqual(Container(8999).ListItem.Label,$LOCALIZE[135])" /> <!-- Genre -->
 			</include>
-			
+
 			<include content="InfoResultWidgetPoster">
 			  <param name="id" value="53006" />
 			  <param name="groupid" value="530066" />
@@ -3040,7 +2989,7 @@
 			  <param name="layoutheight" value="374" />
 			  <param name="layout">PosterPanelBingie</param>
 			  <param name="visible" value="String.IsEqual(Container(8999).ListItem.Label,$LOCALIZE[345])" /> <!-- Year -->
-			</include>	
+			</include>
 
 			<include content="InfoResultWidgetPoster">
 			  <param name="id" value="53004" />
@@ -3053,10 +3002,10 @@
 			  <param name="layout">PosterPanelBingie</param>
 			  <param name="visible" value="String.IsEqual(Container(8999).ListItem.Label,$LOCALIZE[31529])" /> <!-- Posters -->
 			  <onfocus>SetProperty(DisablePosterFade,1)</onfocus>
-			</include>			
-				
+			</include>
+
 		</control>
-	
+
 		<include content="Busy_Spinner">
 				<param name="centerleft" value="70%"/>
 				<param name="centertop" value="50%"/>
@@ -3071,7 +3020,7 @@
         <include condition="Skin.HasSetting(EnableSnowAnimation)">SnowAnimation</include>
 		</control>
 	</include>
-	
+
 	<!-- Cast Info -->
 	<include name="TMDB_Helper_Cast">
 		<!-- background -->
@@ -3087,14 +3036,14 @@
 				<colordiffuse>$INFO[Skin.String(BackgroundDiffuseColor)]</colordiffuse>
 				<aspectratio>scale</aspectratio>
 				<fadetime>350</fadetime>
-				<animation effect="fade" start="100" end="0" time="300" condition="String.IsEmpty(Window(Home).Property(TMDbBingieHelper.Recommendations.HideRecs))">WindowClose</animation>
-				<animation effect="fade" start="100" end="0" time="300" condition="!String.IsEmpty(Window(Home).Property(TMDbBingieHelper.Recommendations.HideRecs))">WindowClose</animation>
-			</control>	
+				<animation effect="fade" start="100" end="0" time="300" condition="String.IsEmpty(Window(Home).Property(StremioRecommendations.HideRecs))">WindowClose</animation>
+				<animation effect="fade" start="100" end="0" time="300" condition="!String.IsEmpty(Window(Home).Property(StremioRecommendations.HideRecs))">WindowClose</animation>
+			</control>
 		</control>
-		
+
 		<!-- Now Playing -->
-        <include>NowPlayingBackground</include>	
-		
+        <include>NowPlayingBackground</include>
+
 		<!-- Cast busy image while widget loading -->
 		<include content="Busy_Spinner">
 			<param name="centerleft" value="64%"/>
@@ -3102,9 +3051,9 @@
 			<param name="visibility" value="[[Container(4000).IsUpdating + String.IsEqual(Container(2999).ListItem.Label,$LOCALIZE[31519])] | [Container(4001).IsUpdating + String.IsEqual(Container(2999).ListItem.Label,$LOCALIZE[31508])] | [Container(4002).IsUpdating + String.IsEqual(Container(2999).ListItem.Label,$LOCALIZE[31509])] |
 				[Container(4003).IsUpdating + String.IsEqual(Container(2999).ListItem.Label,$LOCALIZE[31510])]]"/>
 			<param name="size" value="100"/>
-		</include>	
+		</include>
 
-		<control type="group">		
+		<control type="group">
 			<include>Animation_Recommendations_Window_2</include>
 			<!-- Cast List Button -->
 			<control type="list" id="2999">
@@ -3162,7 +3111,7 @@
 					</control>
 				</focusedlayout>
 				<content>
-				
+
 					<item id="1">
 						<label>$LOCALIZE[14116]</label> <!-- Info -->
 					</item>
@@ -3170,37 +3119,37 @@
 					<item id="2">
 						<label>$LOCALIZE[31519]</label> <!-- Cast -->
 					</item>
-					  
+
 					<item id="3">
 						<label>$LOCALIZE[31508]</label> <!-- Cast -->
 					</item>
-					
+
 					<item id="4">
 						<label>$LOCALIZE[31509]</label> <!-- Crew -->
 					</item>
 
 					<item id="5">
 						<label>$LOCALIZE[31510]</label> <!-- Crew -->
-					</item>		
+					</item>
 
 				</content>
-			</control>		
-			
+			</control>
+
 				<!-- TMDB Helper Cast Panel -->
-				<control type="grouplist" id="3999">	
-					<visible>String.IsEqual(ListItem.Property(tmdb_type),person)</visible>				
+				<control type="grouplist" id="3999">
+					<visible>String.IsEqual(ListItem.Property(tmdb_type),person)</visible>
 					<orientation>vertical</orientation>
 					<posx>52</posx>
 					<posy>0</posy>
 					<itemgap>28</itemgap>
 					<width>1820</width>
-					<height>1080</height>	
+					<height>1080</height>
 					<onback>8000</onback>
 					<pagecontrol>999</pagecontrol>
-					<control type="group">									
-						<height>82</height>				
-						<control type="label">	
-							<visible>!String.IsEmpty(ListItem.Label)</visible>	
+					<control type="group">
+						<height>82</height>
+						<control type="label">
+							<visible>!String.IsEmpty(ListItem.Label)</visible>
 							<top>17</top>
 							<left>6</left>
 							<label>$INFO[ListItem.Label]</label>
@@ -3210,15 +3159,15 @@
 							<textcolor>$INFO[Skin.String(BingieHeaderTextColor)]</textcolor>
 							<font>Bold60</font>
 						</control>
-					</control>	
+					</control>
 					<control type="group">
-						<height>70</height>			
+						<height>70</height>
 						<control type="grouplist">
 						<orientation>horizontal</orientation>
-						<height>70</height>	
+						<height>70</height>
 						<itemgap>0</itemgap>
 						<width>1796</width>
-						<left>6</left>	
+						<left>6</left>
 						<control type="label">
 							<visible>!String.IsEmpty(ListItem.Property(Gender))</visible>
 							<top>105</top>
@@ -3238,11 +3187,11 @@
 							<width>auto</width>
 							<height>30</height>
 							<label>$INFO[ListItem.Property(Department)]</label>
-							<textcolor>$INFO[Skin.String(BingieHeaderTextColor)]</textcolor>				
+							<textcolor>$INFO[Skin.String(BingieHeaderTextColor)]</textcolor>
 							<align>left</align>
 							<font>Reg40</font>
 							<visible>!ControlGroup(4100).HasFocus</visible>
-						</control>			
+						</control>
 						<control type="label">
 							  <top>105</top>
 							  <left>6</left>
@@ -3264,16 +3213,16 @@
 							  <textcolor>$INFO[Skin.String(BingieHeaderTextColor)]</textcolor>
 							  <font>Reg40</font>
 							  <visible>ControlGroup(4100).HasFocus</visible>
-						</control>				
 						</control>
-					</control>			
-					<control type="group" id="3000">			
+						</control>
+					</control>
+					<control type="group" id="3000">
 						<height>1080</height>
 						<control type="group">
 							<top>0</top>
 							<left>0</left>
 							<right>0</right>
-							<height>900</height>		
+							<height>900</height>
 							<!-- Poster -->
 							<control type="image">
 								<left>8</left>
@@ -3298,13 +3247,13 @@
 							<!-- Info -->
 							<control type="group" id="300">
 								<animation effect="fade" start="0" end="100" time="400">Visible</animation>
-								<visible>String.IsEqual(Container(2999).ListItem.Label,$LOCALIZE[14116])</visible>			
+								<visible>String.IsEqual(Container(2999).ListItem.Label,$LOCALIZE[14116])</visible>
 								<top>8</top>
 								<left>553</left>
 								<control type="grouplist">
 									<orientation>vertical</orientation>
 									<usecontrolcoords>true</usecontrolcoords>
-									<itemgap>10</itemgap>							
+									<itemgap>10</itemgap>
 									<control type="group">
 									<visible>!String.IsEmpty(ListItem.Property(Birthday)) | !String.IsEmpty(ListItem.Property(Deathday))</visible>
 									<height>40</height>
@@ -3316,7 +3265,7 @@
 										<height>30</height>
 										<colordiffuse>$INFO[Skin.String(BingieDeatailsTextColor)]</colordiffuse>
 										<texture>dialogs/videoinfo/calendar.png</texture>
-									</control>				
+									</control>
 									<control type="label">
 										<posx>40</posx>
 										<posy>0</posy>
@@ -3326,7 +3275,7 @@
 										<textcolor>$INFO[Skin.String(BingieDeatailsTextColor)]</textcolor>
 										<align>justify</align>
 										<font>Reg30</font>
-									</control>			
+									</control>
 									</control>
 									<control type="group">
 									<visible>!String.IsEmpty(ListItem.Property(Born))</visible>
@@ -3339,7 +3288,7 @@
 										<height>28</height>
 										<colordiffuse>$INFO[Skin.String(BingieDeatailsTextColor)]</colordiffuse>
 										<texture>dialogs/videoinfo/location.png</texture>
-									</control>				
+									</control>
 									<control type="label">
 										<posx>40</posx>
 										<posy>0</posy>
@@ -3349,7 +3298,7 @@
 										<textcolor>$INFO[Skin.String(BingieDeatailsTextColor)]</textcolor>
 										<align>justify</align>
 										<font>Reg30</font>
-									</control>			
+									</control>
 									</control>
 									<control type="textbox">
 										<posx>0</posx>
@@ -3361,7 +3310,7 @@
 										<textcolor>$INFO[Skin.String(BingiePlotTextColor)]</textcolor>
 										<align>justify</align>
 										<font>Reg30</font>
-									</control>		
+									</control>
 								</control>
 							</control>
 						</control>
@@ -3386,8 +3335,8 @@
 							  <param name="id" value="4003" />
 							  <param name="content" value="$VAR[Path_CrewInShows]" />
 							  <param name="visible" value="String.IsEqual(Container(2999).ListItem.Label,$LOCALIZE[31510])" /> <!-- Crew in Shows -->
-							</include>				
-							<!-- There are no matches text -->	
+							</include>
+							<!-- There are no matches text -->
 							<control type="label">
 								<animation effect="fade" start="0" end="100" time="400" delay="300">Visible</animation>
 								<top>318</top>
@@ -3401,8 +3350,8 @@
 								<textcolor>$INFO[Skin.String(BingiePrimaryTextColor)]</textcolor>
 								<label>$LOCALIZE[31558]</label>
 								<visible>[!Container(4000).IsUpdating + !Integer.IsGreater(Container(4000).NumItems,0) + String.IsEqual(Container(2999).ListItem.Label,$LOCALIZE[31519])] | [!Container(4001).IsUpdating + !Integer.IsGreater(Container(4001).NumItems,0) + String.IsEqual(Container(2999).ListItem.Label,$LOCALIZE[31508])] | [!Container(4002).IsUpdating + !Integer.IsGreater(Container(4002).NumItems,0) + String.IsEqual(Container(2999).ListItem.Label,$LOCALIZE[31509])] | [!Container(4003).IsUpdating + !Integer.IsGreater(Container(4003).NumItems,0) + String.IsEqual(Container(2999).ListItem.Label,$LOCALIZE[31510])]</visible>
-							</control>		
-						</control>							
+							</control>
+						</control>
 					</control>
 				</control>
 			<control type="scrollbar" id="90">
@@ -3418,10 +3367,10 @@
                 <width>10</width>
                 <top>339</top>
                 <bottom>189</bottom>
-                <centerright>30</centerright>               
-				<visible>String.IsEqual(Container(2999).ListItem.Label,$LOCALIZE[14116])</visible>	
+                <centerright>30</centerright>
+				<visible>String.IsEqual(Container(2999).ListItem.Label,$LOCALIZE[14116])</visible>
 				<animation effect="fade" start="0" end="100" time="400" condition="Control.HasFocus(90)">Conditional</animation>
-				<animation effect="fade" start="100" end="0" time="400" condition="!Control.HasFocus(90)">Conditional</animation>				
+				<animation effect="fade" start="100" end="0" time="400" condition="!Control.HasFocus(90)">Conditional</animation>
 			</control>
 			<!-- Snow Effect -->
 			<include condition="Skin.HasSetting(EnableSnowAnimation)">SnowAnimation</include>
@@ -3438,7 +3387,7 @@
             <texture>$PARAM[icon_image]</texture>
         </control>
     </include>
-	
+
 	<include name="More_Details_Object_Icon2">
         <control type="image">
             <posx>$PARAM[icon_posx]</posx>
@@ -3463,7 +3412,7 @@
             <scroll>false</scroll>
         </control>
     </include>
-	
+
 	<include name="More_Details_Object_Label2">
         <control type="label">
             <posx>66</posx>
@@ -3482,7 +3431,7 @@
         <height>33</height>
         <visible>$PARAM[visibility]</visible>
     </include>
-	
+
 	<include name="More_Details_Object_Defs2">
         <width>760</width>
         <height>56</height>
@@ -3506,7 +3455,7 @@
 		<texturenofocus/>
         <texturefocus border="10" background="true" colordiffuse="$INFO[Skin.String(ViewDetailsBorderFocusColor)]">bingie/border/default_button_focus.png</texturefocus>
     </include>
-	
+
 	<include name="Bingie_InfoDialog_Trailer_Button_Default_Defs">
         <width>550</width>
         <height>64</height>
@@ -3520,7 +3469,7 @@
 		<texturenofocus/>
         <texturefocus border="10" background="true" colordiffuse="$INFO[Skin.String(ViewDetailsBorderFocusColor)]">bingie/border/default_button_focus.png</texturefocus>
     </include>
-	
+
 	<include name="Bingie_InfoDialog_Button_Default_Defs2">
         <width>auto</width>
         <height>64</height>
@@ -3542,7 +3491,7 @@
         <textureradiooffnofocus colordiffuse="$INFO[Skin.String(BingieButtonTextColor)]">$PARAM[radiotexture]</textureradiooffnofocus>
 		<textureradiooffdisabled colordiffuse="ffaaaaaa">$PARAM[radiotexture]</textureradiooffdisabled>
     </include>
-	
+
 	<include name="Bingie_InfoDialog_Trailer_Button_Texture">
         <textureradioonfocus colordiffuse="$INFO[Skin.String(BingieSecondaryButtonFocusTextColor)]">$PARAM[radiotexture]</textureradioonfocus>
         <textureradioofffocus colordiffuse="$INFO[Skin.String(BingieSecondaryButtonFocusTextColor)]">$PARAM[radiotexture]</textureradioofffocus>
@@ -3550,7 +3499,7 @@
         <textureradiooffnofocus colordiffuse="$INFO[Skin.String(BingieSecondaryButtonFocusTextColor)]">$PARAM[radiotexture]</textureradiooffnofocus>
 		<textureradiooffdisabled colordiffuse="ffaaaaaa">$PARAM[radiotexture]</textureradiooffdisabled>
     </include>
-	
+
 	<include name="Bingie_InfoDialog_Button_Texture2">
         <textureradioonfocus colordiffuse="$INFO[Skin.String(BingiePrimaryTextColor)]">$PARAM[radiotexture]</textureradioonfocus>
         <textureradioofffocus colordiffuse="$INFO[Skin.String(BingiePrimaryTextColor)]">$PARAM[radiotexture]</textureradioofffocus>
@@ -3580,7 +3529,7 @@
             </include>
         </control>
     </include>
-	
+
 	<include name="More_Details_Cast2">
         <control type="group">
             <include content="More_Details_Object_Defs">
@@ -3616,7 +3565,7 @@
             </include>
         </control>
     </include>
-	
+
 	<include name="More_Details_Writer">
         <control type="group">
             <include content="More_Details_Object_Defs">
@@ -3670,7 +3619,7 @@
             </include>
         </control>
     </include>
-	
+
 	<include name="More_Details_Top250">
         <control type="group">
             <include content="More_Details_Object_Defs2">
@@ -3691,11 +3640,11 @@
     </include>
 
     <variable name="MenuFocus">
-		<value condition="!String.IsEmpty(ListItem.DBID) + !String.IsEqual(ListItem.Path,plugin://plugin.video.tmdb.bingie.helper/) + Skin.HasSetting(UseBingieInfoDialog) + Control.IsVisible(7001) + Skin.HasSetting(videoinfo_button_myrating) + !Skin.HasSetting(AddRaitingTrakt) + [Library.HasContent(Movies) | Library.HasContent(TVShows)]">7001</value>
-        <value condition="!String.IsEmpty(ListItem.DBID) + !String.IsEqual(ListItem.Path,plugin://plugin.video.tmdb.bingie.helper/) + Skin.HasSetting(UseBingieInfoDialog) + Control.IsVisible(7002) + Skin.HasSetting(videoinfo_button_myrating) + !Skin.HasSetting(AddRaitingTrakt) + [Library.HasContent(Movies) | Library.HasContent(TVShows)]">7002</value>
-		<value condition="!$EXP[IsEpisodeDBType] + Skin.HasSetting(UseBingieInfoDialog) + Control.IsVisible(7011) + Skin.HasSetting(videoinfo_button_myrating) + [Skin.HasSetting(AddRaitingTrakt) | !Library.HasContent(Movies) + !Library.HasContent(TVShows)]">7011</value>
+		<value condition="!String.IsEmpty(ListItem.DBID) + String.IsEmpty(ListItem.Property(StremioID)) + Skin.HasSetting(UseBingieInfoDialog) + Control.IsVisible(7001) + Skin.HasSetting(videoinfo_button_myrating) + False + !Skin.HasSetting(AddRaitingTrakt) + [Library.HasContent(Movies) | Library.HasContent(TVShows)]">7001</value>
+        <value condition="!String.IsEmpty(ListItem.DBID) + String.IsEmpty(ListItem.Property(StremioID)) + Skin.HasSetting(UseBingieInfoDialog) + Control.IsVisible(7002) + Skin.HasSetting(videoinfo_button_myrating) + False + !Skin.HasSetting(AddRaitingTrakt) + [Library.HasContent(Movies) | Library.HasContent(TVShows)]">7002</value>
+		<value condition="!$EXP[IsEpisodeDBType] + Skin.HasSetting(UseBingieInfoDialog) + Control.IsVisible(7011) + Skin.HasSetting(videoinfo_button_myrating) + False + [Skin.HasSetting(AddRaitingTrakt) | !Library.HasContent(Movies) + !Library.HasContent(TVShows)]">7011</value>
 		<value condition="!String.IsEmpty(ListItem.DBID) + Control.IsVisible(51)">51</value>
-        <value condition="String.IsEmpty(ListItem.DBID) + String.IsEqual(ListItem.Path,plugin://plugin.video.tmdb.bingie.helper/) + Control.IsVisible(8181)">8181</value>
+        <value condition="String.IsEmpty(ListItem.DBID) + !String.IsEmpty(ListItem.Property(StremioID)) + Control.IsVisible(8181)">8181</value>
         <value condition="[!Control.IsVisible(51) | !Control.IsVisible(8181)] + Control.IsVisible(80)">80</value>
 		<value condition="[!Control.IsVisible(51) | !Control.IsVisible(8181) | !Control.IsVisible(80)] + Control.IsVisible(90)">90</value>
 		<value condition="[!Control.IsVisible(51) | !Control.IsVisible(8181) | !Control.IsVisible(80) | !Control.IsVisible(90)] + Control.IsVisible(53)">53</value>
@@ -3707,19 +3656,19 @@
         <value condition="Integer.IsGreater(Container(5050).NumItems,0) + !Container(5050).IsUpdating">$LOCALIZE[208]$INFO[Container(5050).ListItem.Season, $LOCALIZE[20373] ,: ]$INFO[Container(5050).ListItem.Episode,$LOCALIZE[20359] ,]</value>
 		<value>$LOCALIZE[31209]</value>
    </variable>
-	
+
 	<variable name="PlayOrResumeSeasonEpisodeLabel2">
         <value condition="Integer.IsGreater(Container(5050).NumItems,0) + !Container(5050).IsUpdating + Container(5050).ListItem.IsResumable">$LOCALIZE[13404]$INFO[Container(5050).ListItem.Season, $LOCALIZE[31000],: ]$INFO[Container(5050).ListItem.Episode,$LOCALIZE[31001],]</value>
         <value condition="Integer.IsGreater(Container(5050).NumItems,0) + !Container(5050).IsUpdating">$LOCALIZE[208]$INFO[Container(5050).ListItem.Season, $LOCALIZE[31000],: ]$INFO[Container(5050).ListItem.Episode,$LOCALIZE[31001],]</value>
 		<value>$LOCALIZE[31209]</value>
 	</variable>
-	
+
 	<variable name="PlayOrResumeSeasonEpisodeLabel3">
         <value condition="!Container(1234).IsUpdating + !Integer.IsEqual(Container(1234).NumItems,0) + Container(1234).ListItem.IsResumable">$LOCALIZE[13404]$INFO[Container(1234).ListItem.Season, $LOCALIZE[31000],: ]$INFO[Container(1234).ListItem.Episode,$LOCALIZE[31002]. ,]</value>
         <value condition="!Container(1234).IsUpdating + !Integer.IsEqual(Container(1234).NumItems,0)">$LOCALIZE[208]$INFO[Container(1234).ListItem.Season, $LOCALIZE[20373] ,: ]$INFO[Container(1234).ListItem.Episode,$LOCALIZE[20359] ,]</value>
 		<value>$LOCALIZE[31209]</value>
     </variable>
-	
+
 	<variable name="PlayOrResumeSeasonEpisodeLabel4">
         <value condition="!Container(1234).IsUpdating + !Integer.IsEqual(Container(1234).NumItems,0) + Container(1234).ListItem.IsResumable">$LOCALIZE[13404]$INFO[Container(1234).ListItem.Season, $LOCALIZE[31000],: ]$INFO[Container(1234).ListItem.Episode,$LOCALIZE[31001],]</value>
         <value condition="!Container(1234).IsUpdating + !Integer.IsEqual(Container(1234).NumItems,0)">$LOCALIZE[208]$INFO[Container(1234).ListItem.Season, $LOCALIZE[31000],: ]$INFO[Container(1234).ListItem.Episode,$LOCALIZE[31001],]</value>
@@ -3731,27 +3680,27 @@
         <value condition="[String.IsEqual(ListItem.DBType,tvshow) | Container.Content(tvshows)] + !String.IsEmpty(ListItem.DBID)">videodb://inprogresstvshows/$INFO[ListItem.DBID]/-2/?tvshowid=$INFO[ListItem.DBID]</value>
         <value condition="[String.IsEqual(ListItem.DBType,episode) | Container.Content(episodes)] + !String.IsEmpty(Window(Home).Property(ListItem.TVShowID))">videodb://inprogresstvshows/$INFO[Window(Home).Property(ListItem.TVShowID)]/-2/?tvshowid=$INFO[Window(Home).Property(ListItem.TVShowID)]</value>
     </variable>
-	
+
 	<!-- next-up content for info dialog -->
     <variable name="InfoDialogTMDbBingieHelperNextUpContent">
-        <value condition="String.IsEqual(ListItem.DBType,tvshow) + String.IsEmpty(ListItem.DBID) + Skin.HasSetting(videoinfo_button_play_next_tmdb) + String.IsEqual(ListItem.Path,plugin://plugin.video.tmdb.bingie.helper/) + !String.IsEmpty(ListItem.UniqueID(tmdb))">plugin://plugin.video.tmdb.bingie.helper/?info=trakt_upnext&amp;tmdb_id=$INFO[ListItem.UniqueID(tmdb)]&amp;tmdb_type=tv&amp;cacheonly=true</value>
+        <value></value>
     </variable>
 
 	<variable name="BingieInfoGenre">
 		<value condition="!String.IsEmpty(ListItem.Genre)">$INFO[ListItem.Genre]</value>
 		<value condition="!String.IsEmpty(Container(17195).ListItem.Genre)">$INFO[Container(17195).ListItem.Genre]</value>
 	</variable>
-	
+
 	<variable name="BingieInfoStudio">
 		<value condition="!String.IsEmpty(ListItem.Studio)">$INFO[ListItem.Studio]</value>
-		<value condition="!String.IsEmpty(Container(17195).ListItem.Studio)">$INFO[Container(17195).ListItem.Studio]</value>	
+		<value condition="!String.IsEmpty(Container(17195).ListItem.Studio)">$INFO[Container(17195).ListItem.Studio]</value>
 	</variable>
-	
+
 	<variable name="BingieInfoWriter">
 		<value condition="!String.IsEmpty(ListItem.Writer) + $EXP[IsMovieDBType]">$INFO[ListItem.Writer]</value>
-		<value condition="!String.IsEmpty(Container(17195).ListItem.Writer) + $EXP[IsMovieDBType]">$INFO[Container(17195).ListItem.Writer]</value>	
+		<value condition="!String.IsEmpty(Container(17195).ListItem.Writer) + $EXP[IsMovieDBType]">$INFO[Container(17195).ListItem.Writer]</value>
 	</variable>
-	
+
 	<variable name="BingieInfoCreator">
 		<value condition="!String.IsEmpty(ListItem.Property(Creator)) + !$EXP[IsMovieDBType] + !$EXP[IsSetDBType]">$INFO[ListItem.Property(Creator)]</value>
 		<value condition="!String.IsEmpty(Container(17195).ListItem.Property(Creator)) + !$EXP[IsMovieDBType] + !$EXP[IsSetDBType]">$INFO[Container(17195).ListItem.Property(Creator)]</value>
@@ -3759,37 +3708,37 @@
 		<value condition="!String.IsEmpty(Container(17195).ListItem.Writer) + !$EXP[IsMovieDBType] + !$EXP[IsSetDBType]">$INFO[Container(17195).ListItem.Writer]</value>
 		<value>$LOCALIZE[13205]</value>
 	</variable>
-	
+
 	<variable name="BingieInfoCast">
 		<value condition="!String.IsEmpty(Container(50).ListItem.Label)">$INFO[Container(50).ListItem(0).Label], $INFO[Container(50).ListItem(1).Label], $INFO[Container(50).ListItem(2).Label], $INFO[Container(50).ListItem(3).Label], $INFO[Container(50).ListItem(4).Label]</value>
 		<value condition="!String.IsEmpty(Container(17195).ListItem.Property(Cast.1.name))">$INFO[Container(17195).ListItem.Property(Cast.1.name)]$INFO[Container(17195).ListItem.Property(Cast.2.name),$COMMA ,]$INFO[Container(17195).ListItem.Property(Cast.3.name),$COMMA ,]$INFO[Container(17195).ListItem.Property(Cast.4.name),$COMMA ,]$INFO[Container(17195).ListItem.Property(Cast.5.name),$COMMA ,]</value>
 	</variable>
-	
+
 	<variable name="BingieInfoCast2">
 		<value condition="!String.IsEmpty(Container(17195).ListItem.Property(Cast.1.name))">$INFO[Container(17195).ListItem.Property(Cast.1.name)]$INFO[Container(17195).ListItem.Property(Cast.2.name),$COMMA ,]$INFO[Container(17195).ListItem.Property(Cast.3.name),$COMMA ,]$INFO[Container(17195).ListItem.Property(Cast.4.name),$COMMA ,]$INFO[Container(17195).ListItem.Property(Cast.5.name),$COMMA ,]</value>
 	</variable>
-	
+
 	<variable name="BingieInfoDirector">
 		<value condition="!String.IsEmpty(ListItem.Director) + !$EXP[IsTvShowDBType]">$INFO[ListItem.Director]</value>
 		<value condition="!String.IsEmpty(Container(17195).ListItem.Director) + !$EXP[IsTvShowDBType]">$INFO[Container(17195).ListItem.Director]</value>
 	</variable>
-	
+
 	<variable name="InfoDialogClearLogo">
 		<value condition="!String.IsEmpty(Container.ListItem.Art(tvshow.clearlogo))">$INFO[Container.ListItem.Art(tvshow.clearlogo)]</value>
         <value condition="!String.IsEmpty(Container.ListItem.Art(clearlogo))">$INFO[Container.ListItem.Art(clearlogo)]</value>
 	</variable>
-	
+
 	<variable name="InfoDialogMainFallbackTitle">
         <value condition="!String.IsEmpty(Container.ListItem.TVShowTitle)">$INFO[Container.ListItem.TVShowTitle]</value>
         <value condition="!String.IsEmpty(Container.ListItem.Title)">$INFO[Container.ListItem.Title]</value>
         <value>$INFO[Container.ListItem.Label]</value>
     </variable>
-	
+
 	<variable name="StudioNetwork">
         <value condition="$EXP[IsMovieDBType]">$INFO[Container(17195).ListItem.Property(Studio.1.name)]</value>
         <value condition="!$EXP[IsMovieDBType]">$INFO[Container(17195).ListItem.Property(Network.1.name)]</value>
     </variable>
-	
+
 	<!-- view352 landscape layout -->
     <include name="View_352_Landscape_Defs">
         <control type="group">
@@ -3834,7 +3783,7 @@
             </control>
         </control>
     </include>
-	
+
 	<!-- view352 container item details -->
     <include name="View_352_Details_Defs">
         <!-- details -->
@@ -3878,7 +3827,7 @@
             </control>
         </control>
     </include>
-	
+
 	<!-- view352 container item details focus -->
     <include name="View_352_Details_Defs_Focus">
         <!-- details -->
@@ -3922,7 +3871,7 @@
             </control>
         </control>
     </include>
-	
+
 	<!-- view354 landscape layout -->
     <include name="View_354_Landscape_Defs">
         <control type="group">
@@ -3949,7 +3898,7 @@
             </control>
         </control>
     </include>
-	
+
 	<!-- view354 container item details -->
     <include name="View_354_Details_Defs">
         <!-- details -->
@@ -3972,7 +3921,7 @@
             </control>
         </control>
     </include>
-	
+
 	<!-- view354 container item details focus -->
     <include name="View_354_Details_Defs_Focus">
         <!-- details -->
@@ -3995,7 +3944,7 @@
             </control>
         </control>
     </include>
-	
+
 	<!-- Cast List -->
 	<include name="InfoResultWidget">
         <param name="height">search_widget_height</param>
@@ -4018,7 +3967,7 @@
                 </include>
         </definition>
     </include>
-	
+
 	<!-- Cast List -->
 	<include name="InfoContainerTemplate">
         <definition>
@@ -4030,7 +3979,7 @@
             <control type="list" id="$PARAM[id]">
                 <nested />
 				<animation effect="fade" start="0" end="100" time="400">Visible</animation>
-				<animation effect="fade" start="100" end="0" time="0" condition="Container($PARAM[id]).IsUpdating">Conditional</animation>	
+				<animation effect="fade" start="100" end="0" time="0" condition="Container($PARAM[id]).IsUpdating">Conditional</animation>
 				<animation effect="fade" start="0" end="100" time="400" condition="!Container($PARAM[id]).IsUpdating">Conditional</animation>
 				<visible>$PARAM[visible]</visible>
                 <width>100%</width>
@@ -4045,7 +3994,7 @@
 				<onback>8000</onback>
 				<onclick>Close</onclick>
 				<onclick>SetProperty(CloseInfoDialog,1,Home)</onclick>
-				<onclick>RunScript(plugin.video.tmdb.bingie.helper,add_path=$INFO[ListItem.FolderPath],call_auto=1190)</onclick>
+				<onclick>ActivateWindow(Videos,$ESCINFO[ListItem.FolderPath],return)</onclick>
 					<itemlayout height="46" width="800" condition="Control.HasFocus(8999)">
 						<control type="label">
 							<left>7</left>
@@ -4099,7 +4048,7 @@
             </control>
         </definition>
     </include>
-	
+
 	<!-- Movies Poster Panel -->
 	<include name="InfoResultWidgetPoster">
         <param name="height">search_widget_height</param>
@@ -4122,20 +4071,20 @@
                 </include>
         </definition>
     </include>
-	
+
 	<!-- Movies Poster Panel -->
 	<include name="InfoContainerTemplate2">
         <definition>
 		<include content="InfoWidgetTopLabel">
             <param name="groupid" value="$PARAM[groupid]" />
             <param name="id" value="$PARAM[id]" />
-            <param name="label" value="$PARAM[label]" />			
+            <param name="label" value="$PARAM[label]" />
         </include>
             <control type="panel" id="$PARAM[id]">
                 <nested />
 				<animation effect="fade" start="0" end="100" time="400">Visible</animation>
 				<animation effect="fade" start="100" end="0" time="0" condition="Container($PARAM[id]).IsUpdating + String.IsEmpty(Window.Property(DisablePosterFade))">Conditional</animation>
-				<animation effect="fade" start="0" end="100" time="400" condition="!Container($PARAM[id]).IsUpdating | !String.IsEmpty(Window.Property(DisablePosterFade))">Conditional</animation>				
+				<animation effect="fade" start="0" end="100" time="400" condition="!Container($PARAM[id]).IsUpdating | !String.IsEmpty(Window.Property(DisablePosterFade))">Conditional</animation>
 				<visible>$PARAM[visible]</visible>
                 <width>$PARAM[width]</width>
                 <height>$PARAM[height]</height>
@@ -4149,7 +4098,7 @@
                 <preloaditems>4</preloaditems>
 				<onclick condition="[Control.HasFocus(53001) | Control.HasFocus(53002) | Control.HasFocus(53003) | Control.HasFocus(53005) | Control.HasFocus(53006) | Control.HasFocus(53007) | Control.HasFocus(53008) | Control.HasFocus(53009)] + String.IsEmpty(Window(Home).Property(SetCustomAddon)) | [Control.HasFocus(53001) | Control.HasFocus(53002)] + !String.IsEmpty(Window(Home).Property(SetCustomAddon))">Close</onclick>
 				<onclick condition="[Control.HasFocus(53001) | Control.HasFocus(53002) | Control.HasFocus(53003) | Control.HasFocus(53005) | Control.HasFocus(53006) | Control.HasFocus(53007) | Control.HasFocus(53008) | Control.HasFocus(53009)] + String.IsEmpty(Window(Home).Property(SetCustomAddon)) | [Control.HasFocus(53001) | Control.HasFocus(53002)] + !String.IsEmpty(Window(Home).Property(SetCustomAddon))">SetProperty(CloseInfoDialog,1,Home)</onclick>
-				<onclick condition="[Control.HasFocus(53001) | Control.HasFocus(53002) | Control.HasFocus(53003) | Control.HasFocus(53005) | Control.HasFocus(53006) | Control.HasFocus(53007) | Control.HasFocus(53008) | Control.HasFocus(53009)] + String.IsEmpty(Window(Home).Property(SetCustomAddon)) | [Control.HasFocus(53001) | Control.HasFocus(53002)] + !String.IsEmpty(Window(Home).Property(SetCustomAddon))">RunScript(plugin.video.tmdb.bingie.helper,add_path=$INFO[ListItem.FolderPath],call_auto=1190)</onclick>
+				<onclick condition="[Control.HasFocus(53001) | Control.HasFocus(53002) | Control.HasFocus(53003) | Control.HasFocus(53005) | Control.HasFocus(53006) | Control.HasFocus(53007) | Control.HasFocus(53008) | Control.HasFocus(53009)] + String.IsEmpty(Window(Home).Property(SetCustomAddon)) | [Control.HasFocus(53001) | Control.HasFocus(53002)] + !String.IsEmpty(Window(Home).Property(SetCustomAddon))">ActivateWindow(Videos,$ESCINFO[ListItem.FolderPath],return)</onclick>
 				<onclick condition="[Control.HasFocus(53003) | Control.HasFocus(53005) | Control.HasFocus(53006) | Control.HasFocus(53007) | Control.HasFocus(53008) | Control.HasFocus(53009)] + !String.IsEmpty(Window(Home).Property(SetCustomAddon))">SetProperty(osdheader,$ESCINFO[Container($PARAM[id]).ListItem.Label],1122)</onclick>
 				<onclick condition="[Control.HasFocus(53003) | Control.HasFocus(53005) | Control.HasFocus(53006) | Control.HasFocus(53007) | Control.HasFocus(53008) | Control.HasFocus(53009)] + !String.IsEmpty(Window(Home).Property(SetCustomAddon))">SetProperty(osdtextbox,$ESCINFO[Container($PARAM[id]).ListItem.Plot],1122)</onclick>
 				<onclick condition="[Control.HasFocus(53003) | Control.HasFocus(53005) | Control.HasFocus(53006) | Control.HasFocus(53007) | Control.HasFocus(53008) | Control.HasFocus(53009)] + !String.IsEmpty(Window(Home).Property(SetCustomAddon))">SetProperty(osdrating,$ESCINFO[Container($PARAM[id]).ListItem.Rating],1122)</onclick>
@@ -4176,7 +4125,7 @@
             </control>
         </definition>
     </include>
-	
+
 	<!-- Poster Panel for Non Bingie Info Dialog -->
 	<include name="InfoResultWidgetPoster3">
         <param name="height">search_widget_height</param>
@@ -4199,7 +4148,7 @@
                 </include>
         </definition>
     </include>
-	
+
 	<!-- Poster Panel for Non Bingie Info Dialog -->
 	<include name="InfoContainerTemplate4">
         <definition>
@@ -4207,7 +4156,7 @@
                 <nested />
 				<animation effect="fade" start="0" end="100" time="400">Visible</animation>
 				<animation effect="fade" start="100" end="0" time="0" condition="Container($PARAM[id]).IsUpdating + String.IsEmpty(Window.Property(DisablePosterFade))">Conditional</animation>
-				<animation effect="fade" start="0" end="100" time="400" condition="!Container($PARAM[id]).IsUpdating | !String.IsEmpty(Window.Property(DisablePosterFade))">Conditional</animation>	
+				<animation effect="fade" start="0" end="100" time="400" condition="!Container($PARAM[id]).IsUpdating | !String.IsEmpty(Window.Property(DisablePosterFade))">Conditional</animation>
 				<visible>$PARAM[visible]</visible>
                 <width>$PARAM[width]</width>
                 <height>$PARAM[height]</height>
@@ -4222,7 +4171,7 @@
 				<onup>SetFocus(8999)</onup>
 				<onclick condition="[Control.HasFocus(53002) | Control.HasFocus(53003) | Control.HasFocus(53005) | Control.HasFocus(53006) | Control.HasFocus(53007) | Control.HasFocus(53008) | Control.HasFocus(53009)] + String.IsEmpty(Window(Home).Property(SetCustomAddon))] | Control.HasFocus(53002) + !String.IsEmpty(Window(Home).Property(SetCustomAddon))">Close</onclick>
 				<onclick condition="[Control.HasFocus(53002) | Control.HasFocus(53003) | Control.HasFocus(53005) | Control.HasFocus(53006) | Control.HasFocus(53007) | Control.HasFocus(53008) | Control.HasFocus(53009)] + String.IsEmpty(Window(Home).Property(SetCustomAddon))] | Control.HasFocus(53002) + !String.IsEmpty(Window(Home).Property(SetCustomAddon))">SetProperty(CloseInfoDialog,1,Home)</onclick>
-				<onclick condition="[Control.HasFocus(53002) | Control.HasFocus(53003) | Control.HasFocus(53005) | Control.HasFocus(53006) | Control.HasFocus(53007) | Control.HasFocus(53008) | Control.HasFocus(53009)] + String.IsEmpty(Window(Home).Property(SetCustomAddon)) | Control.HasFocus(53002) + !String.IsEmpty(Window(Home).Property(SetCustomAddon))">RunScript(plugin.video.tmdb.bingie.helper,add_path=$INFO[ListItem.FolderPath],call_auto=1190)</onclick>
+				<onclick condition="[Control.HasFocus(53002) | Control.HasFocus(53003) | Control.HasFocus(53005) | Control.HasFocus(53006) | Control.HasFocus(53007) | Control.HasFocus(53008) | Control.HasFocus(53009)] + String.IsEmpty(Window(Home).Property(SetCustomAddon)) | Control.HasFocus(53002) + !String.IsEmpty(Window(Home).Property(SetCustomAddon))">ActivateWindow(Videos,$ESCINFO[ListItem.FolderPath],return)</onclick>
 				<onclick condition="[Control.HasFocus(53003) | Control.HasFocus(53005) | Control.HasFocus(53006) | Control.HasFocus(53007) | Control.HasFocus(53008) | Control.HasFocus(53009)] + !String.IsEmpty(Window(Home).Property(SetCustomAddon))">SetProperty(osdheader,$ESCINFO[Container($PARAM[id]).ListItem.Label],1122)</onclick>
 				<onclick condition="[Control.HasFocus(53003) | Control.HasFocus(53005) | Control.HasFocus(53006) | Control.HasFocus(53007) | Control.HasFocus(53008) | Control.HasFocus(53009)] + !String.IsEmpty(Window(Home).Property(SetCustomAddon))">SetProperty(osdtextbox,$ESCINFO[Container($PARAM[id]).ListItem.Plot],1122)</onclick>
 				<onclick condition="[Control.HasFocus(53003) | Control.HasFocus(53005) | Control.HasFocus(53006) | Control.HasFocus(53007) | Control.HasFocus(53008) | Control.HasFocus(53009)] + !String.IsEmpty(Window(Home).Property(SetCustomAddon))">SetProperty(osdrating,$ESCINFO[Container($PARAM[id]).ListItem.Rating],1122)</onclick>
@@ -4269,11 +4218,11 @@
             </control>
         </definition>
     </include>
-	
+
 	<include name="InfoWidgetTopLabel">
         <definition>
-            <control type="grouplist" id="$PARAM[groupid]">		
-				<visible>Control.IsVisible($PARAM[id])</visible>			
+            <control type="grouplist" id="$PARAM[groupid]">
+				<visible>Control.IsVisible($PARAM[id])</visible>
                 <visible>Integer.IsGreater(Container($PARAM[id]).NumItems,0) | Container($PARAM[id]).IsUpdating</visible>
                 <nested />
                 <height>45</height>
@@ -4293,8 +4242,8 @@
             </control>
         </definition>
     </include>
-	
-		<include name="CastContainerTemplate">	
+
+		<include name="CastContainerTemplate">
 			<definition>
 				<control type="panel" id="$PARAM[id]">
 				<visible>$PARAM[visible]</visible>
@@ -4306,7 +4255,7 @@
 					<posy>-8</posy>
 					<width>1300</width>
 					<height>720</height>
-                    <onclick condition="!Skin.HasSetting(EnableOSDInfo) + String.IsEmpty(Window(Home).Property(SetCustomAddon))">RunScript(plugin.video.tmdb.bingie.helper,add_path=$INFO[ListItem.FolderPath],call_auto=1190)</onclick>
+                    <onclick condition="!Skin.HasSetting(EnableOSDInfo) + String.IsEmpty(Window(Home).Property(SetCustomAddon))">ActivateWindow(Videos,$ESCINFO[ListItem.FolderPath],return)</onclick>
 					<onclick condition="Skin.HasSetting(EnableOSDInfo) | !String.IsEmpty(Window(Home).Property(SetCustomAddon))">SetProperty(osdheader,$ESCINFO[Container($PARAM[id]).ListItem.Label],1122)</onclick>
 					<onclick condition="Skin.HasSetting(EnableOSDInfo) | !String.IsEmpty(Window(Home).Property(SetCustomAddon))">SetProperty(osdtextbox,$ESCINFO[Container($PARAM[id]).ListItem.Plot],1122)</onclick>
 					<onclick condition="Skin.HasSetting(EnableOSDInfo) | !String.IsEmpty(Window(Home).Property(SetCustomAddon))">SetProperty(osdrating,$ESCINFO[Container($PARAM[id]).ListItem.Rating],1122)</onclick>

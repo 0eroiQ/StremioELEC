@@ -798,11 +798,11 @@
             <effect type="fade" start="0" end="100" delay="300" time="500" tween="sine" easing="out"/>
             <effect type="slide" start="150,0" end="0" delay="300" time="500" tween="cubic" easing="out" />
         </animation>
-        <animation type="WindowOpen" reversible="false" condition="String.IsEmpty(Window(Home).Property(TMDbBingieHelper.Recommendations.HideInfo))">
+        <animation type="WindowOpen" reversible="false" condition="String.IsEmpty(Window(Home).Property(StremioRecommendations.HideInfo))">
             <effect type="fade" start="0" end="100" delay="400" time="500" tween="sine" easing="out"/>
             <effect type="slide" start="150,0" end="0" delay="400" time="500" tween="cubic" easing="out" />
         </animation>
-        <animation type="WindowOpen" reversible="false" condition="!String.IsEmpty(Window(Home).Property(TMDbBingieHelper.Recommendations.HideInfo))">
+        <animation type="WindowOpen" reversible="false" condition="!String.IsEmpty(Window(Home).Property(StremioRecommendations.HideInfo))">
             <effect type="fade" start="0" end="100" delay="400" time="500" tween="sine" easing="out"/>
             <effect type="slide" start="150,0" end="0" delay="400" time="500" tween="cubic" easing="out" />
         </animation>
@@ -814,11 +814,11 @@
             <effect type="fade" start="100" end="0" time="300" tween="sine" easing="out"/>
             <effect type="slide" start="0" end="150" time="300" tween="cubic" easing="out" />
         </animation>
-		<animation type="WindowClose" reversible="false" condition="String.IsEmpty(Window(Home).Property(TMDbBingieHelper.Recommendations.HideRecs))">
+		<animation type="WindowClose" reversible="false" condition="String.IsEmpty(Window(Home).Property(StremioRecommendations.HideRecs))">
             <effect type="fade" start="100" end="0" time="300" tween="sine" easing="out"/>
             <effect type="slide" start="0" end="150" time="300" tween="cubic" easing="out" />
         </animation>
-        <animation type="WindowClose" reversible="false" condition="!String.IsEmpty(Window(Home).Property(TMDbBingieHelper.Recommendations.HideRecs))">
+        <animation type="WindowClose" reversible="false" condition="!String.IsEmpty(Window(Home).Property(StremioRecommendations.HideRecs))">
             <effect type="fade" start="100" end="0" time="300" tween="sine" easing="out"/>
             <effect type="slide" start="0" end="150" time="300" tween="cubic" easing="out" />
         </animation>

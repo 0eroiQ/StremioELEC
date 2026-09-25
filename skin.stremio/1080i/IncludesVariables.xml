@@ -364,14 +364,14 @@
          <value condition="!String.IsEmpty(Player.Art(clearlogo))">$INFO[Player.Art(clearlogo)]</value>
          <value condition="!String.IsEmpty(Player.Art(tvshow.clearart))">$INFO[Player.Art(tvshow.clearart)]</value>
          <value condition="!String.IsEmpty(Player.Art(tvshow.clearlogo))">$INFO[Player.Art(tvshow.clearlogo)]</value>
-		 <value condition="!String.IsEmpty(Window(home).Property(TMDbBingieHelper.Player.clearart))">$INFO[Window(home).Property(TMDbBingieHelper.Player.clearart)]</value>
-		 <value condition="!String.IsEmpty(Window(home).Property(TMDbBingieHelper.Player.clearlogo))">$INFO[Window(home).Property(TMDbBingieHelper.Player.clearlogo)]</value>
+		 <value condition="!String.IsEmpty(Player.Art(clearart))">$INFO[Player.Art(clearart)]</value>
+		 <value condition="!String.IsEmpty(Player.Art(clearlogo))">$INFO[Player.Art(clearlogo)]</value>
 	 </variable>
 	 
 	 <variable name="VideoPlayerClearLogo">
 		<value condition="!String.IsEmpty(Player.Art(tvshow.clearlogo))">$INFO[Player.Art(tvshow.clearlogo)]</value>
 		<value condition="!String.IsEmpty(Player.Art(clearlogo))">$INFO[Player.Art(clearlogo)]</value>
-		<value condition="!String.IsEmpty(Window(home).Property(TMDbBingieHelper.Player.clearlogo))">$INFO[Window(home).Property(TMDbBingieHelper.Player.clearlogo)]</value>
+		<value condition="!String.IsEmpty(Player.Art(clearlogo))">$INFO[Player.Art(clearlogo)]</value>
 	 </variable>
 	      
      <variable name="AudioPlayerCoverImage">

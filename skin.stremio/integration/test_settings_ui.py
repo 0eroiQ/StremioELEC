@@ -112,17 +112,24 @@ class SettingsTests(unittest.TestCase):
         self.assertNotIn('ActivateWindow(1199)', top)
 
         stremio = (skin / 'Custom_1198_StremioSettings.xml').read_text()
-        for label in ('Account', 'Stremio Addons', 'Playback', 'Audio', 'Subtitles',
-                      'Display', 'Remote &amp; TV', 'Home &amp; Appearance',
-                      'Catalogs &amp; Artwork', 'Weather', 'System &amp; Updates',
-                      'Advanced', 'About'):
+        for label in ('Account', 'Region &amp; Language', 'Stremio Addons', 'Playback',
+                      'Audio', 'Subtitles', 'Display &amp; TV', 'Remote &amp; TV',
+                      'Home &amp; Interface', 'Catalogs &amp; Artwork',
+                      'Weather location', 'System &amp; Updates', 'Advanced',
+                      'About StremioELEC'):
             self.assertIn(label, stremio)
-        for section in ('account', 'playback', 'audio', 'subtitles', 'display',
-                        'remote', 'home', 'catalogs', 'weather', 'system',
+        for section in ('account', 'playback', 'audio', 'subtitles',
+                        'remote', 'home_rows', 'card_layout', 'appearance',
+                        'catalogs', 'weather', 'diagnostics', 'power', 'system',
                         'advanced', 'about'):
             self.assertIn('settings_ui.py,' + section, stremio)
+        for category in ('account', 'region', 'playback', 'audio', 'subtitles',
+                         'display', 'home', 'addons', 'system'):
+            self.assertIn('SetProperty(SettingsSection,' + category + ')', stremio)
         self.assertIn('ActivateWindow(1196)', stremio)
         self.assertNotIn('Kodi Settings', stremio)
+        self.assertNotIn('<label>Close</label>', stremio)
+        self.assertIn('<left>0</left><top>0</top><width>1920</width><height>1080</height>', stremio)
 
         backend = (skin / 'Custom_1199_KodiSettings.xml').read_text()
         self.assertIn('!Skin.HasSetting(StremioDeveloperMode)', backend)
@@ -231,8 +238,8 @@ class SettingsTests(unittest.TestCase):
 
     def test_home_card_layout_cancel_does_not_change_skin(self):
         self.xbmc.getInfoLabel.return_value = 'poster'
-        with patch.object(self.module, 'choose', side_effect=[1, -1, -1]):
-            self.module.home_menu()
+        self.dialog.select.return_value = -1
+        self.module.card_layout_menu()
         calls = [call.args[0] for call in self.xbmc.executebuiltin.call_args_list]
         self.assertFalse(any(call.startswith('Skin.SetString(widgetstyle,') for call in calls))
         self.assertNotIn('ReloadSkin()', calls)

@@ -18,6 +18,11 @@ from account import AccountError, Store, create_link, read_link, pull_addons, pu
 from sources import collect, direct_url
 from continue_playback import button_label, resume_seconds
 from addons_core import active_addons, community_catalog, configuration_state, descriptor_id, filter_community, merge_account
+from metadata_bridge import (details as metadata_details, people as metadata_people,
+                             seasons as metadata_seasons, episodes as metadata_episodes,
+                             recommendations as metadata_recommendations,
+                             search as metadata_search,
+                             trailer_rows as metadata_trailers, runtime_seconds)
 
 HANDLE = int(sys.argv[1])
 BASE = sys.argv[0]
@@ -100,25 +105,104 @@ def route(**params):
 
 
 def item(meta):
-    entry = xbmcgui.ListItem(label=meta.get('name') or meta.get('id', ''))
+    meta = dict(meta or {})
+    identity = str(meta.get('id', ''))
+    media_type = meta.get('_media_type') or ('tvshow' if meta.get('type') == 'series' else 'movie')
+    entry = xbmcgui.ListItem(label=meta.get('name') or identity)
     info = entry.getVideoInfoTag()
     info.setTitle(meta.get('name', ''))
     info.setPlot(meta.get('description', ''))
-    info.setMediaType('tvshow' if meta.get('type') == 'series' else 'movie')
-    if re.fullmatch(r'tt[0-9]+', str(meta.get('id', ''))):
-        info.setUniqueIDs({'imdb': meta['id']}, 'imdb')
+    info.setMediaType(media_type)
+
+    imdb = str(meta.get('imdb_id') or (identity if re.fullmatch(r'tt[0-9]+', identity) else ''))
+    tmdb = str(meta.get('moviedb_id') or '')
+    ids = {}
+    if imdb:
+        ids['imdb'] = imdb
+    if tmdb:
+        ids['tmdb'] = tmdb
+    if ids:
+        try:
+            info.setUniqueIDs(ids, 'imdb' if imdb else 'tmdb')
+        except Exception:
+            pass
+
+    year_text = str(meta.get('year') or meta.get('releaseInfo') or meta.get('released') or '')
+    year_match = re.search(r'(19|20)\d{2}', year_text)
+    details = {
+        'title': meta.get('name', ''),
+        'plot': meta.get('description', ''),
+        'mediatype': media_type,
+        'genre': meta.get('genres') or [],
+        'cast': meta.get('cast') or [],
+        'director': meta.get('director') or [],
+        'writer': meta.get('writer') or [],
+        'duration': runtime_seconds(meta.get('runtime')),
+        'country': meta.get('country') or '',
+        'status': meta.get('status') or '',
+    }
+    for key in ('season', 'episode'):
+        try:
+            if meta.get(key) is not None:
+                details[key] = int(meta.get(key))
+        except (TypeError, ValueError):
+            pass
+    if meta.get('tvshowtitle'):
+        details['tvshowtitle'] = str(meta.get('tvshowtitle'))
+    if meta.get('released'):
+        details['premiered'] = str(meta.get('released'))[:10]
+    if year_match:
+        details['year'] = int(year_match.group(0))
+    try:
+        if meta.get('imdbRating') not in (None, ''):
+            details['rating'] = float(meta.get('imdbRating'))
+    except (TypeError, ValueError):
+        pass
+    try:
+        entry.setInfo('video', details)
+    except Exception:
+        pass
+
+    entry.setProperty('StremioID', identity)
+    entry.setProperty('StremioType', str(meta.get('type', '')))
+    if meta.get('genres'):
+        entry.setProperty('StremioGenre', str(meta['genres'][0]))
+    if meta.get('director'):
+        entry.setProperty('StremioDirector', str(meta['director'][0]))
+    if meta.get('writer'):
+        entry.setProperty('StremioWriter', str(meta['writer'][0]))
+    if year_match:
+        entry.setProperty('StremioYear', year_match.group(0))
+    if imdb:
+        entry.setProperty('imdb_id', imdb)
+    if tmdb:
+        entry.setProperty('tmdb_id', tmdb)
+    if meta.get('tvdb_id') not in (None, ''):
+        entry.setProperty('tvdb_id', str(meta.get('tvdb_id')))
+    if meta.get('country'):
+        entry.setProperty('StremioCountry', str(meta.get('country')))
+    if meta.get('status'):
+        entry.setProperty('StremioStatus', str(meta.get('status')))
+    if meta.get('awards'):
+        entry.setProperty('StremioAwards', str(meta.get('awards')))
+    if meta.get('imdbRating') not in (None, ''):
+        entry.setProperty('StremioRating', str(meta.get('imdbRating')))
+    if meta.get('runtime'):
+        entry.setProperty('StremioRuntime', str(meta.get('runtime')))
     entry.setArt({key: value for key, value in {
-        'poster': meta.get('poster'), 'thumb': meta.get('landscape') or meta.get('background') or 'DefaultVideo.png',
+        'poster': meta.get('poster'),
+        'thumb': meta.get('landscape') or meta.get('background') or 'DefaultVideo.png',
         'landscape': meta.get('landscape') or meta.get('background') or 'DefaultVideo.png',
-        'fanart': meta.get('background'), 'clearlogo': meta.get('logo')
-    }.items() if isinstance(value, str)})
+        'fanart': meta.get('background'),
+        'clearlogo': meta.get('logo')
+    }.items() if isinstance(value, str) and value})
     return entry
 
 
 def episode_item(video, series_meta=None):
     series_meta = series_meta or {}
     season = video.get('season')
-    episode = video.get('episode')
+    episode = video.get('episode') if video.get('episode') is not None else video.get('number')
     title = video.get('title') or video.get('name') or (
         'Episode {}'.format(episode) if episode not in (None, '') else 'Episode')
     prefix = ''
@@ -140,7 +224,7 @@ def episode_item(video, series_meta=None):
     plot = video.get('overview') or video.get('description') or ''
     if isinstance(plot, str) and plot:
         info.setPlot(plot)
-    released = video.get('released')
+    released = video.get('released') or video.get('firstAired')
     if isinstance(released, str) and released:
         first_aired = released[:10]
         info.setFirstAired(first_aired)
@@ -160,6 +244,8 @@ def episode_item(video, series_meta=None):
         art['fanart'] = fanart
     if art:
         entry.setArt(art)
+    entry.setProperty('StremioID', identity)
+    entry.setProperty('StremioType', 'series')
     return entry
 
 
@@ -286,64 +372,81 @@ def run(params):
         xbmcplugin.endOfDirectory(HANDLE, succeeded=False)
         xbmc.executebuiltin('Container.Refresh')
         return
-    if action in ('home_catalog', 'search_prompt'):
-        providers = list(active_addons(STORE.load()))
-        try:
-            manual = fetch(MANIFEST)
-            if not any(item.get('transportUrl') == MANIFEST for item in providers):
-                providers.append({'id': '', 'transportUrl': MANIFEST, 'manifest': manual})
-        except Exception:
-            pass
+    if action in ('details_cast', 'details_crew', 'details_recommendations',
+                  'details_trailers', 'seasons', 'episodes'):
+        state = STORE.load()
+        providers = list(active_addons(state))
+        kind = params.get('kind', 'movie')
+        if kind in ('tv', 'tvshow', 'season', 'episode'):
+            kind = 'series'
+        identity = params.get('id') or params.get('imdb_id') or ''
+        query = params.get('query', '')
+        meta = metadata_details(kind, identity, query, providers)
 
-        if action == 'home_catalog':
-            kind = params.get('kind', 'movie')
-            try:
-                slot = max(0, int(params.get('slot', '0')))
-            except ValueError:
-                slot = 0
-            choices = []
-            for addon in providers:
-                for catalog in catalogs(addon.get('manifest', {})):
-                    if catalog.get('type') == kind:
-                        choices.append((addon, catalog))
-            if slot >= len(choices):
-                xbmcplugin.endOfDirectory(HANDLE)
-                return
-            addon, catalog = choices[slot]
-            return run({'action': 'catalog', 'provider': addon.get('id', ''),
-                        'kind': kind, 'id': catalog['id']})
-
-        query = xbmcgui.Dialog().input('Search Stremio')
-        if not query.strip():
-            xbmcplugin.endOfDirectory(HANDLE, succeeded=False)
-            return
-        xbmcplugin.setContent(HANDLE, 'videos')
-        seen = set()
-        for addon in providers:
-            manifest = addon.get('manifest', {})
-            for catalog in manifest.get('catalogs', []):
-                if catalog.get('type') not in ('movie', 'series') or not catalog.get('id'):
-                    continue
-                if not any(isinstance(extra, dict) and extra.get('name') == 'search'
-                           for extra in catalog.get('extra', [])):
-                    continue
+        if action == 'details_cast':
+            xbmcplugin.setContent(HANDLE, 'actors')
+            for row in metadata_people(meta, 'cast'):
+                entry = xbmcgui.ListItem(label=row['name'])
                 try:
-                    response = fetch(resource_url(
-                        addon['transportUrl'], 'catalog', catalog['type'],
-                        catalog['id'], {'search': query.strip()}))
+                    entry.setLabel2(row['job'])
                 except Exception:
-                    continue
-                for meta in response.get('metas', [])[:25]:
-                    identity = meta.get('id')
-                    if not identity or (catalog['type'], identity) in seen:
-                        continue
-                    seen.add((catalog['type'], identity))
-                    xbmcplugin.addDirectoryItem(
-                        HANDLE,
-                        route(action='meta', provider=addon.get('id', ''),
-                              kind=meta.get('type', catalog['type']), id=identity),
-                        item(meta), True)
+                    pass
+                entry.setProperty('StremioPersonJob', row['job'])
+                xbmcplugin.addDirectoryItem(HANDLE, '', entry, False)
+        elif action == 'details_crew':
+            xbmcplugin.setContent(HANDLE, 'actors')
+            for row in metadata_people(meta, 'crew'):
+                entry = xbmcgui.ListItem(label=row['name'])
+                try:
+                    entry.setLabel2(row['job'])
+                except Exception:
+                    pass
+                entry.setProperty('StremioPersonJob', row['job'])
+                xbmcplugin.addDirectoryItem(HANDLE, '', entry, False)
+        elif action == 'details_recommendations':
+            xbmcplugin.setContent(HANDLE, 'tvshows' if kind == 'series' else 'movies')
+            for row in metadata_recommendations(meta, providers):
+                xbmcplugin.addDirectoryItem(
+                    HANDLE, route(action='meta', home='1', kind=row.get('type', kind),
+                                  id=row.get('id', '')), item(row), True)
+        elif action == 'details_trailers':
+            xbmcplugin.setContent(HANDLE, 'videos')
+            for row in metadata_trailers(meta):
+                entry = xbmcgui.ListItem(label=row['name'])
+                entry.setProperty('StremioTrailerYouTubeID', row['id'])
+                entry.setProperty('StremioTrailerURL',
+                                  'https://www.youtube.com/watch?v=' + row['id'])
+                xbmcplugin.addDirectoryItem(
+                    HANDLE, route(action='trailer_unavailable', video_id=row['id']),
+                    entry, False)
+        elif action == 'seasons':
+            xbmcplugin.setContent(HANDLE, 'seasons')
+            for row in metadata_seasons(meta):
+                season = row['season']
+                label = 'Specials' if season == 0 else 'Season {}'.format(season)
+                entry = xbmcgui.ListItem(label=label)
+                entry.setProperty('StremioID', str(meta.get('id', '')))
+                entry.setProperty('StremioType', 'series')
+                entry.getVideoInfoTag().setMediaType('season')
+                xbmcplugin.addDirectoryItem(
+                    HANDLE, route(action='episodes', kind='series',
+                                  id=meta.get('id', ''), season=str(season)), entry, True)
+        elif action == 'episodes':
+            xbmcplugin.setContent(HANDLE, 'episodes')
+            for video in metadata_episodes(meta, params.get('season', '0')):
+                entry = episode_item(video, meta)
+                xbmcplugin.addDirectoryItem(
+                    HANDLE, route(action='streams', kind='series',
+                                  id=video.get('id', '')), entry, True)
         xbmcplugin.endOfDirectory(HANDLE)
+        return
+
+    if action == 'trailer_unavailable':
+        xbmcgui.Dialog().ok(
+            'StremioELEC trailer',
+            'Trailer metadata now comes directly from Stremio. '
+            'A built-in YouTube playback resolver is not installed on this Kodi test setup yet.')
+        xbmcplugin.endOfDirectory(HANDLE, succeeded=False)
         return
 
     provider = params.get('provider', '')
@@ -388,21 +491,20 @@ def run(params):
                 True)
     elif action == 'search_results':
         query = params.get('query', '').strip()
+        requested_kind = params.get('kind', '')
+        kinds = (requested_kind,) if requested_kind in ('movie', 'series') else ('movie', 'series')
         xbmcplugin.setContent(HANDLE, 'videos')
-        if query:
-            seen = set()
-            for kind in ('movie', 'series'):
-                response = fetch(resource_url(HOME_MANIFEST, 'catalog', kind, 'top', {'search': query}))
-                for meta in response.get('metas', []):
-                    identity = meta.get('id')
-                    if not identity or (kind, identity) in seen:
-                        continue
-                    seen.add((kind, identity))
-                    xbmcplugin.addDirectoryItem(
-                        HANDLE,
-                        route(action='meta', home='1', kind=meta.get('type', kind), id=identity),
-                        item(meta),
-                        True)
+        providers = list(active_addons(STORE.load()))
+        for meta in metadata_search(query, providers, kinds):
+            identity = meta.get('id')
+            kind = meta.get('type') if meta.get('type') in ('movie', 'series') else requested_kind or 'movie'
+            if not identity:
+                continue
+            xbmcplugin.addDirectoryItem(
+                HANDLE,
+                route(action='meta', home='1', kind=kind, id=identity),
+                item(meta),
+                True)
     elif action == 'widgets':
         for target, label in [('library', 'My Library'), ('continue', 'Continue Watching')]:
             xbmcplugin.addDirectoryItem(HANDLE, route(action=target), xbmcgui.ListItem(label=label), True)
@@ -492,19 +594,37 @@ def run(params):
                 kind=meta.get('type', kind), id=meta['id']), item(meta), True)
     elif action == 'meta':
         kind, identity = params['kind'], params['id']
-        meta = fetch(resource_url(manifest_url, 'meta', kind, identity)).get('meta') or {}
-        videos = meta.get('videos', []) if kind == 'series' else []
-        if videos:
-            xbmcplugin.setContent(HANDLE, 'episodes')
-            for video in videos:
-                if not video.get('id'):
-                    continue
-                entry = episode_item(video, meta)
-                xbmcplugin.addDirectoryItem(HANDLE, provider_route(action='streams', kind=kind,
-                    id=video['id']), entry, True)
+        providers = list(active_addons(STORE.load()))
+        if manifest_url and manifest_url not in {p.get('transportUrl') for p in providers}:
+            try:
+                providers.append({'transportUrl': manifest_url,
+                                  'manifest': descriptor['manifest'] if descriptor else fetch(manifest_url)})
+            except Exception:
+                pass
+        meta = metadata_details(kind, identity, '', providers)
+        if kind == 'series' and meta.get('videos'):
+            xbmcplugin.setContent(HANDLE, 'seasons')
+            for row in metadata_seasons(meta):
+                season = row['season']
+                label = 'Specials' if season == 0 else 'Season {}'.format(season)
+                entry = xbmcgui.ListItem(label=label)
+                tag = entry.getVideoInfoTag()
+                tag.setMediaType('season')
+                entry.setProperty('StremioID', identity)
+                entry.setProperty('StremioType', 'series')
+                poster = meta.get('poster')
+                fanart = meta.get('background')
+                entry.setArt({k: v for k, v in {'poster': poster, 'fanart': fanart}.items()
+                              if isinstance(v, str) and v})
+                xbmcplugin.addDirectoryItem(
+                    HANDLE,
+                    provider_route(action='episodes', kind='series',
+                                   id=identity, season=str(season)),
+                    entry, True)
         else:
-            xbmcplugin.addDirectoryItem(HANDLE, provider_route(action='streams', kind=kind,
-                id=identity), item(meta), True)
+            xbmcplugin.addDirectoryItem(
+                HANDLE, provider_route(action='streams', kind=kind, id=identity),
+                item(meta), True)
     elif action == 'streams':
         providers = list(active_addons(STORE.load()))
         if not provider:
@@ -512,16 +632,42 @@ def run(params):
                 providers.append({'transportUrl': manifest_url, 'manifest': fetch(manifest_url)})
             except Exception:
                 pass  # Account providers can still work if the manual provider is down.
-        playable, skipped, failed = collect(providers, params['kind'], params['id'])
+
+        kind, stream_id = params['kind'], params['id']
+        base_id = stream_id.split(':', 1)[0] if kind == 'series' else stream_id
+        play_meta = metadata_details(kind, base_id, '', providers)
+        if kind == 'series' and ':' in stream_id:
+            episode = next((v for v in play_meta.get('videos', [])
+                            if str(v.get('id', '')) == stream_id), None)
+            if episode:
+                play_meta = dict(play_meta)
+                play_meta.update({
+                    'id': stream_id,
+                    'name': episode.get('name') or episode.get('title') or play_meta.get('name'),
+                    'description': episode.get('description') or episode.get('overview') or '',
+                    'released': episode.get('released') or episode.get('firstAired') or '',
+                    'season': episode.get('season'),
+                    'episode': episode.get('episode') or episode.get('number'),
+                    'tvshowtitle': play_meta.get('name', ''),
+                    '_media_type': 'episode',
+                    'landscape': episode.get('thumbnail') or play_meta.get('landscape'),
+                })
+
+        playable, skipped, failed = collect(providers, kind, stream_id)
         # Keep signed stream URLs out of saved plugin routes and widget configuration.
         import secrets
         cache = Store(STORE.directory / 'streams')
         cached = {}
         for stream in playable:
             key = secrets.token_hex(16)
-            cached[key] = dict(stream, kind=params['kind'], id=params['id'],
+            cached[key] = dict(stream, kind=kind, id=stream_id,
+                               meta=play_meta,
                                resume_ms=int(resume_seconds(params.get('resume_ms')) * 1000))
             entry = xbmcgui.ListItem(label=stream['label'])
+            entry.setArt({k: v for k, v in {
+                'thumb': play_meta.get('landscape') or play_meta.get('poster'),
+                'fanart': play_meta.get('background')
+            }.items() if isinstance(v, str) and v})
             entry.setProperty('IsPlayable', 'true')
             xbmcplugin.addDirectoryItem(HANDLE, route(action='play', key=key), entry, False)
         cache.save({'created': time.time(), 'urls': cached})
@@ -538,7 +684,11 @@ def run(params):
         url = stream.get('url', '') if isinstance(stream, dict) else stream
         if time.time() - cache.get('created', 0) > 3600 or not direct_url({'url': url}):
             raise ValueError('Source expired; reopen the stream list')
-        entry = xbmcgui.ListItem(path=url)
+        if isinstance(stream, dict) and isinstance(stream.get('meta'), dict):
+            entry = item(stream['meta'])
+            entry.setPath(url)
+        else:
+            entry = xbmcgui.ListItem(path=url)
         if isinstance(stream, dict) and resume_seconds(stream.get('resume_ms')):
             entry.setProperty('StartOffset', str(resume_seconds(stream['resume_ms'])))
         if isinstance(stream, dict):

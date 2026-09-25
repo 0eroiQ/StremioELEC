@@ -14,7 +14,6 @@
     <item><label>Settings</label><property name="path">ActivateWindow(1198)</property><onclick>ActivateWindow(1198)</onclick></item>
     <item><label>Restart StremioELEC</label><property name="path">RestartApp</property><onclick>RestartApp</onclick></item>
   </include>
-  <include name="skinshortcuts-submenu" />
 
   <!-- Names retained only as internal layout aliases used by the inherited XML. -->
   <include name="skinshortcuts-template-Widgets"><include>StremioHomeWidgets</include></include>

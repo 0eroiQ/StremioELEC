@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <window>
     <onunload>ClearProperty(filename_formatted,Home)</onunload>
-    <onload>RunScript(script.bingie.toolbox,action=GETPLAYERFILENAME,output=filename_formatted)</onload>
+    <onload>SetProperty(filename_formatted,$INFO[Player.Filename],Home)</onload>
     <controls>
 		<include>DialogOverlayExtra</include>
         <control type="group" id="250">

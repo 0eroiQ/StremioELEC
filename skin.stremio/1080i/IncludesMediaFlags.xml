@@ -343,7 +343,7 @@
 		<value condition="String.Contains(videoplayer.mpaa,Rated 6) | String.IsEqual(videoplayer.mpaa,6) | String.Contains(Window(Home).Property(TMDbBingieHelper.Player.mpaa,Rated 6)) | String.IsEqual(Window(Home).Property(TMDbBingieHelper.Player.mpaa,6))">$INFO[Skin.String(GPanelColor)]</value>	
 		<value condition="String.Contains(videoplayer.mpaa,Rated 10) | String.IsEqual(videoplayer.mpaa,10) | String.Contains(Window(Home).Property(TMDbBingieHelper.Player.mpaa,Rated 10)) | String.IsEqual(Window(Home).Property(TMDbBingieHelper.Player.mpaa,10))">$INFO[Skin.String(PGPanelColor)]</value>		
 		<value condition="String.Contains(videoplayer.mpaa,Rated 16) | String.IsEqual(videoplayer.mpaa,16) | String.Contains(Window(Home).Property(TMDbBingieHelper.Player.mpaa,Rated 16)) | String.IsEqual(Window(Home).Property(TMDbBingieHelper.Player.mpaa,16))">$INFO[Skin.String(NC17PanelColor)]</value>		
-		<value condition="!String.IsEmpty(videoplayer.mpaa) | !String.IsEmpty(Window(Home).Property(TMDbBingieHelper.Player.mpaa))">$INFO[Skin.String(NRPanelColor)]</value>
+		<value condition="!String.IsEmpty(videoplayer.mpaa) | !String.IsEmpty(videoplayer.mpaa)">$INFO[Skin.String(NRPanelColor)]</value>
 	</variable>
  
     <include name="mediaflags_text">

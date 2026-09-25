@@ -1200,6 +1200,9 @@
 
     <!-- StremioELEC-owned Home. No skinshortcuts or TMDb Bingie Helper. -->
     <include name="StremioHomeRows">
+        <!-- Use the selected layout, not forced posters. The 42px header +
+             341px normal row matches the 383px navigation step. Compact
+             landscape supplies its own 251px height: 42 + 251 = 293. -->
         <include content="widget_header_multi"><param name="widgetid" value="5100" /><param name="widgetName" value="Continue Watching" /></include>
         <include content="widget_base_normal">
             <param name="widgetid" value="5100" />
@@ -1207,8 +1210,8 @@
             <param name="container" value="fixedlist" />
             <param name="position" value="horizontal" />
             <param name="width" value="100%" />
-            <param name="height" value="339" />
-            <param name="widgetStyle" value="widget_layout_poster" />
+            <param name="height" value="341" />
+            <param name="widgetStyle" value="widget_layout_default" />
             <param name="widgetTarget" value="videos" />
             <param name="widgetPath" value="plugin://plugin.video.stremioelec/?action=continue" />
             <param name="widgetSortBy" value="none" />
@@ -1222,8 +1225,8 @@
             <param name="container" value="fixedlist" />
             <param name="position" value="horizontal" />
             <param name="width" value="100%" />
-            <param name="height" value="339" />
-            <param name="widgetStyle" value="widget_layout_poster" />
+            <param name="height" value="341" />
+            <param name="widgetStyle" value="widget_layout_default" />
             <param name="widgetTarget" value="videos" />
             <param name="widgetPath" value="plugin://plugin.video.stremioelec/?action=library" />
             <param name="widgetSortBy" value="none" />
@@ -1237,8 +1240,8 @@
             <param name="container" value="fixedlist" />
             <param name="position" value="horizontal" />
             <param name="width" value="100%" />
-            <param name="height" value="339" />
-            <param name="widgetStyle" value="widget_layout_poster" />
+            <param name="height" value="341" />
+            <param name="widgetStyle" value="widget_layout_default" />
             <param name="widgetTarget" value="videos" />
             <param name="widgetPath" value="plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=movie&amp;slot=0" />
             <param name="widgetSortBy" value="none" />
@@ -1252,8 +1255,8 @@
             <param name="container" value="fixedlist" />
             <param name="position" value="horizontal" />
             <param name="width" value="100%" />
-            <param name="height" value="339" />
-            <param name="widgetStyle" value="widget_layout_poster" />
+            <param name="height" value="341" />
+            <param name="widgetStyle" value="widget_layout_default" />
             <param name="widgetTarget" value="videos" />
             <param name="widgetPath" value="plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=series&amp;slot=0" />
             <param name="widgetSortBy" value="none" />
@@ -1267,8 +1270,8 @@
             <param name="container" value="fixedlist" />
             <param name="position" value="horizontal" />
             <param name="width" value="100%" />
-            <param name="height" value="339" />
-            <param name="widgetStyle" value="widget_layout_poster" />
+            <param name="height" value="341" />
+            <param name="widgetStyle" value="widget_layout_default" />
             <param name="widgetTarget" value="videos" />
             <param name="widgetPath" value="plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=movie&amp;slot=1" />
             <param name="widgetSortBy" value="none" />
@@ -1282,8 +1285,8 @@
             <param name="container" value="fixedlist" />
             <param name="position" value="horizontal" />
             <param name="width" value="100%" />
-            <param name="height" value="339" />
-            <param name="widgetStyle" value="widget_layout_poster" />
+            <param name="height" value="341" />
+            <param name="widgetStyle" value="widget_layout_default" />
             <param name="widgetTarget" value="videos" />
             <param name="widgetPath" value="plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=series&amp;slot=1" />
             <param name="widgetSortBy" value="none" />
@@ -1297,8 +1300,8 @@
             <param name="container" value="fixedlist" />
             <param name="position" value="horizontal" />
             <param name="width" value="100%" />
-            <param name="height" value="339" />
-            <param name="widgetStyle" value="widget_layout_poster" />
+            <param name="height" value="341" />
+            <param name="widgetStyle" value="widget_layout_default" />
             <param name="widgetTarget" value="videos" />
             <param name="widgetPath" value="plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=movie&amp;slot=2" />
             <param name="widgetSortBy" value="none" />
@@ -1312,8 +1315,8 @@
             <param name="container" value="fixedlist" />
             <param name="position" value="horizontal" />
             <param name="width" value="100%" />
-            <param name="height" value="339" />
-            <param name="widgetStyle" value="widget_layout_poster" />
+            <param name="height" value="341" />
+            <param name="widgetStyle" value="widget_layout_default" />
             <param name="widgetTarget" value="videos" />
             <param name="widgetPath" value="plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=series&amp;slot=2" />
             <param name="widgetSortBy" value="none" />
