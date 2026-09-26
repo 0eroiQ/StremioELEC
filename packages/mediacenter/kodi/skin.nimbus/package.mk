@@ -18,6 +18,24 @@ makeinstall_target() {
 
   # Phase 1 bridge: keep upstream Nimbus intact and add a hidden, callable
   # Stremio Core anchor. Later Home rows will target concrete Core routes.
+  # Feed Nimbus' existing Movie/TV widget renderer from Stremio Core for the
+  # first live integration test. Kodi supports plugin:// paths as dynamic
+  # container content, so Nimbus keeps ownership of layout/focus/artwork.
+  INCLUDES_HOME="${INSTALL}/usr/share/kodi/addons/skin.nimbus/xml/Includes_Home.xml"
+  if [ -f "${INCLUDES_HOME}" ] && ! grep -q 'StremioELEC Core catalog test' "${INCLUDES_HOME}"; then
+    sed -i '/<includes>/a\
+    <!-- StremioELEC Core catalog test: root listing rendered by Nimbus -->\
+    <include name="StremioELECCoreWidget">\
+      <include content="WidgetListPoster">\
+        <param name="content_path" value="plugin://plugin.video.stremioelec/"/>\
+        <param name="widget_header" value="Stremio"/>\
+        <param name="widget_target" value="videos"/>\
+        <param name="list_id" value="19400"/>\
+        <param name="limit" value="20"/>\
+      </include>\
+    </include>' "${INCLUDES_HOME}"
+  fi
+
   HOME_XML="${INSTALL}/usr/share/kodi/addons/skin.nimbus/xml/Home.xml"
   if [ -f "${HOME_XML}" ]; then
     sed -i '/<controls>/a\
