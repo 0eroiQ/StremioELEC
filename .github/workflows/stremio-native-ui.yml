@@ -82,7 +82,8 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install --no-install-recommends -y \
-            build-essential bc curl gawk git libncurses-dev python3 unzip xz-utils zip
+            build-essential bc curl gawk git libncurses-dev python3 unzip xz-utils zip \
+            xfonts-utils rdfind libparse-yapp-perl gperf xsltproc libxml-parser-perl patchutils lzop
       - name: Build Generic x86_64 StremioELEC test image
         shell: bash
         run: |
