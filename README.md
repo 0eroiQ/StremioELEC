@@ -1,25 +1,73 @@
-# LibreELEC
+# StremioELEC
 
-LibreELEC is a 'Just enough OS' Linux distribution for the award-winning [Kodi](https://kodi.tv) software on popular mediacentre hardware. Further information on the project can be found on the [LibreELEC website](https://libreelec.tv).
+**StremioELEC** is an experimental, TV-first Linux media distribution built on the LibreELEC/Kodi platform. The goal is to provide a focused Stremio-style experience where the custom interface and Stremio integration feel like part of the operating system instead of a collection of separately installed Kodi add-ons.
 
-**Documentation**
+> **Development status:** early development. The native UI, Stremio Core bridge and distribution integration are currently being built and tested.
 
-- [CONTRIBUTING.md](CONTRIBUTING.md) — how to report issues and submit pull requests
-- [STANDARDS.md](STANDARDS.md) — coding standards for build scripts and package files
-- [packages/README.md](packages/README.md) — detailed guide to `package.mk` structure and variables
+## Project direction
 
-**Issues & Support**
+StremioELEC keeps LibreELEC as the low-level OS/build foundation and Kodi as the mature media and playback engine, while replacing the user-facing experience with a dedicated Stremio-oriented layer.
 
-Please ask questions in the [LibreELEC forum: Help & Support](https://forum.libreelec.tv/forum-3.html) or ask a member of project staff in the #libreelec IRC channel on Libera.Chat. Please report bugs via [GitHub Issues](https://github.com/LibreELEC/LibreELEC.tv/issues).
+```text
+StremioELEC
+├── Main UI / Skin
+│   └── Nimbus-based UI foundation, heavily customized for StremioELEC
+├── Stremio Core bridge
+│   ├── catalogs
+│   ├── metadata
+│   ├── seasons / episodes
+│   ├── streams
+│   ├── continue watching
+│   └── playback integration
+├── Portable / Setup Controller
+│   └── Kodi Program add-on
+├── Kodi media engine
+└── LibreELEC Linux foundation
+```
 
-**Donations**
+## Native UI
 
-Contributions towards current project funding goals can be made via [OpenCollective](https://opencollective.com/libreelec/donate).
+The current UI work uses **Nimbus** as the initial Kodi skin foundation. Nimbus provides proven Kodi layout, navigation, focus, dialog and animation behavior while StremioELEC progressively replaces Nimbus-specific integrations with its own Stremio Core data layer.
 
-**License**
+Nimbus is currently being integrated as a reproducible package for development and boot testing. It is not yet the finished StremioELEC interface.
 
-LibreELEC original code is released under [GPLv2](https://www.gnu.org/licenses/gpl-2.0.html).
+## Distribution architecture
 
-**Copyright**
+StremioELEC-specific changes are being isolated from the LibreELEC upstream base wherever practical. The project owns the custom distribution identity, Main UI, Stremio Core bridge, compatibility helpers, setup controller and StremioELEC defaults.
 
-As LibreELEC includes code from many upstream projects it has many copyright owners; notably [OpenELEC](https://openelec.tv) which we forked from after disagreeing with project direction and management, and [OpenBricks/GeeXboX](https://github.com/OpenBricks/openbricks/blob/master/AUTHORS) the uncredited source of the original 2009 build system. LibreELEC makes no claim of copyright on any upstream code. However all original LibreELEC authored code is copyright LibreELEC.tv. Patches to upstream code have the same license as the upstream project unless specified otherwise. For a complete copyright list please checkout the source code to examine license headers. Unless expressly stated otherwise all code submitted to the LibreELEC project (in any form) is licensed under [GPLv2](https://www.gnu.org/licenses/gpl-2.0.html) and copyright is donated to the project. This approach gives the project freedom to maintain the code without the overhead of preserving contact with every submitter, e.g. GPLv3. You are free to retain copyright by adding your copyright header to each submitted code page. If you submit code that is not your own work it is your responsibility to place a header stating the copyright.
+This separation is intended to make future LibreELEC updates easier to integrate without mixing application-specific code into the upstream base unnecessarily.
+
+## Current development milestones
+
+- [x] Create dedicated `stremio-native-ui` development branch
+- [x] Add Nimbus source/package baseline
+- [x] Establish `distributions/StremioELEC` project area
+- [ ] Complete build-valid StremioELEC distribution configuration
+- [ ] Integrate Nimbus Helper dependency
+- [ ] Boot-test Nimbus from a StremioELEC image
+- [ ] Connect Stremio Core data to the Main UI
+- [ ] Convert Portable/setup controller to a Kodi Program add-on
+- [ ] Replace Nimbus-specific integrations with StremioELEC-native equivalents
+- [ ] Add repeatable test/update builds
+
+## Development policy
+
+Active StremioELEC work is committed to the project repository so test builds can be reproduced and installed on development hardware. Experimental native-UI work is currently kept off `master` until the integration is ready.
+
+## Upstream projects and attribution
+
+StremioELEC builds on open-source work from several projects, including:
+
+- **LibreELEC** — Linux distribution and build system foundation
+- **Kodi** — media center, playback and add-on platform
+- **Nimbus** by ivarbrandt — current skin/UI foundation used during native UI development
+
+StremioELEC does not claim ownership of upstream project code. Upstream code and modifications remain subject to their respective licenses and copyright notices.
+
+## License
+
+This repository is derived from LibreELEC and contains software from multiple upstream projects. LibreELEC original code is released under GPLv2. Individual packages, patches and upstream components may have their own compatible licenses; consult the relevant source and license headers for details.
+
+## Contributing
+
+The project is under active development and its architecture is still evolving. Before making large changes, check the active development branch and existing package/layout conventions so changes remain compatible with the StremioELEC build and test workflow.
