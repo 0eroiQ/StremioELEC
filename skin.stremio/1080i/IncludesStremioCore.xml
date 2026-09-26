@@ -77,6 +77,9 @@
     <include content="StremioWidgetRow" condition="!Skin.HasSetting(StremioHideHomeRow9)"><param name="widgetid" value="3110" /><param name="widgetName" value="Comedy Series" /><param name="widgetPath" value="plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=series&amp;id=top&amp;genre=Comedy" /></include>
   </include>
 
+  <variable name="StremioStreamsFiltersContent"><value>$INFO[Window(Home).Property(StremioStreams.FilterPath)]</value></variable>
+  <variable name="StremioStreamsItemsContent"><value>$INFO[Window(Home).Property(StremioStreams.ItemsPath)]</value></variable>
+
   <variable name="DefSpotlightWidgetContent"><value>plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=movie&amp;id=imdbRating</value></variable>
   <variable name="DefSpotlightMovieHubContent"><value>plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=movie&amp;id=imdbRating</value></variable>
   <variable name="DefSpotlightTVShowHubContent"><value>plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=series&amp;id=imdbRating</value></variable>

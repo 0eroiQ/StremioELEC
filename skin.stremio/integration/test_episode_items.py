@@ -69,7 +69,16 @@ class EpisodeItemTests(unittest.TestCase):
         list_item.setProperty.assert_any_call('StremioSeriesID', 'tt1234567')
         list_item.setProperty.assert_any_call(
             'StremioMoreEpisodesPath',
-            'plugin://plugin.video.stremioelec/?action=more_episodes&kind=series&id=tt1234567')
+            'plugin://plugin.video.stremioelec/?action=more_episodes&kind=series&id=tt1234567&layout=bingie527v2')
+
+    def test_episode_runtime_falls_back_to_series_runtime(self):
+        list_item = MagicMock()
+        tag = list_item.getVideoInfoTag.return_value
+        self.modules['xbmcgui'].ListItem.return_value = list_item
+        self.entry.episode_item(
+            {'id': 'tt1234567:1:1', 'season': 1, 'episode': 1, 'name': 'Pilot'},
+            {'id': 'tt1234567', 'name': 'Example Show', 'runtime': '52 min'})
+        tag.setDuration.assert_called_once_with(3120)
 
     def test_season_item_exposes_episode_count_for_bingie_view(self):
         list_item = MagicMock()

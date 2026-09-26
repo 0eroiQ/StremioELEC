@@ -15,8 +15,9 @@ import xbmcplugin
 
 from protocol import base_url, catalogs, fetch, resource_url
 from account import AccountError, Store, create_link, read_link, pull_addons, pull_library, library_rows
-from sources import collect, direct_url
-from continue_playback import button_label, resume_seconds
+from sources import collect, direct_url, supports
+from stream_ui import stream_card
+from continue_playback import button_label, resume_seconds, next_series_episode
 from addons_core import active_addons, community_catalog, configuration_state, descriptor_id, filter_community, merge_account
 from metadata_bridge import (details as metadata_details, people as metadata_people,
                              seasons as metadata_seasons, episodes as metadata_episodes,
@@ -30,6 +31,7 @@ ADDON = xbmcaddon.Addon('plugin.video.stremioelec')
 MANIFEST = ADDON.getSetting('manifest').strip()
 HOME_MANIFEST = 'https://v3-cinemeta.strem.io/manifest.json'
 COMMUNITY_RUNTIME_WINDOW_ID = 11194
+STREAMS_WINDOW_ID = 10000
 STORE = Store(xbmcvfs.translatePath(ADDON.getAddonInfo('profile')))
 
 
@@ -169,7 +171,8 @@ def item(meta):
     if media_type == 'tvshow' and identity:
         entry.setProperty('StremioSeriesID', identity)
         entry.setProperty('StremioMoreEpisodesPath',
-                          route(action='more_episodes', kind='series', id=identity))
+                          route(action='more_episodes', kind='series', id=identity,
+                                layout='bingie527v2'))
     if meta.get('genres'):
         entry.setProperty('StremioGenre', str(meta['genres'][0]))
     if meta.get('director'):
@@ -229,6 +232,12 @@ def episode_item(video, series_meta=None):
     plot = video.get('overview') or video.get('description') or ''
     if isinstance(plot, str) and plot:
         info.setPlot(plot)
+    duration = runtime_seconds(video.get('runtime') or series_meta.get('runtime'))
+    if duration:
+        try:
+            info.setDuration(duration)
+        except Exception:
+            pass
     released = video.get('released') or video.get('firstAired')
     if isinstance(released, str) and released:
         first_aired = released[:10]
@@ -264,7 +273,8 @@ def episode_item(video, series_meta=None):
     entry.setProperty('StremioSeriesID', series_id)
     if series_id:
         entry.setProperty('StremioMoreEpisodesPath',
-                          route(action='more_episodes', kind='series', id=series_id))
+                          route(action='more_episodes', kind='series', id=series_id,
+                                layout='bingie527v2'))
     return entry
 
 
@@ -303,6 +313,124 @@ def season_item(row, series_meta):
     return entry
 
 
+def configure_streams_window(play_meta, kind, stream_id, selected_provider, resume_ms):
+    window = xbmcgui.Window(STREAMS_WINDOW_ID)
+    names = [
+        'Title', 'Subtitle', 'Meta', 'Poster', 'Landscape', 'HeroImage',
+        'Fanart', 'ClearLogo', 'ItemsPath', 'SelectedProvider',
+        'SelectedProviderIndex', 'AllPath', 'RefocusChip'
+    ]
+    for index in range(1, 7):
+        names.extend(('Provider{}Name'.format(index),
+                      'Provider{}Path'.format(index)))
+    for name in names:
+        window.clearProperty('StremioStreams.' + name)
+
+    title = str(play_meta.get('tvshowtitle') or play_meta.get('name') or 'Sources')
+    subtitle = ''
+    if kind == 'series':
+        season = play_meta.get('season')
+        episode = play_meta.get('episode')
+        episode_name = str(play_meta.get('name') or '')
+        if season not in (None, '') and episode not in (None, ''):
+            subtitle = 'S{}:E{}'.format(season, episode)
+            if episode_name and episode_name != title:
+                subtitle += ' · ' + episode_name
+
+    year_text = str(play_meta.get('year') or play_meta.get('releaseInfo') or play_meta.get('released') or '')
+    year_match = re.search(r'(19|20)\d{2}', year_text)
+    genres = play_meta.get('genres') or []
+    if isinstance(genres, str):
+        genres = [genres]
+    meta = ' • '.join(
+        [value for value in (
+            year_match.group(0) if year_match else '',
+            ' / '.join(str(g) for g in genres[:3] if g),
+        ) if value])
+
+    window.setProperty('StremioStreams.Title', title)
+    window.setProperty('StremioStreams.Subtitle', subtitle)
+    window.setProperty('StremioStreams.Meta', meta)
+    hero_image = safe_image(play_meta.get('landscape')) or safe_image(play_meta.get('poster'))
+    if hero_image:
+        window.setProperty('StremioStreams.HeroImage', hero_image)
+    for prop, key in (
+            ('Poster', 'poster'), ('Landscape', 'landscape'),
+            ('Fanart', 'background'), ('ClearLogo', 'logo')):
+        value = safe_image(play_meta.get(key))
+        if value:
+            window.setProperty('StremioStreams.' + prop, value)
+
+    selected = selected_provider if selected_provider and selected_provider != 'all' else 'all'
+    window.setProperty('StremioStreams.SelectedProvider', selected)
+
+    cache = Store(STORE.directory / 'streams').load()
+    provider_names = []
+    if (cache.get('kind') == kind and cache.get('id') == stream_id
+            and isinstance(cache.get('raw'), list)):
+        for stream in cache['raw']:
+            name = str(stream.get('provider') or '').strip()
+            if name and name not in provider_names:
+                provider_names.append(name)
+    if not provider_names:
+        for addon in active_addons(STORE.load()):
+            manifest = addon.get('manifest', {})
+            if not supports(manifest, kind, stream_id):
+                continue
+            name = str(manifest.get('name') or '').strip()
+            if name and name not in provider_names:
+                provider_names.append(name)
+
+    common = dict(kind=kind, id=stream_id,
+                  resume_ms=str(resume_ms or ''), layout='streams1200v2')
+    window.setProperty(
+        'StremioStreams.AllPath',
+        route(action='stream_select_filter', stream_provider='all', **common))
+
+    selected_index = 0
+    for index, provider_name in enumerate(provider_names[:6], 1):
+        window.setProperty(
+            'StremioStreams.Provider{}Name'.format(index), provider_name)
+        window.setProperty(
+            'StremioStreams.Provider{}Path'.format(index),
+            route(action='stream_select_filter',
+                  stream_provider=provider_name, **common))
+        if provider_name == selected:
+            selected_index = index
+
+    window.setProperty(
+        'StremioStreams.SelectedProviderIndex', str(selected_index))
+    window.setProperty(
+        'StremioStreams.ItemsPath',
+        route(action='stream_items', kind=kind, id=stream_id,
+              stream_provider=selected, resume_ms=str(resume_ms or ''),
+              layout='streams1200v2'))
+
+
+def stream_list_item(stream, play_meta):
+    card = stream_card(stream)
+    entry = xbmcgui.ListItem(label=card['headline'])
+    entry.setArt({k: v for k, v in {
+        'thumb': play_meta.get('landscape') or play_meta.get('poster'),
+        'fanart': play_meta.get('background')
+    }.items() if isinstance(v, str) and v})
+    for prop, value in (
+            ('Provider', card['provider']),
+            ('Quality', card['quality']),
+            ('Headline', card['headline']),
+            ('Filename', card['filename']),
+            ('Tech', card['tech']),
+            ('Meta', card['meta']),
+            ('Size', card['size']),
+            ('Source', card['source']),
+            ('Seeders', card['seeders']),
+            ('Languages', card['languages'])):
+        if value:
+            entry.setProperty('StremioStream.' + prop, value)
+    entry.setProperty('IsPlayable', 'true')
+    return entry
+
+
 def run(params):
     action = params.get('action', 'root')
     # Kodi may dispatch the subtitle extension through the addon's primary
@@ -334,6 +462,99 @@ def run(params):
                 return run({'action': 'catalog', 'provider': addon['id'],
                             'kind': available[0]['type'], 'id': available[0]['id']})
         xbmcplugin.endOfDirectory(HANDLE)
+        return
+
+    if action == 'stream_filters':
+        kind = params.get('kind', '')
+        identity = params.get('id', '')
+        selected = params.get('selected', 'all') or 'all'
+        resume_ms = params.get('resume_ms', '')
+        cache = Store(STORE.directory / 'streams').load()
+        raw = cache.get('raw', []) if (
+            cache.get('kind') == kind and cache.get('id') == identity
+            and time.time() - cache.get('created', 0) < 300
+            and isinstance(cache.get('raw'), list)) else []
+
+        provider_names = []
+        for stream in raw:
+            name = str(stream.get('provider') or '').strip()
+            if name and name not in provider_names:
+                provider_names.append(name)
+
+        if not provider_names:
+            for addon in active_addons(STORE.load()):
+                manifest = addon.get('manifest', {})
+                if not supports(manifest, kind, identity):
+                    continue
+                name = str(manifest.get('name') or '').strip()
+                if name and name not in provider_names:
+                    provider_names.append(name)
+
+        for value, label in [('all', 'All')] + [(name, name) for name in provider_names]:
+            entry = xbmcgui.ListItem(label=label)
+            entry.setProperty('StremioFilterSelected',
+                              'true' if value == selected else 'false')
+            entry.setProperty('StremioFilterValue', value)
+            target = route(action='stream_select_filter', kind=kind, id=identity,
+                           stream_provider=value, resume_ms=resume_ms,
+                           layout='streams1193v1')
+            xbmcplugin.addDirectoryItem(HANDLE, target, entry, False)
+        xbmcplugin.endOfDirectory(HANDLE)
+        return
+
+    if action == 'stream_items':
+        kind = params.get('kind', '')
+        identity = params.get('id', '')
+        selected = params.get('stream_provider', 'all') or 'all'
+        resume_ms = params.get('resume_ms', '')
+        cache_store = Store(STORE.directory / 'streams')
+        cache = cache_store.load()
+        if not (cache.get('kind') == kind and cache.get('id') == identity
+                and time.time() - cache.get('created', 0) < 300
+                and isinstance(cache.get('raw'), list)
+                and isinstance(cache.get('meta'), dict)):
+            xbmcplugin.endOfDirectory(HANDLE)
+            return
+
+        raw = cache['raw']
+        visible = raw if selected == 'all' else [
+            stream for stream in raw
+            if str(stream.get('provider') or '').strip() == selected
+        ]
+        import secrets
+        urls = dict(cache.get('urls') or {})
+        for stream in visible:
+            key = secrets.token_hex(16)
+            urls[key] = dict(
+                stream, kind=kind, id=identity, meta=cache['meta'],
+                resume_ms=int(resume_seconds(resume_ms) * 1000))
+            xbmcplugin.addDirectoryItem(
+                HANDLE, route(action='play', key=key),
+                stream_list_item(stream, cache['meta']), False)
+        cache['urls'] = urls
+        cache_store.save(cache)
+        xbmcplugin.endOfDirectory(HANDLE)
+        return
+
+    if action == 'stream_select_filter':
+        kind = params.get('kind', '')
+        identity = params.get('id', '')
+        selected = params.get('stream_provider', 'all') or 'all'
+        resume_ms = params.get('resume_ms', '')
+        cache = Store(STORE.directory / 'streams').load()
+        play_meta = cache.get('meta') if (
+            cache.get('kind') == kind and cache.get('id') == identity
+            and isinstance(cache.get('meta'), dict)) else {}
+        if play_meta:
+            configure_streams_window(
+                play_meta, kind, identity, selected, resume_ms)
+            try:
+                index = int(xbmcgui.Window(STREAMS_WINDOW_ID).getProperty(
+                    'StremioStreams.SelectedProviderIndex') or '0')
+            except (TypeError, ValueError):
+                index = 0
+            xbmc.sleep(250)
+            xbmc.executebuiltin('SetFocus({})'.format(101 + max(0, min(index, 6))))
         return
 
     if action == 'community_catalog':
@@ -427,7 +648,8 @@ def run(params):
         xbmc.executebuiltin('Container.Refresh')
         return
     if action in ('details_cast', 'details_crew', 'details_recommendations',
-                  'details_trailers', 'seasons', 'episodes', 'more_episodes'):
+                  'details_trailers', 'seasons', 'episodes', 'more_episodes',
+                  'next_episode'):
         state = STORE.load()
         providers = list(active_addons(state))
         kind = params.get('kind', 'movie')
@@ -473,30 +695,52 @@ def run(params):
                 xbmcplugin.addDirectoryItem(
                     HANDLE, route(action='trailer_unavailable', video_id=row['id']),
                     entry, False)
-        elif action == 'seasons':
+        elif action == 'next_episode':
+            xbmcplugin.setContent(HANDLE, 'episodes')
+            saved = next((row for row in state.get('library', [])
+                          if isinstance(row, dict) and row.get('_id') == identity
+                          and row.get('type') == 'series'), None)
+            video, resume_ms = next_series_episode(meta.get('videos', []), identity, saved)
+            if video:
+                entry = episode_item(video, meta)
+                target = route(action='streams', kind='series', id=video.get('id', ''))
+                if resume_ms:
+                    target = route(action='streams', kind='series', id=video.get('id', ''),
+                                   resume_ms=str(resume_ms))
+                    try:
+                        tag = entry.getVideoInfoTag()
+                        duration_ms = ((saved or {}).get('state') or {}).get('duration', 0)
+                        tag.setResumePoint(
+                            resume_seconds(resume_ms),
+                            resume_seconds(duration_ms) if duration_ms else 0)
+                    except Exception:
+                        pass
+                entry.setProperty('StremioNextEpisodePath', target)
+                xbmcplugin.addDirectoryItem(HANDLE, target, entry, True)
+        elif action in ('seasons', 'more_episodes'):
             xbmcplugin.setContent(HANDLE, 'seasons')
-            for row in metadata_seasons(meta):
+            season_rows = metadata_seasons(meta)
+            if action == 'more_episodes':
+                regular = [row for row in season_rows if int(row.get('season', 0)) > 0]
+                if regular:
+                    season_rows = regular
+            for row in season_rows:
                 season = row['season']
                 entry = season_item(row, meta)
                 xbmcplugin.addDirectoryItem(
                     HANDLE, route(action='episodes', kind='series',
                                   id=meta.get('id', ''), season=str(season)), entry, True)
-        elif action in ('episodes', 'more_episodes'):
+        elif action == 'episodes':
             xbmcplugin.setContent(HANDLE, 'episodes')
-            season = params.get('season')
-            if action == 'more_episodes' or season in (None, ''):
-                available = metadata_seasons(meta)
-                regular = [row['season'] for row in available if int(row['season']) > 0]
-                season = str(regular[0] if regular else
-                             (available[0]['season'] if available else 0))
+            season = params.get('season', '0')
             for video in metadata_episodes(meta, season):
                 entry = episode_item(video, meta)
                 xbmcplugin.addDirectoryItem(
                     HANDLE, route(action='streams', kind='series',
                                   id=video.get('id', '')), entry, True)
         xbmcplugin.endOfDirectory(HANDLE)
-        if action in ('episodes', 'more_episodes'):
-            xbmc.executebuiltin('Container.SetViewMode(525)')
+        if action == 'more_episodes':
+            xbmc.executebuiltin('Container.SetViewMode(527)')
         return
 
     if action == 'trailer_unavailable':
@@ -713,43 +957,53 @@ def run(params):
                 pass  # Account providers can still work if the manual provider is down.
 
         kind, stream_id = params['kind'], params['id']
-        base_id = stream_id.split(':', 1)[0] if kind == 'series' else stream_id
-        play_meta = metadata_details(kind, base_id, '', providers)
-        if kind == 'series' and ':' in stream_id:
-            episode = next((v for v in play_meta.get('videos', [])
-                            if str(v.get('id', '')) == stream_id), None)
-            if episode:
-                play_meta = dict(play_meta)
-                play_meta.update({
-                    'id': stream_id,
-                    'name': episode.get('name') or episode.get('title') or play_meta.get('name'),
-                    'description': episode.get('description') or episode.get('overview') or '',
-                    'released': episode.get('released') or episode.get('firstAired') or '',
-                    'season': episode.get('season'),
-                    'episode': episode.get('episode') or episode.get('number'),
-                    'tvshowtitle': play_meta.get('name', ''),
-                    '_media_type': 'episode',
-                    'landscape': episode.get('thumbnail') or play_meta.get('landscape'),
-                })
-
-        playable, skipped, failed = collect(providers, kind, stream_id)
-        # Keep signed stream URLs out of saved plugin routes and widget configuration.
-        import secrets
+        selected_provider = params.get('stream_provider', 'all') or 'all'
+        resume_ms = params.get('resume_ms', '')
         cache = Store(STORE.directory / 'streams')
-        cached = {}
-        for stream in playable:
-            key = secrets.token_hex(16)
-            cached[key] = dict(stream, kind=kind, id=stream_id,
-                               meta=play_meta,
-                               resume_ms=int(resume_seconds(params.get('resume_ms')) * 1000))
-            entry = xbmcgui.ListItem(label=stream['label'])
-            entry.setArt({k: v for k, v in {
-                'thumb': play_meta.get('landscape') or play_meta.get('poster'),
-                'fanart': play_meta.get('background')
-            }.items() if isinstance(v, str) and v})
-            entry.setProperty('IsPlayable', 'true')
-            xbmcplugin.addDirectoryItem(HANDLE, route(action='play', key=key), entry, False)
-        cache.save({'created': time.time(), 'urls': cached})
+        cached_state = cache.load()
+        cache_valid = (
+            cached_state.get('kind') == kind
+            and cached_state.get('id') == stream_id
+            and time.time() - cached_state.get('created', 0) < 300
+            and isinstance(cached_state.get('raw'), list)
+            and isinstance(cached_state.get('meta'), dict))
+
+        if cache_valid:
+            playable = cached_state['raw']
+            play_meta = cached_state['meta']
+            skipped = int(cached_state.get('skipped', 0))
+            failed = int(cached_state.get('failed', 0))
+        else:
+            base_id = stream_id.split(':', 1)[0] if kind == 'series' else stream_id
+            play_meta = metadata_details(kind, base_id, '', providers)
+            if kind == 'series' and ':' in stream_id:
+                episode = next((v for v in play_meta.get('videos', [])
+                                if str(v.get('id', '')) == stream_id), None)
+                if episode:
+                    play_meta = dict(play_meta)
+                    play_meta.update({
+                        'id': stream_id,
+                        'name': episode.get('name') or episode.get('title') or play_meta.get('name'),
+                        'description': episode.get('description') or episode.get('overview') or '',
+                        'released': episode.get('released') or episode.get('firstAired') or '',
+                        'season': episode.get('season'),
+                        'episode': episode.get('episode') or episode.get('number'),
+                        'tvshowtitle': play_meta.get('name', ''),
+                        '_media_type': 'episode',
+                        'landscape': episode.get('thumbnail') or play_meta.get('landscape'),
+                    })
+            playable, skipped, failed = collect(providers, kind, stream_id)
+
+        cache.save({
+            'created': time.time(), 'kind': kind, 'id': stream_id,
+            'raw': playable, 'meta': play_meta,
+            'skipped': skipped, 'failed': failed,
+            'urls': dict(cached_state.get('urls') or {}) if cache_valid else {}
+        })
+
+        configure_streams_window(
+            play_meta, kind, stream_id, selected_provider, resume_ms)
+
         if not playable:
             xbmcgui.Dialog().ok('StremioELEC',
                 'No supported direct HTTP streams. {} unsupported; {} addons failed. '
@@ -757,6 +1011,11 @@ def run(params):
         elif skipped or failed:
             xbmcgui.Dialog().notification('StremioELEC',
                 '{} unsupported streams; {} addons failed'.format(skipped, failed))
+
+        xbmcplugin.endOfDirectory(HANDLE)
+        if playable:
+            xbmc.executebuiltin('ActivateWindow(1200)')
+        return
     elif action == 'play':
         cache = Store(STORE.directory / 'streams').load()
         stream = cache.get('urls', {}).get(params.get('key'), '')

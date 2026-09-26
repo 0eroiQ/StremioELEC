@@ -580,20 +580,18 @@
 			<!-- right list -->
 			<control type="group">
 			<include>Animation_Right_Bingie</include>
-				<control type="fixedlist" id="5027">
+				<control type="list" id="5027">
 				<visible>Control.IsVisible(527) + !Container(527).ListItem.IsParentFolder</visible>
 				<animation effect="fade" start="100" end="0" condition="Container(5027).IsUpdating">Conditional</animation>
-				<top>-153</top>
+				<top>127</top>
 				<posx>781</posx>
-                <height>1280</height>
+                <height>980</height>
                 <width>1100</width>
 				<orientation>vertical</orientation>
-				<focusposition>1</focusposition>
-				<pagecontrol>60</pagecontrol>
 				<onleft>527</onleft>
 				<onup>5027</onup>
 				<ondown>5027</ondown>
-                <onright>60</onright>
+                <onright>5027</onright>
 				<onback>527</onback>
                 <preloaditems>2</preloaditems>
                 <include>ScrollTime</include>				
@@ -633,23 +631,7 @@
                     <colordiffuse>$INFO[Skin.String(ViewDetailsBorderFocusColor)]</colordiffuse>
                     <bordersize>2</bordersize>
                 </control>
-                <!-- vertical Scrollbar -->
-                <control type="scrollbar" id="60">
-					<texturesliderbackground border="5" colordiffuse="$INFO[Skin.String(ScrollbarBackgroundColor)]">scrollbar/texturesliderbar_small.png</texturesliderbackground>
-					<texturesliderbar colordiffuse="$INFO[Skin.String(ScrollbarUnfocusedColor)]" border="5">scrollbar/texturesliderbar_small.png</texturesliderbar>
-					<texturesliderbarfocus colordiffuse="$INFO[Skin.String(ScrollbarFocusedColor)]" border="5">scrollbar/texturesliderbar_small.png</texturesliderbarfocus>
-					<textureslidernib colordiffuse="$INFO[Skin.String(ScrollbarUnfocusedColor)]">scrollbar/texturesliderbar_nib.png</textureslidernib>
-					<textureslidernibfocus colordiffuse="$INFO[Skin.String(ScrollbarFocusedColor)]">scrollbar/texturesliderbar_nib.png</textureslidernibfocus>
-                    <visible>Control.IsVisible(5027) + Integer.IsGreater(Container(5027).NumItems,0)</visible>
-                    <top>0</top>
-                    <right>2</right>
-                    <width>10</width>
-                    <height>100%</height>
-                    <onup>60</onup>
-                    <onleft>5027</onleft>
-                    <animation effect="fade" start="0" end="100" time="400" condition="[Control.HasFocus(60) | String.IsEqual(Skin.String(scrollbar_visibility),always_show)]">Conditional</animation>
-                    <animation effect="fade" start="100" end="0" time="400" condition="![Control.HasFocus(60) | String.IsEqual(Skin.String(scrollbar_visibility),always_show)]">Conditional</animation>
-                </control>
+
 			</control>
 		<!-- Loading Spinner -->
         <include content="Busy_Spinner">

@@ -25,31 +25,54 @@ class HomeViewsTest(unittest.TestCase):
         self.assertIn('ActivateWindow(Videos,$INFO[Window(Home).Property(StremioContinueTarget)],return)', actions)
         self.assertEqual(sum(node.text == 'StremioContinuePlayButton' for node in root.findall('.//include')), 2)
 
-    def test_more_episodes_uses_stremio_native_bingie_episode_view(self):
+    def test_more_episodes_uses_stremio_native_bingie_seasons_view(self):
         info = (ROOT / '1080i/IncludesDialogVideoInfo.xml').read_text()
         self.assertIn('ListItem.Property(StremioMoreEpisodesPath)', info)
         self.assertIn('ActivateWindow(Videos,$ESCINFO[ListItem.Property(StremioMoreEpisodesPath)],return)', info)
 
-        episodes = (ROOT / '1080i/View_525_Bingie_Episodes.xml').read_text()
-        self.assertIn('plugin://plugin.video.stremioelec/?action=seasons&amp;kind=series&amp;id=', episodes)
-        self.assertIn('ListItem.Property(StremioSeriesID)', episodes)
+        seasons = (ROOT / '1080i/View_527_Bingie_Seasons.xml').read_text()
+        self.assertIn('$INFO[Container(527).ListItem.FolderPath]', seasons)
+        self.assertNotIn('<control type="scrollbar" id="60">', seasons)
+        self.assertNotIn('<pagecontrol>60</pagecontrol>', seasons)
+        self.assertIn('<onright>5027</onright>', seasons)
 
         core = (ROOT / 'integration/plugin.video.stremioelec/default.py').read_text()
         self.assertIn("BASE = 'plugin://plugin.video.stremioelec/'", core)
-        self.assertIn("action in ('episodes', 'more_episodes')", core)
-        self.assertIn("Container.SetViewMode(525)", core)
+        self.assertIn("action in ('seasons', 'more_episodes')", core)
+        self.assertIn("Container.SetViewMode(527)", core)
 
-    def test_bingie_episode_airdate_layout_is_restored(self):
-        episodes = (ROOT / '1080i/View_525_Bingie_Episodes.xml').read_text()
-        self.assertIn(
-            '<include condition="Skin.HasSetting(View525_EnableAirDate)">View_525_Details_Defs_2</include>',
-            episodes)
-        self.assertIn(
-            '<include condition="Skin.HasSetting(View525_EnableAirDate)">View_525_Details_Defs_Focus_2</include>',
-            episodes)
-        defaults = (ROOT / '1080i/IncludesDefaultSkinSettings.xml').read_text()
-        self.assertIn('Skin.SetBool(View525_EnableAirDate)', defaults)
-        self.assertIn('StremioEpisodeAirDateDefault', defaults)
+    def test_bingie_episode_list_allows_last_episode_to_rest_at_bottom(self):
+        seasons = (ROOT / '1080i/View_527_Bingie_Seasons.xml').read_text()
+        self.assertIn('<control type="list" id="5027">', seasons)
+        self.assertNotIn('<control type="fixedlist" id="5027">', seasons)
+        self.assertNotIn('<focusposition>1</focusposition>', seasons)
+        self.assertIn('<top>127</top>', seasons)
+        self.assertIn('<height>980</height>', seasons)
+
+    def test_stream_picker_has_dedicated_tv_window(self):
+        streams = (ROOT / '1080i/Custom_1200_StremioStreams.xml').read_text()
+        self.assertIn('<window id="1200">', streams)
+        self.assertIn('<control type="list" id="50">', streams)
+        self.assertIn('<control type="grouplist" id="51">', streams)
+        self.assertIn('<control type="button" id="101">', streams)
+        self.assertIn('<control type="button" id="102">', streams)
+        self.assertIn('<defaultcontrol>50</defaultcontrol>', streams)
+        self.assertNotIn('<defaultcontrol always="true">50</defaultcontrol>', streams)
+        self.assertIn('<onfocus condition=', streams)
+        self.assertIn('RunPlugin($INFO[Window(Home).Property(StremioStreams.Provider1Path)])', streams)
+        self.assertIn('StremioStreams.Provider1Path', streams)
+        self.assertIn('StremioStreamsItemsContent', streams)
+        self.assertIn('StremioStreams.SelectedProviderIndex', streams)
+        self.assertIn('StremioStream.Filename', streams)
+        self.assertIn('StremioStream.Tech', streams)
+        self.assertIn('StremioStream.Meta', streams)
+        self.assertNotIn('<control type="scrollbar"', streams)
+
+        core = (ROOT / 'integration/plugin.video.stremioelec/default.py').read_text()
+        self.assertIn("ActivateWindow(1200)", core)
+        self.assertIn("action == 'stream_filters'", core)
+        self.assertIn("action == 'stream_items'", core)
+        self.assertIn("action == 'stream_select_filter'", core)
 
     def test_stremio_widget_picker_is_browsable_and_optional(self):
         root = ET.parse(ROOT / 'shortcuts/overrides.xml').getroot()

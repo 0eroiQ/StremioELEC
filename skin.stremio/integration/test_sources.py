@@ -4,6 +4,7 @@ import unittest
 
 sys.path.insert(0, str(pathlib.Path(__file__).parent / 'plugin.video.stremioelec'))
 from sources import collect, supports, direct_url
+from stream_ui import stream_card
 
 
 class SourcesTest(unittest.TestCase):
@@ -26,6 +27,22 @@ class SourcesTest(unittest.TestCase):
                        {'url': 'https://example.com/x', 'behaviorHints': {'proxyHeaders': {'request': {}}}},
                        {'url': 'https://user:pass@example.com/x'}):
             self.assertFalse(direct_url(stream))
+
+    def test_stream_card_extracts_tv_metadata(self):
+        stream = {
+            'provider': 'Torrentio TB',
+            'label': 'Torrentio TB · Example 1080p BluRay x265\n👤 17 💾 935.72 MB ⚙️ 1337x\n🇬🇧 / 🇮🇹',
+            'detail': 'Example 1080p BluRay x265\n👤 17 💾 935.72 MB ⚙️ 1337x\n🇬🇧 / 🇮🇹',
+            'filename': 'The.Flash.S01E23.1080p.10bit.BluRay.AAC5.1.HEVC-Vyndros.mkv',
+        }
+        row = stream_card(stream)
+        self.assertEqual(row['headline'], 'Torrentio TB · 1080p')
+        self.assertIn('BluRay', row['tech'])
+        self.assertIn('H.265', row['tech'])
+        self.assertIn('AAC 5.1', row['tech'])
+        self.assertIn('935.72 MB', row['meta'])
+        self.assertIn('1337x', row['meta'])
+        self.assertIn('17 seeders', row['meta'])
 
     def test_aggregation_deduplicates_providers_and_isolates_failures(self):
         providers = [{'transportUrl': 'https://{}.example/manifest.json'.format(name),

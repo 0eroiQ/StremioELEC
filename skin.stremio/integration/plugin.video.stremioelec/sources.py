@@ -52,7 +52,10 @@ def collect(providers, kind, identity, fetcher=fetch):
                 name = provider['manifest'].get('name') or 'Addon'
                 detail = stream.get('title') or stream.get('name') or 'Stream'
                 hints = stream.get('behaviorHints') or {}
-                good.append({'url': stream['url'], 'label': '{} · {}'.format(name, detail),
+                good.append({'url': stream['url'],
+                             'label': '{} · {}'.format(name, detail),
+                             'provider': name,
+                             'detail': detail,
                              'subtitles': stream.get('subtitles', []),
                              'filename': hints.get('filename', '')})
             return good, skipped, 0

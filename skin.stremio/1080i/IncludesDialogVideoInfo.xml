@@ -51,11 +51,10 @@
 					<content sortorder="ascending" sortby="playcount" limit="1">$VAR[InfoDialogNextUpContent]</content>
 				</control>
 
-				<!-- hiddenlist to get first/next episode with tmdb helper -->
+				<!-- hidden Stremio-native first/next episode resolver -->
 				<control type="list" id="1234">
 					<visible>Skin.HasSetting(videoinfo_button_play_next_tmdb)</visible>
-					<visible>String.IsEqual(ListItem.dbtype,tvshow) + String.IsEmpty(ListItem.DBID) + !String.IsEmpty(ListItem.Property(StremioID))</visible>
-					<visible>!String.IsEmpty(ListItem.UniqueID(tmdb))</visible>
+					<visible>String.IsEqual(ListItem.dbtype,tvshow) + !String.IsEmpty(ListItem.Property(StremioID)) + String.IsEmpty(ListItem.Property(StremioContinuePath))</visible>
 					<top>0</top>
 					<left>0</left>
 					<width>0</width>
@@ -376,11 +375,10 @@
                                 <onclick condition="Integer.IsGreater(Container(5050).NumItems,0) + !Container(5050).IsUpdating + Window.IsActive(Custom_1190_TMDbBingieHelperCast.xml)">AlarmClock(PlayMovie,PlayMedia($ESCINFO[Container(5050).ListItem.FileNameAndPath],resume),00:04,silent)</onclick>
                             </control>
 
-							<!-- Play Next Episode with TMDB Helper -->
+							<!-- Play first/next episode with StremioELEC -->
                             <control type="radiobutton" id="8181">
 								<visible>Skin.HasSetting(videoinfo_button_play_next_tmdb)</visible>
 								<visible>Control.IsVisible(1234) + String.IsEqual(ListItem.dbtype,tvshow) + !String.IsEmpty(ListItem.Property(StremioID))</visible>
-								<visible>!String.IsEmpty(ListItem.UniqueID(tmdb))</visible>
                                 <include content="Bingie_InfoDialog_Button_Texture">
                                     <param name="radiotexture" value="dialogs/videoinfo/info/play2.png"/>
                                 </include>
@@ -399,9 +397,10 @@
                                 <radioposx>13</radioposx>
                                 <radiowidth>22</radiowidth>
                                 <radioheight>22</radioheight>
-                                <onclick condition="Integer.IsGreater(Container(5050).NumItems,0) + !Container(5050).IsUpdating + !Window.IsActive(Custom_1190_TMDbBingieHelperCast.xml)">Dialog.Close(movieinformation)</onclick>
-								<onclick condition="Integer.IsGreater(Container(5050).NumItems,0) + !Container(5050).IsUpdating + !Window.IsActive(Custom_1190_TMDbBingieHelperCast.xml)">AlarmClock(PlayMovie,PlayMedia($ESCINFO[Container(1234).ListItem.FileNameAndPath],resume),00:01,silent)</onclick>
-                                <onclick condition="Integer.IsGreater(Container(5050).NumItems,0) + !Container(5050).IsUpdating + Window.IsActive(Custom_1190_TMDbBingieHelperCast.xml)">AlarmClock(PlayMovie,PlayMedia($ESCINFO[Container(1234).ListItem.FileNameAndPath],resume),00:04,silent)</onclick>
+                                <onclick condition="!Container(1234).IsUpdating + !Integer.IsEqual(Container(1234).NumItems,0)">SetProperty(StremioNextEpisodeTarget,$INFO[Container(1234).ListItem.Property(StremioNextEpisodePath)],Home)</onclick>
+                                <onclick condition="!Container(1234).IsUpdating + !Integer.IsEqual(Container(1234).NumItems,0)">Dialog.Close(movieinformation)</onclick>
+                                <onclick condition="!Container(1234).IsUpdating + !Integer.IsEqual(Container(1234).NumItems,0)">ActivateWindow(Videos,$INFO[Window(Home).Property(StremioNextEpisodeTarget)],return)</onclick>
+                                <onclick>ClearProperty(StremioNextEpisodeTarget,Home)</onclick>
                             </control>
 
                             <include>StremioContinuePlayButton</include>
@@ -1203,11 +1202,10 @@
 					<content sortorder="ascending" sortby="playcount" limit="1">$VAR[InfoDialogNextUpContent]</content>
 				</control>
 
-				<!-- hiddenlist to get first/next episode with tmdb helper -->
+				<!-- hidden Stremio-native first/next episode resolver -->
 				<control type="list" id="1234">
 					<visible>Skin.HasSetting(videoinfo_button_play_next_tmdb)</visible>
-					<visible>String.IsEqual(ListItem.dbtype,tvshow) + String.IsEmpty(ListItem.DBID) + !String.IsEmpty(ListItem.Property(StremioID))</visible>
-					<visible>!String.IsEmpty(ListItem.UniqueID(tmdb))</visible>
+					<visible>String.IsEqual(ListItem.dbtype,tvshow) + !String.IsEmpty(ListItem.Property(StremioID)) + String.IsEmpty(ListItem.Property(StremioContinuePath))</visible>
 					<top>0</top>
 					<left>0</left>
 					<width>0</width>
@@ -1643,11 +1641,10 @@
                                 <onclick condition="Integer.IsGreater(Container(5050).NumItems,0) + !Container(5050).IsUpdating + Window.IsActive(Custom_1190_TMDbBingieHelperCast.xml)">AlarmClock(PlayMovie,PlayMedia($ESCINFO[Container(5050).ListItem.FileNameAndPath],resume),00:04,silent)</onclick>
                             </control>
 
-							<!-- Play Next Episode with TMDB Helper -->
+							<!-- Play first/next episode with StremioELEC -->
                             <control type="radiobutton" id="8181">
                                 <visible>Skin.HasSetting(videoinfo_button_play_next_tmdb)</visible>
 								<visible>Control.IsVisible(1234) + String.IsEqual(ListItem.dbtype,tvshow) + !String.IsEmpty(ListItem.Property(StremioID))</visible>
-								<visible>!String.IsEmpty(ListItem.UniqueID(tmdb))</visible>
                                 <include>Bingie_InfoDialog_Button_Default_Defs</include>
                                 <include content="Bingie_InfoDialog_Button_Texture">
                                     <param name="radiotexture" value="dialogs/videoinfo/info/play2.png"/>
@@ -1657,9 +1654,10 @@
 								<radioposy>22</radioposy>
                                 <radiowidth>22</radiowidth>
                                 <radioheight>22</radioheight>
-                                <onclick condition="!Container(1234).IsUpdating + !Integer.IsEqual(Container(1234).NumItems,0) + !Window.IsActive(Custom_1190_TMDbBingieHelperCast.xml)">Dialog.Close(movieinformation)</onclick>
-								<onclick condition="!Container(1234).IsUpdating + !Integer.IsEqual(Container(1234).NumItems,0) + !Window.IsActive(Custom_1190_TMDbBingieHelperCast.xml)">AlarmClock(PlayMovie,PlayMedia($ESCINFO[Container(1234).ListItem.FileNameAndPath],resume),00:01,silent)</onclick>
-                                <onclick condition="!Container(1234).IsUpdating + !Integer.IsEqual(Container(1234).NumItems,0) + Window.IsActive(Custom_1190_TMDbBingieHelperCast.xml)">AlarmClock(PlayMovie,PlayMedia($ESCINFO[Container(1234).ListItem.FileNameAndPath],resume),00:04,silent)</onclick>
+                                <onclick condition="!Container(1234).IsUpdating + !Integer.IsEqual(Container(1234).NumItems,0)">SetProperty(StremioNextEpisodeTarget,$INFO[Container(1234).ListItem.Property(StremioNextEpisodePath)],Home)</onclick>
+                                <onclick condition="!Container(1234).IsUpdating + !Integer.IsEqual(Container(1234).NumItems,0)">Dialog.Close(movieinformation)</onclick>
+                                <onclick condition="!Container(1234).IsUpdating + !Integer.IsEqual(Container(1234).NumItems,0)">ActivateWindow(Videos,$INFO[Window(Home).Property(StremioNextEpisodeTarget)],return)</onclick>
+                                <onclick>ClearProperty(StremioNextEpisodeTarget,Home)</onclick>
                             </control>
 
                             <include>StremioContinuePlayButton</include>
@@ -3685,9 +3683,10 @@
         <value condition="[String.IsEqual(ListItem.DBType,episode) | Container.Content(episodes)] + !String.IsEmpty(Window(Home).Property(ListItem.TVShowID))">videodb://inprogresstvshows/$INFO[Window(Home).Property(ListItem.TVShowID)]/-2/?tvshowid=$INFO[Window(Home).Property(ListItem.TVShowID)]</value>
     </variable>
 
-	<!-- next-up content for info dialog -->
+	<!-- Stremio-native next-up content for non-library / non-Continue items -->
     <variable name="InfoDialogTMDbBingieHelperNextUpContent">
-        <value></value>
+        <value condition="String.IsEqual(ListItem.DBType,tvshow) + !String.IsEmpty(ListItem.Property(StremioID)) + String.IsEmpty(ListItem.Property(StremioContinuePath))">plugin://plugin.video.stremioelec/?action=next_episode&amp;kind=series&amp;id=$INFO[ListItem.Property(StremioID)]</value>
+        <value />
     </variable>
 
 	<variable name="BingieInfoGenre">
