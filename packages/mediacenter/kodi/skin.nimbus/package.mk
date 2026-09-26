@@ -38,6 +38,10 @@ makeinstall_target() {
 
   HOME_XML="${INSTALL}/usr/share/kodi/addons/skin.nimbus/xml/Home.xml"
   if [ -f "${HOME_XML}" ]; then
+    # Put the live Stremio Core test row at the top of Nimbus Movies.
+    # Keep upstream MovieWidgets underneath until device validation passes.
+    sed -i '/<include content="MovieWidgets"/i\
+            <include>StremioELECCoreWidget</include>' "${HOME_XML}"
     sed -i '/<controls>/a\
         <control type="button" id="9400">\
           <description>StremioELEC Core bridge</description>\
