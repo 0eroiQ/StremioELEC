@@ -84,6 +84,15 @@ jobs:
           sudo apt-get install --no-install-recommends -y \
             build-essential bc curl gawk git libncurses-dev python3 unzip xz-utils zip \
             xfonts-utils rdfind libparse-yapp-perl gperf xsltproc libxml-parser-perl patchutils lzop
+      - name: Seed GMP source cache
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p sources/gmp
+          curl --fail --location --retry 5 --retry-delay 3 \
+            https://ftp.gnu.org/gnu/gmp/gmp-6.3.0.tar.xz \
+            -o sources/gmp/gmp-6.3.0.tar.xz
+          echo "a3c2b80201b89e68616f4ad30bc66aee4927c3ce50e33929ca819d5c43538898  sources/gmp/gmp-6.3.0.tar.xz" | sha256sum -c -
       - name: Build Generic x86_64 StremioELEC test image
         shell: bash
         run: |
