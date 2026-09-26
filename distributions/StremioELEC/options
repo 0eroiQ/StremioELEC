@@ -50,7 +50,7 @@ SSH_ENABLED_DEFAULT="no"
 MEDIACENTER="kodi"
 # Keep Estuary available as a recovery skin until the StremioELEC Main/Nimbus package passes boot testing.
 SKINS="Estuary skin.nimbus"
-SKIN_DEFAULT="Estuary"
+SKIN_DEFAULT="Nimbus"
 KODI_EXTRA_FONTS="yes"
 PULSEAUDIO_SUPPORT="yes"
 PIPEWIRE_SUPPORT="no"
