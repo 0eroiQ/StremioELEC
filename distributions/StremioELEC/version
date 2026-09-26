@@ -1,0 +1,8 @@
+# VERSION: set full version, use "devel" for development version
+DISTRO_VERSION="devel"
+
+# OS_VERSION: track the LibreELEC base while StremioELEC is in development
+OS_VERSION="13.0"
+
+# ADDON_VERSION: keep compatibility with the current LibreELEC addon ABI
+ADDON_VERSION="12.80.7"
