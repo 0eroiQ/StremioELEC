@@ -33,6 +33,24 @@ makeinstall_target() {
         <param name="list_id" value="19400"/>\
         <param name="limit" value="20"/>\
       </include>\
+    </include>\
+    <include name="StremioELECSeriesWidget">\
+      <include content="WidgetListPoster">\
+        <param name="content_path" value="plugin://plugin.video.stremioelec/"/>\
+        <param name="widget_header" value="Stremio Series"/>\
+        <param name="widget_target" value="videos"/>\
+        <param name="list_id" value="22400"/>\
+        <param name="limit" value="20"/>\
+      </include>\
+    </include>\
+    <include name="StremioELECContinueWidget">\
+      <include content="WidgetListLandscape">\
+        <param name="content_path" value="plugin://plugin.video.stremioelec/"/>\
+        <param name="widget_header" value="Continue Watching"/>\
+        <param name="widget_target" value="videos"/>\
+        <param name="list_id" value="19500"/>\
+        <param name="limit" value="20"/>\
+      </include>\
     </include>' "${INCLUDES_HOME}"
   fi
 
@@ -41,7 +59,10 @@ makeinstall_target() {
     # Put the live Stremio Core test row at the top of Nimbus Movies.
     # Keep upstream MovieWidgets underneath until device validation passes.
     sed -i '/<include content="MovieWidgets"/i\
-            <include>StremioELECCoreWidget</include>' "${HOME_XML}"
+            <include>StremioELECContinueWidget</include>\
+            <include>StremioELECCoreWidget</include>' "${HOME_XML}"\
+    sed -i '/<include content="TVShowWidgets"/i\
+            <include>StremioELECSeriesWidget</include>' "${HOME_XML}"
     sed -i '/<controls>/a\
         <control type="button" id="9400">\
           <description>StremioELEC Core bridge</description>\
