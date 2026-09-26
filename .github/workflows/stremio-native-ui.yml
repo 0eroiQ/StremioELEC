@@ -1,0 +1,71 @@
+name: StremioELEC native UI validation
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [stremio-native-ui]
+    paths:
+      - distributions/StremioELEC/**
+      - packages/mediacenter/kodi/skin.nimbus/**
+      - packages/mediacenter/kodi/script.nimbus.helper/**
+      - packages/mediacenter/kodi/plugin.video.stremioelec/**
+      - packages/mediacenter/kodi/service.stremioelec.portable/**
+      - .github/workflows/stremio-native-ui.yml
+  pull_request:
+    paths:
+      - distributions/StremioELEC/**
+      - packages/mediacenter/kodi/skin.nimbus/**
+      - packages/mediacenter/kodi/script.nimbus.helper/**
+      - packages/mediacenter/kodi/plugin.video.stremioelec/**
+      - packages/mediacenter/kodi/service.stremioelec.portable/**
+      - .github/workflows/stremio-native-ui.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: stremio-native-ui-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Validate native UI package wiring
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f distributions/StremioELEC/options
+          test -f packages/mediacenter/kodi/skin.nimbus/package.mk
+          test -f packages/mediacenter/kodi/script.nimbus.helper/package.mk
+          test -f packages/mediacenter/kodi/plugin.video.stremioelec/package.mk
+          test -f packages/mediacenter/kodi/service.stremioelec.portable/package.mk
+          grep -q 'SKIN_DEFAULT="Nimbus"' distributions/StremioELEC/options
+          grep -q 'skin.nimbus' distributions/StremioELEC/options
+          grep -q 'plugin.video.stremioelec' distributions/StremioELEC/options
+          grep -q 'service.stremioelec.portable' distributions/StremioELEC/options
+          grep -q 'StremioELECCoreWidget' packages/mediacenter/kodi/skin.nimbus/package.mk
+          grep -q '<provides>executable</provides>' packages/mediacenter/kodi/service.stremioelec.portable/package.mk
+      - name: Check shell syntax
+        shell: bash
+        run: |
+          set -euo pipefail
+          bash -n distributions/StremioELEC/options
+          bash -n packages/mediacenter/kodi/skin.nimbus/package.mk
+          bash -n packages/mediacenter/kodi/script.nimbus.helper/package.mk
+          bash -n packages/mediacenter/kodi/plugin.video.stremioelec/package.mk
+          bash -n packages/mediacenter/kodi/service.stremioelec.portable/package.mk
+      - name: Native UI summary
+        run: |
+          {
+            echo '### StremioELEC native UI'
+            echo '- Nimbus is the test default skin.'
+            echo '- Estuary remains available for recovery.'
+            echo '- Stremio Core 0.9.5 is bundled.'
+            echo '- Portable runtime 0.3.5 remains a service and is exposed under Programs.'
+            echo '- This workflow validates source wiring only; N60 boot validation is still required.'
+          } >> "$GITHUB_STEP_SUMMARY"
