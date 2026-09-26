@@ -69,7 +69,7 @@ def main():
     if json.loads(gh('api', 'repos/' + REPO + '/git/matching-refs/tags/' + tag)):
         raise ValueError('Release tag already exists; use a new version, never overwrite')
     notes = ('N60 / PN60-R test image — NOT hardware-accepted.\n\n'
-             'Built from pinned LibreELEC 12.2.1 Generic x86-64 with skin.stremio and the Stremio bridge. '
+             'Built from pinned LibreELEC 12.2.1 Generic x86-64 with skin.stremioelec and the Stremio bridge. '
              'Includes separate system and skin/bridge update controls. Automatic downloads default OFF; '
              'installation requires confirmation and restart.\n\n'
              'Assets: .img.gz for first USB installation; .tar for system updates; -addons.zip for our updater; '

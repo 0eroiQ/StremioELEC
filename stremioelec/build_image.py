@@ -17,7 +17,7 @@ import xml.etree.ElementTree as ET
 import zipfile
 
 HERE = Path(__file__).resolve().parent
-OWN_IDS = ('skin.stremio', 'plugin.video.stremioelec', 'repository.stremioelec')
+OWN_IDS = ('skin.stremioelec', 'plugin.video.stremioelec', 'repository.stremioelec')
 IMAGE_IDS = OWN_IDS + ('service.stremioelec.updates', 'slyguy.trailers', 'inputstream.adaptive')
 
 
@@ -134,7 +134,7 @@ def patch_kodi(root, skin, lock, scratch):
         print('Dependency:', record['id'], record['version'], flush=True)
         download(record['url'], dest, record['sha256'])
         extract_addon(dest, addons, record['id'], record['version'])
-    copy_source(skin, addons / 'skin.stremio', skin=True)
+    copy_source(skin, addons / 'skin.stremioelec', skin=True)
 
     # StremioELEC runtime is part of SYSTEM, not a user-installed Kodi addon.
     # Kodi keeps only a tiny internal plugin/subtitle bridge so plugin:// routes
@@ -173,7 +173,7 @@ def patch_kodi(root, skin, lock, scratch):
     default = tree.find(".//setting[@id='lookandfeel.skin']/default")
     if default is None or default.text != 'skin.estuary':
         raise ValueError('Unknown base skin defaults')
-    default.text = 'skin.stremio'
+    default.text = 'skin.stremioelec'
     tree.write(settings, encoding='utf-8', xml_declaration=True)
 
     manifest_path = kodi / 'system/addon-manifest.xml'
@@ -181,7 +181,7 @@ def patch_kodi(root, skin, lock, scratch):
     old = next((n for n in manifest.getroot() if n.text == 'skin.estuary'), None)
     if old is None:
         raise ValueError('Missing base skin manifest')
-    old.text = 'skin.stremio'
+    old.text = 'skin.stremioelec'
     present = {n.text for n in manifest.getroot()}
     for identity in sorted(closure):
         if identity not in present:
@@ -195,7 +195,7 @@ def patch_kodi(root, skin, lock, scratch):
 
     config = kodi / 'config/guisettings.xml'
     defaults = ET.parse(config)
-    for identity, value in [('lookandfeel.skin', 'skin.stremio'), ('general.addonupdates', '2')]:
+    for identity, value in [('lookandfeel.skin', 'skin.stremioelec'), ('general.addonupdates', '2')]:
         node = defaults.find("setting[@id='" + identity + "']")
         if node is None:
             node = ET.SubElement(defaults.getroot(), 'setting', id=identity)
@@ -279,10 +279,10 @@ def main():
     lock = json.loads((HERE / 'image.lock.json').read_text())
     if lock['target'] != 'Generic.x86_64':
         raise ValueError('Only reviewed Generic x86-64 target is supported')
-    if lock['skin']['path'] != 'skin.stremio' or args.skin.resolve() != (HERE.parent / 'skin.stremio').resolve():
+    if lock['skin']['path'] != 'skin.stremioelec' or args.skin.resolve() != (HERE.parent / 'skin.stremioelec').resolve():
         raise ValueError('Skin must come from this StremioELEC checkout')
     run('git', '-c', 'safe.directory=' + str(HERE.parent), '-C', HERE.parent,
-        'diff', '--exit-code', 'HEAD', '--', 'skin.stremio')
+        'diff', '--exit-code', 'HEAD', '--', 'skin.stremioelec')
     args.output.mkdir(parents=True, exist_ok=False)
     output = args.output.resolve()
     name = 'StremioELEC-Generic.x86_64-' + lock['version']

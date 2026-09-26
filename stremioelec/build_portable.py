@@ -21,7 +21,7 @@ ROOT = HERE.parent
 TEST_BRANCH = 'portable-repository-test'
 TEST_BASE = 'https://raw.githubusercontent.com/0eroiQ/StremioELEC/' + TEST_BRANCH + '/'
 PORTABLE_THIRD_PARTY = ()
-OWN = ('plugin.video.stremioelec', 'skin.stremio', 'service.stremioelec.portable')
+OWN = ('plugin.video.stremioelec', 'skin.stremioelec', 'service.stremioelec.portable')
 KODI_BUILTINS = {'kodi.resource', 'script.module.pil'}
 
 
@@ -102,16 +102,16 @@ def package_folder(source, repo_root):
 
 def build_own(stage):
     plugin = stage / 'plugin.video.stremioelec'
-    copy_tree(ROOT / 'skin.stremio/integration/plugin.video.stremioelec', plugin)
+    copy_tree(ROOT / 'skin.stremioelec/integration/plugin.video.stremioelec', plugin)
     shutil.copy2(HERE / 'portable/plugin.video.stremioelec/addon.xml', plugin / 'addon.xml')
-    shutil.copy2(ROOT / 'skin.stremio/LICENSE', plugin / 'LICENSE')
+    shutil.copy2(ROOT / 'skin.stremioelec/LICENSE', plugin / 'LICENSE')
 
-    skin = stage / 'skin.stremio'
-    copy_tree(ROOT / 'skin.stremio', skin, skin=True)
+    skin = stage / 'skin.stremioelec'
+    copy_tree(ROOT / 'skin.stremioelec', skin, skin=True)
 
     portable = stage / 'service.stremioelec.portable'
     copy_tree(HERE / 'portable/service.stremioelec.portable', portable)
-    shutil.copy2(ROOT / 'skin.stremio/LICENSE', portable / 'LICENSE')
+    shutil.copy2(ROOT / 'skin.stremioelec/LICENSE', portable / 'LICENSE')
 
 
 def dependency_closure(index):
@@ -150,7 +150,7 @@ def repository_addon(output):
         '    <source>https://github.com/0eroiQ/StremioELEC</source>\n'
         '  </extension>\n'
         '</addon>\n')
-    shutil.copy2(ROOT / 'skin.stremio/LICENSE', source / 'LICENSE')
+    shutil.copy2(ROOT / 'skin.stremioelec/LICENSE', source / 'LICENSE')
     manifest, archive = package_folder(source, output)
     top = output / archive.name
     shutil.copy2(archive, top)

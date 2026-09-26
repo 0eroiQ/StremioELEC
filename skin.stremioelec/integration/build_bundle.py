@@ -30,7 +30,7 @@ def main():
     ]:
         for node in ET.fromstring(data):
             available[node.attrib['id']] = (node, name, base)
-    sources = {'skin.stremio': root, 'plugin.video.stremioelec': root / 'integration/plugin.video.stremioelec'}
+    sources = {'skin.stremioelec': root, 'plugin.video.stremioelec': root / 'integration/plugin.video.stremioelec'}
     pending = [(key, '0') for key in sources]
     resolved, records, dependencies = {}, [], {}
     while pending:
@@ -71,7 +71,7 @@ def main():
                     relative = path.relative_to(sources[identity])
                     if path.is_file() and not any(part.startswith('.') or part == '__pycache__'
                                                   for part in relative.parts):
-                        if identity == 'skin.stremio' and relative.parts[0] in ('integration', 'README.md'):
+                        if identity == 'skin.stremioelec' and relative.parts[0] in ('integration', 'README.md'):
                             continue
                         archive.write(path, identity + '/' + str(relative))
         with zipfile.ZipFile(dest) as archive:
@@ -124,7 +124,7 @@ def main():
         'until all packages are installed. Disable unknown sources afterwards.\n\n'
         + ''.join(f'{i}. `{name}`\n' for i, name in enumerate(ordered, 1))
         + '\nSelect Stremio skin in Interface settings. The internal ID is still '
-        'skin.stremio: this replaces an existing Bingie installation. '
+        'skin.stremioelec: this replaces an existing Bingie installation. '
         'Open Videos / Add-ons / StremioELEC catalogs to test the bridge.\n\n'
         'Cinemeta supplies metadata, not playable streams. QR login, account sync '
         'and cross-addon aggregation are not implemented. Legacy Bingie/TMDB '

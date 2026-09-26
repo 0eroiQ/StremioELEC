@@ -1,4 +1,4 @@
-"""Reversible StremioELEC portable-mode control."""
+"""Optional StremioELEC Skin control for an existing Kodi installation."""
 import json
 import os
 from pathlib import Path
@@ -11,6 +11,8 @@ import xbmcvfs
 ADDON = xbmcaddon.Addon('service.stremioelec.portable')
 PROFILE = Path(xbmcvfs.translatePath(ADDON.getAddonInfo('profile')))
 STATE = PROFILE / 'state.json'
+NEW_SKIN = 'skin.stremioelec'
+LEGACY_SKIN = 'skin.stremio'
 
 
 def rpc(method, params=None):
@@ -62,35 +64,50 @@ def set_skin(identity):
 
 
 def begin_onboarding():
+    """Record installation state without changing the user's active Kodi skin.
+
+    The only automatic switch is a legacy-ID migration when the user was
+    already actively using the previous StremioELEC skin.
+    """
     state = load()
     active = current_skin()
     previous = state.get('previous_skin')
-    if active != 'skin.stremio':
+
+    if active == LEGACY_SKIN and xbmc.getCondVisibility('System.HasAddon(' + NEW_SKIN + ')'):
+        previous = previous or 'skin.estuary'
+        set_skin(NEW_SKIN)
+        active = NEW_SKIN
+    elif active != NEW_SKIN:
         previous = active
-    state.update({'initialized': True, 'enabled': True, 'setup_started': True,
-                  'previous_skin': previous or 'skin.estuary'})
+
+    state.update({
+        'initialized': True,
+        'enabled': active == NEW_SKIN,
+        'previous_skin': previous or 'skin.estuary',
+    })
     save(state)
-    set_skin('skin.stremio')
-    # ReloadSkin is asynchronous; queue Welcome after the new skin is active.
-    xbmc.executebuiltin('AlarmClock(StremioWelcome,ReplaceWindow(1101),00:01,silent)')
 
 
 def enable():
+    """Explicit user action: switch the current Kodi profile to StremioELEC Skin."""
     state = load()
     active = current_skin()
     previous = state.get('previous_skin')
-    if active != 'skin.stremio':
+    if active != NEW_SKIN:
         previous = active
-    state.update({'initialized': True, 'enabled': True,
-                  'previous_skin': previous or 'skin.estuary'})
+    state.update({
+        'initialized': True,
+        'enabled': True,
+        'previous_skin': previous or 'skin.estuary',
+    })
     save(state)
-    set_skin('skin.stremio')
+    set_skin(NEW_SKIN)
 
 
 def restore():
     state = load()
     target = state.get('previous_skin') or 'skin.estuary'
-    if target == 'skin.stremio' or not xbmc.getCondVisibility('System.HasAddon(' + target + ')'):
+    if target in (NEW_SKIN, LEGACY_SKIN) or not xbmc.getCondVisibility('System.HasAddon(' + target + ')'):
         target = 'skin.estuary'
     state.update({'initialized': True, 'enabled': False})
     save(state)
@@ -99,17 +116,25 @@ def restore():
 
 def status():
     state = load()
-    return {'enabled': bool(state.get('enabled')),
-            'previous_skin': state.get('previous_skin') or 'skin.estuary',
-            'current_skin': current_skin()}
+    return {
+        'enabled': current_skin() == NEW_SKIN,
+        'previous_skin': state.get('previous_skin') or 'skin.estuary',
+        'current_skin': current_skin(),
+    }
 
 
 def menu():
     dialog = xbmcgui.Dialog()
-    choice = dialog.select('StremioELEC', ['Enable StremioELEC', 'Restore previous interface'])
+    choice = dialog.select(
+        'StremioELEC for Kodi',
+        ['Use StremioELEC Skin', 'Restore previous interface'])
     if choice == 0:
-        if dialog.yesno('Enable StremioELEC?', 'Switch back to the StremioELEC interface?'):
+        if dialog.yesno(
+                'Use StremioELEC Skin?',
+                'Switch this Kodi profile to the optional StremioELEC Skin?'):
             enable()
     elif choice == 1:
-        if dialog.yesno('Restore previous interface?', 'Return to the interface that was active before StremioELEC?'):
+        if dialog.yesno(
+                'Restore previous interface?',
+                'Return to the interface that was active before StremioELEC Skin?'):
             restore()

@@ -1,4 +1,4 @@
-"""Start the StremioELEC Welcome flow after portable installation."""
+"""Initialize portable StremioELEC without forcing an interface change."""
 import xbmc
 import xbmcgui
 from portable_mode import begin_onboarding, load
@@ -10,7 +10,7 @@ if not monitor.waitForAbort(2):
         try:
             begin_onboarding()
         except Exception:
-            xbmcgui.Dialog().ok('StremioELEC', 'StremioELEC could not start. Your previous interface was kept where possible.')
+            xbmcgui.Dialog().ok('StremioELEC for Kodi', 'StremioELEC could not initialize. Your current Kodi interface was not changed.')
 
 while not monitor.waitForAbort(10):
     pass

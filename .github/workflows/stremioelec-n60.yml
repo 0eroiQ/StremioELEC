@@ -9,9 +9,9 @@ on:
         default: false
   push:
     branches: [stremioelec/n60-image-pipeline]
-    paths: [stremioelec/**, skin.stremio/**, .github/workflows/stremioelec-n60.yml]
+    paths: [stremioelec/**, skin.stremioelec/**, .github/workflows/stremioelec-n60.yml]
   pull_request:
-    paths: [stremioelec/**, skin.stremio/**, .github/workflows/stremioelec-n60.yml]
+    paths: [stremioelec/**, skin.stremioelec/**, .github/workflows/stremioelec-n60.yml]
 
 permissions:
   contents: read
@@ -32,11 +32,11 @@ jobs:
           sparse-checkout: |
             stremioelec
             licenses
-            skin.stremio
+            skin.stremioelec
       - name: Validate image tooling
         run: python3 -m unittest discover -s stremioelec/tests -v
       - name: Test Stremio integration
-        run: python3 -m unittest discover -s skin.stremio/integration -p 'test_*.py'
+        run: python3 -m unittest discover -s skin.stremioelec/integration -p 'test_*.py'
       - name: Install image tools
         if: github.event_name != 'pull_request'
         run: |
@@ -46,7 +46,7 @@ jobs:
         if: github.event_name != 'pull_request'
         run: |
           sudo env GITHUB_ACTIONS=true BUILD_COMMIT="$GITHUB_SHA" python3 stremioelec/build_image.py \
-            --skin "$GITHUB_WORKSPACE/skin.stremio" --output "$GITHUB_WORKSPACE/image-output"
+            --skin "$GITHUB_WORKSPACE/skin.stremioelec" --output "$GITHUB_WORKSPACE/image-output"
           sudo chown -R "$(id -u):$(id -g)" image-output
       - name: Verify final artifacts
         if: github.event_name != 'pull_request'
@@ -78,7 +78,7 @@ jobs:
           persist-credentials: false
           sparse-checkout: |
             stremioelec
-            skin.stremio
+            skin.stremioelec
       - name: Build portable Kodi repository
         run: python3 stremioelec/build_portable.py --output "$GITHUB_WORKSPACE/portable-output"
       - name: Verify portable artifacts

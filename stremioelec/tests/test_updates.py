@@ -3,11 +3,13 @@ import hashlib
 import importlib.util
 import io
 import json
+import shutil
 import sys
 from pathlib import Path
 import tarfile
 import tempfile
 import unittest
+import xml.etree.ElementTree as ET
 from unittest.mock import MagicMock, patch
 import zipfile
 
@@ -111,12 +113,12 @@ class UpdateTests(unittest.TestCase):
         self.assertFalse(list(self.updater.root.glob('*.part')))
 
     def test_traversal_and_profile_paths_rejected(self):
-        for path in ('../account.json', 'skin.stremio/../../account.json', 'userdata/account.json', '/root/file'):
+        for path in ('../account.json', 'skin.stremioelec/../../account.json', 'userdata/account.json', '/root/file'):
             with self.subTest(path=path), self.assertRaises(ValueError):
                 self.fetch(extra=(path, 'bad'))
 
     def test_symlink_zip_rejected(self):
-        item = zipfile.ZipInfo('skin.stremio/link')
+        item = zipfile.ZipInfo('skin.stremioelec/link')
         item.create_system = 3
         item.external_attr = 0o120777 << 16
         with self.assertRaises(ValueError):
@@ -164,6 +166,70 @@ class UpdateTests(unittest.TestCase):
         self.assertEqual(self.updater.installed('addons'), 2)
         self.updater.apply_pending()  # Subsequent boots are idempotent.
         self.assertEqual(self.updater.ready(), {})
+
+    def test_addon_update_migrates_test7_skin_identity(self):
+        # Simulate test.7: SYSTEM contains the legacy skin ID, while the
+        # upcoming addon bundle contains the renamed skin.stremioelec package.
+        shutil.rmtree(self.updater.system_addons / engine.NEW_SKIN)
+        legacy_system = self.updater.system_addons / engine.LEGACY_SKIN
+        legacy_system.mkdir(parents=True)
+        (legacy_system / 'addon.xml').write_text(
+            '<addon id="' + engine.LEGACY_SKIN + '" version="1.0.0"/>')
+
+        self.settings.write_text(
+            '<settings><setting id="lookandfeel.skin">' +
+            engine.LEGACY_SKIN + '</setting></settings>')
+
+        old_profile = (
+            self.updater.storage / '.kodi/userdata/addon_data' /
+            engine.LEGACY_SKIN)
+        old_profile.mkdir(parents=True)
+        (old_profile / 'settings.xml').write_text('<settings/>')
+
+        shortcuts = (
+            self.updater.storage /
+            '.kodi/userdata/addon_data/script.skinshortcuts')
+        shortcuts.mkdir(parents=True)
+        old_shortcut = shortcuts / (
+            engine.LEGACY_SKIN + '-10000-1.DATA.xml')
+        old_shortcut.write_text('<includes/>')
+
+        old_override = self.updater.addons / engine.LEGACY_SKIN
+        old_override.mkdir(parents=True)
+        (old_override / 'addon.xml').write_text(
+            '<addon id="' + engine.LEGACY_SKIN + '" version="1.0.0"/>')
+
+        entry = self.fetch()
+        self.updater.stage(entry)
+        self.updater.apply_pending()
+
+        self.assertTrue(
+            (self.updater.addons / engine.NEW_SKIN / 'code.py').is_file())
+        self.assertTrue(legacy_system.is_dir())  # Removed by OS update, not addon update.
+        self.assertEqual(
+            ET.parse(self.settings).find(
+                "setting[@id='lookandfeel.skin']").text,
+            engine.NEW_SKIN)
+        self.assertFalse(old_profile.exists())
+        self.assertTrue(
+            (self.updater.storage / '.kodi/userdata/addon_data' /
+             engine.NEW_SKIN / 'settings.xml').is_file())
+        self.assertTrue(
+            (shortcuts / (
+                engine.NEW_SKIN + '-10000-1.DATA.xml')).is_file())
+        self.assertFalse(old_override.exists())
+        self.assertTrue(
+            (self.updater.root / 'legacy-skin' /
+             engine.LEGACY_SKIN / 'addon.xml').is_file())
+        self.assertEqual(
+            self.profile.read_text(), 'synthetic-account-sentinel')
+
+        # Subsequent pre-Kodi runs are harmless and keep the migrated identity.
+        self.updater.apply_pending()
+        self.assertEqual(
+            ET.parse(self.settings).find(
+                "setting[@id='lookandfeel.skin']").text,
+            engine.NEW_SKIN)
 
     def test_failed_second_addon_rolls_back_first(self):
         for identity in engine.IDS:

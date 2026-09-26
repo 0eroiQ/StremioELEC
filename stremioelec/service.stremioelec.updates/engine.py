@@ -22,7 +22,9 @@ import zipfile
 
 FEED = 'https://raw.githubusercontent.com/0eroiQ/StremioELEC/update-channel/stable.json'
 ASSET = r'https://github\.com/0eroiQ/StremioELEC/releases/download/[A-Za-z0-9._-]+/[A-Za-z0-9._-]+'
-IDS = ('skin.stremio', 'plugin.video.stremioelec')
+IDS = ('skin.stremioelec', 'plugin.video.stremioelec')
+NEW_SKIN = 'skin.stremioelec'
+LEGACY_SKIN = 'skin.stremio'
 MAX_SIZE = {'os': 1536 * 1024 * 1024, 'addons': 128 * 1024 * 1024}
 DEFAULTS = {'auto_os': False, 'auto_addons': False, 'installed_addons': 0}
 
@@ -114,6 +116,68 @@ class Updater:
 
     def save(self, **values):
         atomic(self.root / 'state.json', dict(self.state(), **values))
+
+    def current_addon_manifest(self, identity):
+        candidates = [self.addons / identity / 'addon.xml',
+                      self.system_addons / identity / 'addon.xml']
+        if identity == NEW_SKIN:
+            candidates.extend([
+                self.addons / LEGACY_SKIN / 'addon.xml',
+                self.system_addons / LEGACY_SKIN / 'addon.xml',
+            ])
+        for file in candidates:
+            if file.exists():
+                return file
+        raise FileNotFoundError('Installed addon manifest missing: ' + identity)
+
+    def migrate_legacy_skin_profile(self):
+        """Switch an existing test.7 profile to the newly installed skin ID."""
+        if not ((self.addons / NEW_SKIN / 'addon.xml').is_file()
+                or (self.system_addons / NEW_SKIN / 'addon.xml').is_file()):
+            return
+        userdata = self.storage / '.kodi/userdata'
+        gui = userdata / 'guisettings.xml'
+        if gui.exists():
+            try:
+                tree = ET.parse(gui)
+            except ET.ParseError:
+                tree = None
+            if tree is not None:
+                active = tree.find("setting[@id='lookandfeel.skin']")
+                if active is not None and active.text == LEGACY_SKIN:
+                    active.text = NEW_SKIN
+                    temporary = gui.with_suffix('.xml.new')
+                    tree.write(temporary, encoding='utf-8', xml_declaration=True)
+                    temporary.chmod(0o600)
+                    os.replace(temporary, gui)
+
+        old_profile = userdata / 'addon_data' / LEGACY_SKIN
+        new_profile = userdata / 'addon_data' / NEW_SKIN
+        if old_profile.is_dir() and not new_profile.exists():
+            new_profile.parent.mkdir(parents=True, exist_ok=True)
+            durable_move(old_profile, new_profile)
+
+        shortcuts = userdata / 'addon_data/script.skinshortcuts'
+        if shortcuts.is_dir():
+            for source in shortcuts.glob(LEGACY_SKIN + '*'):
+                if not source.is_file():
+                    continue
+                target = source.with_name(
+                    source.name.replace(LEGACY_SKIN, NEW_SKIN, 1))
+                if not target.exists():
+                    shutil.copy2(source, target)
+
+        # A user override of the old skin would otherwise shadow/duplicate the
+        # renamed addon. The read-only SYSTEM copy is removed only by an OS update.
+        old_override = self.addons / LEGACY_SKIN
+        if old_override.is_dir():
+            legacy = self.root / 'legacy-skin'
+            legacy.mkdir(exist_ok=True)
+            target = legacy / LEGACY_SKIN
+            if target.exists():
+                shutil.rmtree(old_override)
+            else:
+                durable_move(old_override, target)
 
     def toggle(self, key):
         if key not in ('auto_os', 'auto_addons'):
@@ -258,9 +322,7 @@ class Updater:
                 for identity, node in manifests.items():
                     if node.get('id') != identity or node.get('version') != info['addons'][identity]:
                         raise ValueError('Addon identity/version mismatch')
-                    current = self.addons / identity / 'addon.xml'
-                    if not current.exists():
-                        current = self.system_addons / identity / 'addon.xml'
+                    current = self.current_addon_manifest(identity)
                     if version(node.get('version')) < version(ET.parse(current).getroot().get('version')):
                         raise ValueError('Addon downgrade rejected')
                     for dep in node.findall('requires/import'):
@@ -343,6 +405,7 @@ class Updater:
     def apply_pending(self):
         """Called before Kodi starts, never against live imported Python modules."""
         self.recover()
+        self.migrate_legacy_skin_profile()
         entry = read(self.root / 'pending-addons.json')
         if not entry or entry['sequence'] <= self.installed('addons'):
             return
@@ -383,6 +446,7 @@ class Updater:
                 self.save(installed_addons=entry['sequence'], last_error='')
                 atomic(self.root / 'transaction.json', {'phase': 'committed', 'sequence': entry['sequence'], 'old': old})
                 (self.root / 'pending-addons.json').unlink(missing_ok=True)
+                self.migrate_legacy_skin_profile()
             except Exception:
                 self.recover()
                 raise

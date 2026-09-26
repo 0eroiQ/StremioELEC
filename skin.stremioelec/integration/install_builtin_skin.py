@@ -12,7 +12,7 @@ import xml.etree.ElementTree as ET
 
 def closure(root):
     system, portable = root / 'addons', root / 'portable_data/addons'
-    pending = ['skin.stremio', 'plugin.video.stremioelec']
+    pending = ['skin.stremioelec', 'plugin.video.stremioelec']
     selected = {}
     while pending:
         identity = pending.pop()
@@ -59,7 +59,7 @@ def main():
         if (root / 'addons' / identity).exists():
             raise ValueError('Destination already exists: ' + identity)
         print('Bundle:', identity)
-    print('Default and required skin: skin.stremio')
+    print('Default and required skin: skin.stremioelec')
     if not args.apply:
         return
     if args.backup_parent is None:
@@ -74,8 +74,8 @@ def main():
             destination = root / 'addons' / identity
             copied.append(destination)
             shutil.copytree(path, destination, ignore=shutil.ignore_patterns('__pycache__', '*.pyc', '.git'))
-        skin.text = 'skin.stremio'
-        old.text = 'skin.stremio'
+        skin.text = 'skin.stremioelec'
+        old.text = 'skin.stremioelec'
         if not any(n.text == 'plugin.video.stremioelec' for n in addons.getroot()):
             ET.SubElement(addons.getroot(), 'addon').text = 'plugin.video.stremioelec'
         nodes.write(settings, encoding='utf-8', xml_declaration=True)

@@ -1,9 +1,9 @@
 {
   "schema": 1,
-  "version": "0.4.0-test.7",
+  "version": "0.4.0-test.8",
   "update_schema": 1,
-  "sequence": 18,
-  "addons_sequence": 15,
+  "sequence": 19,
+  "addons_sequence": 16,
   "kodi_major": 21,
   "libreelec_major": 12,
   "target": "Generic.x86_64",
@@ -14,7 +14,7 @@
     "sha256": "85fcac13e046858a142a3161f45771073fa9d3b4a836e5fa4890c4f924a386b8"
   },
   "skin": {
-    "path": "skin.stremio",
+    "path": "skin.stremioelec",
     "imported_commit": "a37b5687563dc3483a6bcb320924c666f03a5990"
   },
   "addons": [

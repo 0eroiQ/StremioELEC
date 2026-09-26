@@ -2,13 +2,13 @@
 
 ## Unified development project
 
-The skin and Stremio bridge live in `skin.stremio/` in this repository.
+The skin and Stremio bridge live in `skin.stremioelec/` in this repository.
 Edit that directory directly; the image builds it from the same Git revision as
 the OS tooling. No separate skin repository, checkout key, or submodule is needed.
 The original skin history was imported without squashing; `skin.imported_commit`
 in the lock file records migration provenance, not a separate build dependency.
 
-The build installs the skin into `/usr/share/kodi/addons/skin.stremio`, selects
+The build installs the skin into `/usr/share/kodi/addons/skin.stremioelec`, selects
 it as Kodi's default, and removes Estuary from the generated image.
 
 This is an independent, unofficial LibreELEC derivative. The first pipeline
@@ -77,12 +77,19 @@ Appearance, Catalogs & Artwork, Weather, System & Updates, Advanced and About.
 Kodi setting IDs are read/written behind those screens. Native engine settings
 are gated behind explicit Developer Mode.
 
-Portable installation enters a StremioELEC Welcome flow, then offers Clean,
-Keep Existing or Advanced Setup. Clean resets only StremioELEC-owned account,
-addon/cache/Home state; existing host/Kodi data remains available as rollback
-but is not part of the normal StremioELEC experience. Advanced Playback exposes
-extra decoder compatibility controls in the StremioELEC UI. Developer Mode is
-the only supported route to the native playback-engine backend.
+On a normal Kodi 21 installation, the portable repository installs
+plugin.video.stremioelec plus skin.stremioelec as ordinary Kodi addons.
+It does not replace the user's current Kodi skin automatically. The user can
+keep Estuary or another skin and use StremioELEC Core from Add-ons, or explicitly
+select StremioELEC Skin under Kodi's Interface settings. Manual switching is
+reversible. A legacy portable profile that was already actively using the old
+skin.stremio ID is migrated once to skin.stremioelec.
+
+The StremioELEC image uses a different boundary: the same skin.stremioelec
+package is built into SYSTEM, replaces Estuary in Kodi's required-addon/default
+GUI configuration, and is therefore the appliance interface from first boot.
+Advanced Playback exposes extra decoder compatibility controls in that interface.
+Developer Mode is the only supported route to the native playback-engine backend.
 
 ## First-image limitations and acceptance
 

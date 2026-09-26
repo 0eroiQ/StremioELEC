@@ -1,4 +1,4 @@
-"""Manual portable-mode control."""
+"""Manual optional-skin control for StremioELEC on Kodi."""
 import sys
 import xbmcgui
 from portable_mode import enable, menu, restore

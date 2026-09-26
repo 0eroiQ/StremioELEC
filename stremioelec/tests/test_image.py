@@ -34,20 +34,20 @@ class ImageTests(unittest.TestCase):
         return path
 
     def test_dependency_closure(self):
-        self.addon('skin.stremio', requires='<import addon="xbmc.gui" version="5.17.0"/>')
+        self.addon('skin.stremioelec', requires='<import addon="xbmc.gui" version="5.17.0"/>')
         self.addon('xbmc.gui', '5.17.0')
-        self.assertEqual(build.validate_closure(self.root, ['skin.stremio']), {'skin.stremio': '1.0.0', 'xbmc.gui': '5.17.0'})
+        self.assertEqual(build.validate_closure(self.root, ['skin.stremioelec']), {'skin.stremioelec': '1.0.0', 'xbmc.gui': '5.17.0'})
 
     def test_missing_dependency_fails(self):
-        self.addon('skin.stremio', requires='<import addon="xbmc.gui" version="5.17.0"/>')
+        self.addon('skin.stremioelec', requires='<import addon="xbmc.gui" version="5.17.0"/>')
         with self.assertRaises(FileNotFoundError):
-            build.validate_closure(self.root, ['skin.stremio'])
+            build.validate_closure(self.root, ['skin.stremioelec'])
 
     def test_old_dependency_fails(self):
-        self.addon('skin.stremio', requires='<import addon="xbmc.gui" version="5.17.0"/>')
+        self.addon('skin.stremioelec', requires='<import addon="xbmc.gui" version="5.17.0"/>')
         self.addon('xbmc.gui', '5.16.0')
         with self.assertRaises(ValueError):
-            build.validate_closure(self.root, ['skin.stremio'])
+            build.validate_closure(self.root, ['skin.stremioelec'])
 
     def archive(self, entries):
         path = self.root / 'addon.zip'
@@ -111,13 +111,51 @@ class ImageTests(unittest.TestCase):
         bootstrap.seed(self.root)
         self.assertEqual(ET.parse(file).find('settings/system/hostname').text, 'test-box')
 
+    def test_bootstrap_migrates_legacy_skin_even_after_seed(self):
+        marker = self.root / '.config/stremioelec/seed-v1'
+        marker.parent.mkdir(parents=True)
+        marker.write_text('1\n')
+
+        gui = self.root / '.kodi/userdata/guisettings.xml'
+        gui.parent.mkdir(parents=True)
+        gui.write_text(
+            '<settings><setting id="lookandfeel.skin">skin.stremio</setting></settings>')
+
+        old_profile = self.root / '.kodi/userdata/addon_data/skin.stremio'
+        old_profile.mkdir(parents=True)
+        (old_profile / 'settings.xml').write_text('<settings/>')
+
+        shortcuts = self.root / '.kodi/userdata/addon_data/script.skinshortcuts'
+        shortcuts.mkdir(parents=True)
+        (shortcuts / 'skin.stremio-10000-1.DATA.xml').write_text('<includes/>')
+
+        old_addon = self.root / '.kodi/addons/skin.stremio'
+        old_addon.mkdir(parents=True)
+        (old_addon / 'addon.xml').write_text('<addon id="skin.stremio"/>')
+
+        bootstrap.seed(self.root)
+
+        self.assertEqual(
+            ET.parse(gui).find("setting[@id='lookandfeel.skin']").text,
+            'skin.stremioelec')
+        self.assertFalse(old_profile.exists())
+        self.assertTrue(
+            (self.root / '.kodi/userdata/addon_data/skin.stremioelec/settings.xml').is_file())
+        self.assertTrue(
+            (shortcuts / 'skin.stremioelec-10000-1.DATA.xml').is_file())
+        self.assertFalse(old_addon.exists())
+        self.assertTrue(
+            (self.root / '.config/stremioelec/legacy-addons/skin.stremio/addon.xml').is_file())
+        self.assertTrue(
+            (self.root / '.config/stremioelec/skin-id-v2').is_file())
+
     def test_repository_layout(self):
         for identity in build.OWN_IDS:
             self.addon(identity)
         output = self.root / 'repository.zip'
         build.repository_zip(self.root, output)
         with zipfile.ZipFile(output) as archive:
-            self.assertIn('skin.stremio/skin.stremio-1.0.0.zip', archive.namelist())
+            self.assertIn('skin.stremioelec/skin.stremioelec-1.0.0.zip', archive.namelist())
             self.assertEqual(len(ET.fromstring(archive.read('addons.xml'))), 3)
             import hashlib
             self.assertEqual(archive.read('addons.xml.md5').decode(), hashlib.md5(archive.read('addons.xml')).hexdigest())
@@ -125,7 +163,7 @@ class ImageTests(unittest.TestCase):
     def test_lock_is_immutable_and_targeted(self):
         lock = json.loads((BASE / 'image.lock.json').read_text())
         self.assertEqual(lock['target'], 'Generic.x86_64')
-        self.assertEqual(lock['skin']['path'], 'skin.stremio')
+        self.assertEqual(lock['skin']['path'], 'skin.stremioelec')
         self.assertRegex(lock['skin']['imported_commit'], r'^[a-f0-9]{40}$')
         self.assertRegex(lock['libreelec']['sha256'], r'^[a-f0-9]{64}$')
         ids = [a['id'] for a in lock['addons']]
@@ -158,7 +196,7 @@ class ImageTests(unittest.TestCase):
         source = self.root / 'source'
         bridge = source / 'integration/plugin.video.stremioelec'
         bridge.mkdir(parents=True)
-        (source / 'addon.xml').write_text('<addon id="skin.stremio" version="1"/>')
+        (source / 'addon.xml').write_text('<addon id="skin.stremioelec" version="1"/>')
         (source / 'LICENSE').write_text('test fixture')
         (bridge / 'addon.xml').write_text('<addon id="plugin.video.stremioelec" version="1"/>')
         python = kodi / 'addons/xbmc.python'
@@ -177,7 +215,7 @@ class ImageTests(unittest.TestCase):
         result = build.patch_kodi(root, source, {'addons': []}, self.root)
         self.assertEqual(set(result['dependency_closure']), set(build.IMAGE_IDS) | {'xbmc.python'})
         self.assertFalse((kodi / 'addons/skin.estuary').exists())
-        self.assertEqual(ET.parse(kodi / 'system/settings/settings.xml').find(".//default").text, 'skin.stremio')
+        self.assertEqual(ET.parse(kodi / 'system/settings/settings.xml').find(".//default").text, 'skin.stremioelec')
         config = ET.parse(kodi / 'config/guisettings.xml')
         self.assertEqual(config.find("setting[@id='general.addonupdates']").text, '2')
         self.assertEqual(config.find("setting[@id='test.preserved']").text, 'yes')

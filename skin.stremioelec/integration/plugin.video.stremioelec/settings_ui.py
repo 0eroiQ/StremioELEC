@@ -15,7 +15,7 @@ from setup_profile import rpc, get_setting, prepare, replace_backed_up, home_xml
 ADDON = xbmcaddon.Addon('plugin.video.stremioelec')
 PROFILE = Path(xbmcvfs.translatePath(ADDON.getAddonInfo('profile')))
 DIALOG = xbmcgui.Dialog()
-HOME = 'special://profile/addon_data/script.skinshortcuts/skin.stremio-10000-1.DATA.xml'
+HOME = 'special://profile/addon_data/script.skinshortcuts/skin.stremioelec-10000-1.DATA.xml'
 SETTINGS_COMMAND_WINDOW_ID = 1198
 SETTINGS_RUNTIME_WINDOW_ID = 11198
 
