@@ -69,3 +69,38 @@ jobs:
             echo '- Portable runtime 0.3.5 remains a service and is exposed under Programs.'
             echo '- This workflow validates source wiring only; N60 boot validation is still required.'
           } >> "$GITHUB_STEP_SUMMARY"
+
+  source-build-smoke:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-22.04
+    timeout-minutes: 360
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Install LibreELEC build prerequisites
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y \
+            build-essential bc curl gawk git libncurses-dev python3 unzip xz-utils zip
+      - name: Build Generic x86_64 StremioELEC test image
+        shell: bash
+        run: |
+          set -euo pipefail
+          PROJECT=Generic ARCH=x86_64 DEVICE=Generic DISTRIBUTION=StremioELEC make image
+      - name: Collect images
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p native-image-output
+          find target -maxdepth 1 -type f \( -name '*.img.gz' -o -name '*.tar' -o -name '*.img' \) -exec cp -v {} native-image-output/ \;
+          test -n "$(find native-image-output -type f -print -quit)"
+          sha256sum native-image-output/* > native-image-output/SHA256SUMS
+      - name: Upload native UI image
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: StremioELEC-native-ui-${{ github.run_number }}
+          path: native-image-output/
+          if-no-files-found: error
+          retention-days: 14
+          compression-level: 0
