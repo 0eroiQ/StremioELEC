@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<window id="1199">
+  <onload condition="!Skin.HasSetting(StremioDeveloperMode)">ReplaceWindow(1198)</onload>
+  <defaultcontrol always="true">100</defaultcontrol>
+  <controls>
+    <control type="image"><left>0</left><top>0</top><width>1920</width><height>1080</height><texture colordiffuse="FF080808">white.png</texture></control>
+    <control type="label"><left>150</left><top>65</top><width>1550</width><height>80</height><font>Bold40</font><label>Playback Engine Backend</label><textcolor>white</textcolor></control>
+    <control type="label"><left>150</left><top>135</top><width>1550</width><height>70</height><font>Reg24</font><label>Developer mode only. Native Kodi engine controls can bypass StremioELEC safeguards.</label><textcolor>grey</textcolor></control>
+    <control type="grouplist" id="100"><left>150</left><top>230</top><width>1560</width><height>620</height><orientation>vertical</orientation><itemgap>12</itemgap>
+      <control type="button" id="200"><width>1560</width><height>72</height><font>Reg28</font><align>center</align><label>Player backend</label><onclick>ActivateWindow(PlayerSettings)</onclick><texturefocus border="15">diffuse/bgpanel.png</texturefocus><texturenofocus border="15" colordiffuse="FF202020">diffuse/bgpanel.png</texturenofocus></control>
+      <control type="button" id="201"><width>1560</width><height>72</height><font>Reg28</font><align>center</align><label>Live TV backend</label><onclick>ActivateWindow(PVRSettings)</onclick><texturefocus border="15">diffuse/bgpanel.png</texturefocus><texturenofocus border="15" colordiffuse="FF202020">diffuse/bgpanel.png</texturenofocus></control>
+      <control type="button" id="202"><width>1560</width><height>72</height><font>Reg28</font><align>center</align><label>Service backend</label><onclick>ActivateWindow(ServiceSettings)</onclick><texturefocus border="15">diffuse/bgpanel.png</texturefocus><texturenofocus border="15" colordiffuse="FF202020">diffuse/bgpanel.png</texturenofocus></control>
+      <control type="button" id="203"><width>1560</width><height>72</height><font>Reg28</font><align>center</align><label>System backend</label><onclick>ActivateWindow(SystemSettings)</onclick><texturefocus border="15">diffuse/bgpanel.png</texturefocus><texturenofocus border="15" colordiffuse="FF202020">diffuse/bgpanel.png</texturenofocus></control>
+      <control type="button" id="204"><width>1560</width><height>72</height><font>Reg28</font><align>center</align><label>Engine information</label><onclick>ActivateWindow(7)</onclick><texturefocus border="15">diffuse/bgpanel.png</texturefocus><texturenofocus border="15" colordiffuse="FF202020">diffuse/bgpanel.png</texturenofocus></control>
+    </control>
+  </controls>
+</window>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<window id="1102">
+  <defaultcontrol always="true">101</defaultcontrol>
+  <controls>
+    <control type="image"><include>FullscreenDimensions</include><texture colordiffuse="ff000000">colors/color_white.png</texture></control>
+    <control type="label"><left>390</left><top>105</top><width>1140</width><height>90</height><font>Bold50</font><align>center</align><textcolor>ff9b7cff</textcolor><label>Choose your setup</label></control>
+    <control type="grouplist" id="100"><left>380</left><top>245</top><width>1160</width><height>430</height><orientation>vertical</orientation><itemgap>16</itemgap>
+      <control type="button" id="101"><width>1160</width><height>95</height><font>Reg30</font><align>center</align><label>Clean StremioELEC Setup · Recommended</label><onclick>RunScript(special://skin/extras/stremio_dispatch.py,setup_mode.py,clean)</onclick><texturefocus border="15">diffuse/bgpanel.png</texturefocus><texturenofocus border="15" colordiffuse="FF202020">diffuse/bgpanel.png</texturenofocus></control>
+      <control type="button" id="102"><width>1160</width><height>95</height><font>Reg30</font><align>center</align><label>Keep Existing Setup</label><onclick>RunScript(special://skin/extras/stremio_dispatch.py,setup_mode.py,keep)</onclick><texturefocus border="15">diffuse/bgpanel.png</texturefocus><texturenofocus border="15" colordiffuse="FF202020">diffuse/bgpanel.png</texturenofocus></control>
+      <control type="button" id="103"><width>1160</width><height>95</height><font>Reg30</font><align>center</align><label>Advanced Setup</label><onclick>ReplaceWindow(1192)</onclick><texturefocus border="15">diffuse/bgpanel.png</texturefocus><texturenofocus border="15" colordiffuse="FF202020">diffuse/bgpanel.png</texturenofocus></control>
+      <control type="button" id="104"><width>1160</width><height>75</height><font>Reg25</font><align>center</align><label>Back</label><onclick>ReplaceWindow(1101)</onclick><texturefocus border="15">diffuse/bgpanel.png</texturefocus><texturenofocus border="15" colordiffuse="FF202020">diffuse/bgpanel.png</texturenofocus></control>
+    </control>
+    <control type="textbox"><left>410</left><top>720</top><width>1100</width><height>180</height><font>Reg24</font><textcolor>grey</textcolor><align>center</align><label>Clean Setup starts with fresh StremioELEC account, addon and Home data while keeping the existing playback-engine data as a rollback. Keep Existing preserves the current StremioELEC state. Advanced Setup adds compatibility or developer controls.</label></control>
+  </controls>
+</window>

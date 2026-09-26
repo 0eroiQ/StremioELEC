@@ -1,0 +1,52 @@
+{
+  "schema": 1,
+  "version": "0.4.0-test.8",
+  "update_schema": 1,
+  "sequence": 19,
+  "addons_sequence": 16,
+  "kodi_major": 21,
+  "libreelec_major": 12,
+  "target": "Generic.x86_64",
+  "libreelec": {
+    "version": "12.2.1",
+    "source_commit": "6209f5a3b067c45fbf527286dd84ee483294b46a",
+    "url": "https://ftp.halifax.rwth-aachen.de/libreelec/LibreELEC-Generic.x86_64-12.2.1.img.gz",
+    "sha256": "85fcac13e046858a142a3161f45771073fa9d3b4a836e5fa4890c4f924a386b8"
+  },
+  "skin": {
+    "path": "skin.stremioelec",
+    "imported_commit": "a37b5687563dc3483a6bcb320924c666f03a5990"
+  },
+  "addons": [
+    {
+      "id": "inputstream.adaptive",
+      "version": "21.5.24.1",
+      "sha256": "9e22637310ade32b6808b40478ecf2d93a35bac25b69b0ffa9514be9aff3a110",
+      "url": "https://addons.libreelec.tv/12.2.0/Generic/x86_64/inputstream.adaptive/inputstream.adaptive-21.5.24.1.zip"
+    },
+    {
+      "id": "repository.slyguy",
+      "version": "0.0.9",
+      "sha256": "079915885866a5cbb8f17191c5ee8f7d044d7a9e788e96d116c9f1bc8bb4c3c0",
+      "url": "https://raw.githubusercontent.com/matthuisman/slyguy.addons/master/repository.slyguy.zip"
+    },
+    {
+      "id": "slyguy.dependencies",
+      "version": "0.0.30",
+      "sha256": "ff651f4ca1a6afb963868dc0a962064236b5c9c726a04b9425e43916fb3cb7f2",
+      "url": "https://raw.githubusercontent.com/matthuisman/slyguy.addons/master/slyguy.dependencies/slyguy.dependencies-0.0.30.zip"
+    },
+    {
+      "id": "script.module.slyguy",
+      "version": "0.86.98",
+      "sha256": "0d732d0bc4b0e2f74e125c6b67b2ec826e71ff71fb68112fa9acdf96f051cd80",
+      "url": "https://raw.githubusercontent.com/matthuisman/slyguy.addons/master/script.module.slyguy/script.module.slyguy-0.86.98.zip"
+    },
+    {
+      "id": "slyguy.trailers",
+      "version": "0.2.0",
+      "sha256": "782b3be1b9ed9419c9401bcd00299c5241c89e5814da9d4249bd1093e02e16d4",
+      "url": "https://raw.githubusercontent.com/matthuisman/slyguy.addons/master/slyguy.trailers/slyguy.trailers-0.2.0.zip"
+    }
+  ]
+}

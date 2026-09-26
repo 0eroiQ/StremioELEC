@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shortcuts>
+    <shortcut><label>Continue Watching</label><label2/><icon>DefaultShortcut.png</icon><thumb/><action>plugin://plugin.video.stremioelec/?action=continue</action></shortcut>
+    <shortcut><label>Popular Movies</label><label2/><icon>DefaultShortcut.png</icon><thumb/><action>plugin://plugin.video.tmdb.bingie.helper/?info=popular&amp;tmdb_type=movie&amp;widget=true</action></shortcut>
+    <shortcut><label>Top Rated Movies</label><label2/><icon>DefaultShortcut.png</icon><thumb/><action>plugin://plugin.video.tmdb.bingie.helper/?info=top_rated&amp;tmdb_type=movie&amp;widget=true</action></shortcut>
+    <shortcut><label>Popular TV Shows</label><label2/><icon>DefaultShortcut.png</icon><thumb/><action>plugin://plugin.video.tmdb.bingie.helper/?info=popular&amp;tmdb_type=tv&amp;widget=true</action></shortcut>
+</shortcuts>

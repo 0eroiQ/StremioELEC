@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="utf-8"?>
+<window id="1200">
+  <defaultcontrol>50</defaultcontrol>
+  <onload condition="String.IsEqual(Window(Home).Property(StremioStreams.RefocusChip),true) + String.IsEqual(Window(Home).Property(StremioStreams.SelectedProviderIndex),0)">SetFocus(101)</onload>
+  <onload condition="String.IsEqual(Window(Home).Property(StremioStreams.RefocusChip),true) + String.IsEqual(Window(Home).Property(StremioStreams.SelectedProviderIndex),1)">SetFocus(102)</onload>
+  <onload condition="String.IsEqual(Window(Home).Property(StremioStreams.RefocusChip),true) + String.IsEqual(Window(Home).Property(StremioStreams.SelectedProviderIndex),2)">SetFocus(103)</onload>
+  <onload condition="String.IsEqual(Window(Home).Property(StremioStreams.RefocusChip),true) + String.IsEqual(Window(Home).Property(StremioStreams.SelectedProviderIndex),3)">SetFocus(104)</onload>
+  <onload condition="String.IsEqual(Window(Home).Property(StremioStreams.RefocusChip),true) + String.IsEqual(Window(Home).Property(StremioStreams.SelectedProviderIndex),4)">SetFocus(105)</onload>
+  <onload condition="String.IsEqual(Window(Home).Property(StremioStreams.RefocusChip),true) + String.IsEqual(Window(Home).Property(StremioStreams.SelectedProviderIndex),5)">SetFocus(106)</onload>
+  <onload condition="String.IsEqual(Window(Home).Property(StremioStreams.RefocusChip),true) + String.IsEqual(Window(Home).Property(StremioStreams.SelectedProviderIndex),6)">SetFocus(107)</onload>
+  <onload>ClearProperty(StremioStreams.RefocusChip,Home)</onload>
+  <onback>Close</onback>
+  <controls>
+    <!-- Artwork background -->
+    <control type="image">
+      <left>0</left><top>0</top><width>1920</width><height>1080</height>
+      <texture background="true" fallback="special://skin/resources/fanart.jpg">$INFO[Window(Home).Property(StremioStreams.Fanart)]</texture>
+      <aspectratio>scale</aspectratio>
+      <fadetime>250</fadetime>
+    </control>
+    <control type="image">
+      <left>0</left><top>0</top><width>1920</width><height>1080</height>
+      <texture colordiffuse="E8FFFFFF">colors/color_black.png</texture>
+    </control>
+
+    <!-- Left hero / title panel -->
+    <control type="group">
+      <left>72</left><top>82</top><width>530</width><height>910</height>
+
+      <control type="image">
+        <visible>!String.IsEmpty(Window(Home).Property(StremioStreams.ClearLogo))</visible>
+        <width>500</width><height>175</height>
+        <texture background="true">$INFO[Window(Home).Property(StremioStreams.ClearLogo)]</texture>
+        <aspectratio align="left" aligny="center">keep</aspectratio>
+      </control>
+
+      <control type="textbox">
+        <visible>String.IsEmpty(Window(Home).Property(StremioStreams.ClearLogo))</visible>
+        <top>6</top><width>500</width><height>155</height>
+        <font>title</font><textcolor>FFFFFFFF</textcolor>
+        <label>$INFO[Window(Home).Property(StremioStreams.Title)]</label>
+        <aligny>center</aligny>
+      </control>
+
+      <control type="label">
+        <top>190</top><width>500</width><height>42</height>
+        <font>Bold28</font><textcolor>FFFFFFFF</textcolor>
+        <label>$INFO[Window(Home).Property(StremioStreams.Subtitle)]</label>
+      </control>
+
+      <control type="label">
+        <top>235</top><width>500</width><height>38</height>
+        <font>Reg24</font><textcolor>AFFFFFFF</textcolor>
+        <label>$INFO[Window(Home).Property(StremioStreams.Meta)]</label>
+      </control>
+
+      <control type="image">
+        <top>305</top><width>500</width><height>281</height>
+        <texture background="true" fallback="DefaultVideo.png">$INFO[Window(Home).Property(StremioStreams.HeroImage)]</texture>
+        <aspectratio>scale</aspectratio>
+        <bordersize>2</bordersize>
+      </control>
+
+      <control type="label">
+        <top>625</top><width>500</width><height>42</height>
+        <font>Bold30</font><textcolor>FFFFFFFF</textcolor>
+        <label>Choose a source</label>
+      </control>
+
+      <control type="label">
+        <top>670</top><width>500</width><height>34</height>
+        <font>Reg22</font><textcolor>8FFFFFFF</textcolor>
+        <label>$INFO[Container(50).NumItems] available</label>
+      </control>
+    </control>
+
+    <!-- Top provider chips: focus itself applies the filter -->
+    <control type="grouplist" id="51">
+      <left>670</left><top>60</top><width>1170</width><height>64</height>
+      <orientation>horizontal</orientation><itemgap>10</itemgap>
+      <onup>51</onup><ondown>50</ondown><onback>Close</onback>
+      <control type="button" id="101">
+        <width>170</width><height>50</height><font>Reg22</font><label>All</label>
+        <align>center</align><aligny>center</aligny><ondown>50</ondown>
+        <onfocus condition="!String.IsEqual(Window(Home).Property(StremioStreams.SelectedProvider),all)">RunPlugin($INFO[Window(Home).Property(StremioStreams.AllPath)])</onfocus>
+        <texturefocus border="20" colordiffuse="FFFFFFFF">diffuse/bgpanel.png</texturefocus>
+        <texturenofocus border="20" colordiffuse="50282830">diffuse/bgpanel.png</texturenofocus>
+        <textcolor>DFFFFFFF</textcolor><focusedcolor>FF151515</focusedcolor>
+      </control>
+      <control type="button" id="102">
+        <visible>!String.IsEmpty(Window(Home).Property(StremioStreams.Provider1Name))</visible>
+        <width>190</width><height>50</height><font>Reg22</font>
+        <label>$INFO[Window(Home).Property(StremioStreams.Provider1Name)]</label>
+        <align>center</align><aligny>center</aligny><ondown>50</ondown>
+        <onfocus condition="!String.IsEqual(Window(Home).Property(StremioStreams.SelectedProvider),Window(Home).Property(StremioStreams.Provider1Name))">RunPlugin($INFO[Window(Home).Property(StremioStreams.Provider1Path)])</onfocus>
+        <texturefocus border="20" colordiffuse="FFFFFFFF">diffuse/bgpanel.png</texturefocus>
+        <texturenofocus border="20" colordiffuse="50282830">diffuse/bgpanel.png</texturenofocus>
+        <textcolor>DFFFFFFF</textcolor><focusedcolor>FF151515</focusedcolor>
+      </control>
+      <control type="button" id="103">
+        <visible>!String.IsEmpty(Window(Home).Property(StremioStreams.Provider2Name))</visible>
+        <width>190</width><height>50</height><font>Reg22</font>
+        <label>$INFO[Window(Home).Property(StremioStreams.Provider2Name)]</label>
+        <align>center</align><aligny>center</aligny><ondown>50</ondown>
+        <onfocus condition="!String.IsEqual(Window(Home).Property(StremioStreams.SelectedProvider),Window(Home).Property(StremioStreams.Provider2Name))">RunPlugin($INFO[Window(Home).Property(StremioStreams.Provider2Path)])</onfocus>
+        <texturefocus border="20" colordiffuse="FFFFFFFF">diffuse/bgpanel.png</texturefocus>
+        <texturenofocus border="20" colordiffuse="50282830">diffuse/bgpanel.png</texturenofocus>
+        <textcolor>DFFFFFFF</textcolor><focusedcolor>FF151515</focusedcolor>
+      </control>
+      <control type="button" id="104">
+        <visible>!String.IsEmpty(Window(Home).Property(StremioStreams.Provider3Name))</visible>
+        <width>190</width><height>50</height><font>Reg22</font>
+        <label>$INFO[Window(Home).Property(StremioStreams.Provider3Name)]</label>
+        <align>center</align><aligny>center</aligny><ondown>50</ondown>
+        <onfocus condition="!String.IsEqual(Window(Home).Property(StremioStreams.SelectedProvider),Window(Home).Property(StremioStreams.Provider3Name))">RunPlugin($INFO[Window(Home).Property(StremioStreams.Provider3Path)])</onfocus>
+        <texturefocus border="20" colordiffuse="FFFFFFFF">diffuse/bgpanel.png</texturefocus>
+        <texturenofocus border="20" colordiffuse="50282830">diffuse/bgpanel.png</texturenofocus>
+        <textcolor>DFFFFFFF</textcolor><focusedcolor>FF151515</focusedcolor>
+      </control>
+      <control type="button" id="105">
+        <visible>!String.IsEmpty(Window(Home).Property(StremioStreams.Provider4Name))</visible>
+        <width>190</width><height>50</height><font>Reg22</font>
+        <label>$INFO[Window(Home).Property(StremioStreams.Provider4Name)]</label>
+        <align>center</align><aligny>center</aligny><ondown>50</ondown>
+        <onfocus condition="!String.IsEqual(Window(Home).Property(StremioStreams.SelectedProvider),Window(Home).Property(StremioStreams.Provider4Name))">RunPlugin($INFO[Window(Home).Property(StremioStreams.Provider4Path)])</onfocus>
+        <texturefocus border="20" colordiffuse="FFFFFFFF">diffuse/bgpanel.png</texturefocus>
+        <texturenofocus border="20" colordiffuse="50282830">diffuse/bgpanel.png</texturenofocus>
+        <textcolor>DFFFFFFF</textcolor><focusedcolor>FF151515</focusedcolor>
+      </control>
+      <control type="button" id="106">
+        <visible>!String.IsEmpty(Window(Home).Property(StremioStreams.Provider5Name))</visible>
+        <width>190</width><height>50</height><font>Reg22</font>
+        <label>$INFO[Window(Home).Property(StremioStreams.Provider5Name)]</label>
+        <align>center</align><aligny>center</aligny><ondown>50</ondown>
+        <onfocus condition="!String.IsEqual(Window(Home).Property(StremioStreams.SelectedProvider),Window(Home).Property(StremioStreams.Provider5Name))">RunPlugin($INFO[Window(Home).Property(StremioStreams.Provider5Path)])</onfocus>
+        <texturefocus border="20" colordiffuse="FFFFFFFF">diffuse/bgpanel.png</texturefocus>
+        <texturenofocus border="20" colordiffuse="50282830">diffuse/bgpanel.png</texturenofocus>
+        <textcolor>DFFFFFFF</textcolor><focusedcolor>FF151515</focusedcolor>
+      </control>
+      <control type="button" id="107">
+        <visible>!String.IsEmpty(Window(Home).Property(StremioStreams.Provider6Name))</visible>
+        <width>190</width><height>50</height><font>Reg22</font>
+        <label>$INFO[Window(Home).Property(StremioStreams.Provider6Name)]</label>
+        <align>center</align><aligny>center</aligny><ondown>50</ondown>
+        <onfocus condition="!String.IsEqual(Window(Home).Property(StremioStreams.SelectedProvider),Window(Home).Property(StremioStreams.Provider6Name))">RunPlugin($INFO[Window(Home).Property(StremioStreams.Provider6Path)])</onfocus>
+        <texturefocus border="20" colordiffuse="FFFFFFFF">diffuse/bgpanel.png</texturefocus>
+        <texturenofocus border="20" colordiffuse="50282830">diffuse/bgpanel.png</texturenofocus>
+        <textcolor>DFFFFFFF</textcolor><focusedcolor>FF151515</focusedcolor>
+      </control>
+    </control>
+
+    <!-- Stream cards -->
+    <control type="list" id="50">
+      <left>670</left><top>145</top><width>1170</width><height>880</height>
+      <orientation>vertical</orientation>
+      <preloaditems>5</preloaditems>
+      <onleft>50</onleft><onright>50</onright><onup>51</onup><ondown>50</ondown>
+      <onback>Close</onback>
+      <onclick>PlayMedia($ESCINFO[Container(50).ListItem.FileNameAndPath])</onclick>
+
+      <itemlayout width="1135" height="174">
+        <control type="image">
+          <left>3</left><top>5</top><width>1115</width><height>158</height>
+          <texture border="22" colordiffuse="B31F1F24">diffuse/bgpanel.png</texture>
+        </control>
+        <control type="label">
+          <left>28</left><top>17</top><width>710</width><height>38</height>
+          <font>Bold28</font><textcolor>FFFFFFFF</textcolor>
+          <label>$INFO[ListItem.Property(StremioStream.Headline)]</label>
+        </control>
+        <control type="label">
+          <right>28</right><top>19</top><width>280</width><height>34</height>
+          <font>Reg22</font><align>right</align><textcolor>90FFFFFF</textcolor>
+          <label>$INFO[ListItem.Property(StremioStream.Provider)]</label>
+        </control>
+        <control type="textbox">
+          <left>28</left><top>56</top><width>1040</width><height>51</height>
+          <font>Reg20</font><textcolor>DFFFFFFF</textcolor>
+          <label>$INFO[ListItem.Property(StremioStream.Filename)]</label>
+        </control>
+        <control type="label">
+          <left>28</left><top>111</top><width>555</width><height>30</height>
+          <font>Reg20</font><textcolor>BFFFFFFF</textcolor>
+          <label>$INFO[ListItem.Property(StremioStream.Tech)]</label>
+        </control>
+        <control type="label">
+          <right>28</right><top>111</top><width>515</width><height>30</height>
+          <font>Reg20</font><align>right</align><textcolor>8FFFFFFF</textcolor>
+          <label>$INFO[ListItem.Property(StremioStream.Meta)]</label>
+        </control>
+      </itemlayout>
+
+      <focusedlayout width="1135" height="174">
+        <control type="image">
+          <left>3</left><top>5</top><width>1115</width><height>158</height>
+          <texture border="22" colordiffuse="E84A4A52">diffuse/bgpanel.png</texture>
+        </control>
+        <control type="image">
+          <left>3</left><top>23</top><width>5</width><height>122</height>
+          <texture colordiffuse="FFFFFFFF">white.png</texture>
+        </control>
+        <control type="label">
+          <left>28</left><top>17</top><width>710</width><height>38</height>
+          <font>Bold28</font><textcolor>FFFFFFFF</textcolor>
+          <label>$INFO[ListItem.Property(StremioStream.Headline)]</label>
+        </control>
+        <control type="label">
+          <right>28</right><top>19</top><width>280</width><height>34</height>
+          <font>Reg22</font><align>right</align><textcolor>CFFFFFFF</textcolor>
+          <label>$INFO[ListItem.Property(StremioStream.Provider)]</label>
+        </control>
+        <control type="textbox">
+          <left>28</left><top>56</top><width>1040</width><height>51</height>
+          <font>Reg20</font><textcolor>FFFFFFFF</textcolor>
+          <label>$INFO[ListItem.Property(StremioStream.Filename)]</label>
+        </control>
+        <control type="label">
+          <left>28</left><top>111</top><width>555</width><height>30</height>
+          <font>Reg20</font><textcolor>EFFFFFFF</textcolor>
+          <label>$INFO[ListItem.Property(StremioStream.Tech)]</label>
+        </control>
+        <control type="label">
+          <right>28</right><top>111</top><width>515</width><height>30</height>
+          <font>Reg20</font><align>right</align><textcolor>CFFFFFFF</textcolor>
+          <label>$INFO[ListItem.Property(StremioStream.Meta)]</label>
+        </control>
+      </focusedlayout>
+
+      <content target="videos" browse="never">$VAR[StremioStreamsItemsContent]</content>
+    </control>
+
+    <control type="button" id="90">
+      <left>1835</left><top>28</top><width>54</width><height>54</height>
+      <font>Bold30</font><label>×</label><align>center</align><aligny>center</aligny>
+      <onclick>Close</onclick>
+      <onleft>51</onleft><ondown>51</ondown>
+      <texturefocus border="20" colordiffuse="FF4A4A52">diffuse/bgpanel.png</texturefocus>
+      <texturenofocus border="20" colordiffuse="30282830">diffuse/bgpanel.png</texturenofocus>
+      <textcolor>AFFFFFFF</textcolor><focusedcolor>FFFFFFFF</focusedcolor>
+    </control>
+  </controls>
+</window>

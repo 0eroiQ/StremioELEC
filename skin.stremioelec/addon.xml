@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<addon id="skin.stremioelec" version="3.2.0" name="StremioELEC Skin" provider-name="0eroiQ, matke">
+  <requires>
+        <import version="5.17.0" addon="xbmc.gui" />
+        <import addon="plugin.video.stremioelec" />
+    </requires>
+  <extension debugging="false" defaultthemename="Textures.xbt" effectslowdown="1" point="xbmc.gui.skin">
+    <res aspect="16:9" default="true" folder="1080i" height="1080" width="1920" />
+  </extension>
+  <extension point="xbmc.addon.metadata">
+    <summary lang="en_GB">Stremio-first TV interface for StremioELEC.</summary>
+    <description lang="en_GB">StremioELEC owns account, addons, Home, discovery, library, subtitles and settings while Kodi remains the playback engine. Visual foundations derived from Bingie remain credited under their original licence.</description>
+    <platform>all</platform>
+    <license>GPL v2.0</license>
+    <source>https://github.com/0eroiQ/StremioELEC</source>
+    <assets>
+      <icon>resources/icon.png</icon>
+      <fanart>resources/fanart.jpg</fanart>
+    </assets>
+  </extension>
+</addon>

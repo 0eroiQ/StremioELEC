@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- BINGIE -->
+<window>
+    <defaultcontrol always="true">10</defaultcontrol>
+    <include>DefaultSkinSettings</include>
+    <onload>SetProperty(Random,$INFO[System.Time(ss)],Home)</onload>
+    <!-- start up mask - preload -->
+    <onload condition="String.IsEmpty(Skin.String(SplashScreen))">SetProperty(StartupMask,1,home)</onload>
+    <onload condition="String.IsEmpty(Skin.String(SplashScreen))">ReplaceWindow($VAR[StartUpWindow])</onload>
+    <onunload condition="Player.HasVideo">PlayerControl(Stop)</onunload>
+	
+</window>

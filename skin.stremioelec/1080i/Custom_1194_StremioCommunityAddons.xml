@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<window id="1194">
+  <defaultcontrol always="true">50</defaultcontrol>
+  <onload>RunScript(special://skin/extras/stremio_dispatch.py,addons_ui.py,community_init)</onload>
+  <controls>
+    <control type="image"><left>0</left><top>0</top><width>1920</width><height>1080</height><texture colordiffuse="FF080808">white.png</texture></control>
+
+    <control type="label"><left>100</left><top>55</top><width>1720</width><height>65</height><font>Bold40</font><label>Community Addons</label><textcolor>white</textcolor></control>
+    <control type="label"><left>100</left><top>118</top><width>1720</width><height>38</height><font>Reg22</font><label>Browse the Stremio Community catalog</label><textcolor>grey</textcolor></control>
+
+    <control type="grouplist" id="20">
+      <left>100</left><top>175</top><width>1710</width><height>64</height><orientation>horizontal</orientation><itemgap>8</itemgap>
+      <control type="button" id="21"><width>160</width><height>58</height><font>Reg22</font><label>All</label><onclick>RunScript(special://skin/extras/stremio_dispatch.py,addons_ui.py,community_filter,all)</onclick><texturefocus border="12">diffuse/bgpanel.png</texturefocus><texturenofocus border="12" colordiffuse="FF202020">diffuse/bgpanel.png</texturenofocus></control>
+      <control type="button" id="22"><width>220</width><height>58</height><font>Reg22</font><label>Movies &amp; Series</label><onclick>RunScript(special://skin/extras/stremio_dispatch.py,addons_ui.py,community_filter,movies)</onclick><texturefocus border="12">diffuse/bgpanel.png</texturefocus><texturenofocus border="12" colordiffuse="FF202020">diffuse/bgpanel.png</texturenofocus></control>
+      <control type="button" id="23"><width>170</width><height>58</height><font>Reg22</font><label>Streams</label><onclick>RunScript(special://skin/extras/stremio_dispatch.py,addons_ui.py,community_filter,streams)</onclick><texturefocus border="12">diffuse/bgpanel.png</texturefocus><texturenofocus border="12" colordiffuse="FF202020">diffuse/bgpanel.png</texturenofocus></control>
+      <control type="button" id="24"><width>190</width><height>58</height><font>Reg22</font><label>Subtitles</label><onclick>RunScript(special://skin/extras/stremio_dispatch.py,addons_ui.py,community_filter,subtitles)</onclick><texturefocus border="12">diffuse/bgpanel.png</texturefocus><texturenofocus border="12" colordiffuse="FF202020">diffuse/bgpanel.png</texturenofocus></control>
+      <control type="button" id="25"><width>175</width><height>58</height><font>Reg22</font><label>Catalogs</label><onclick>RunScript(special://skin/extras/stremio_dispatch.py,addons_ui.py,community_filter,catalogs)</onclick><texturefocus border="12">diffuse/bgpanel.png</texturefocus><texturenofocus border="12" colordiffuse="FF202020">diffuse/bgpanel.png</texturenofocus></control>
+      <control type="button" id="26"><width>190</width><height>58</height><font>Reg22</font><label>Live TV</label><onclick>RunScript(special://skin/extras/stremio_dispatch.py,addons_ui.py,community_filter,live)</onclick><texturefocus border="12">diffuse/bgpanel.png</texturefocus><texturenofocus border="12" colordiffuse="FF202020">diffuse/bgpanel.png</texturenofocus></control>
+      <control type="button" id="27"><width>180</width><height>58</height><font>Reg22</font><label>Search</label><onclick>RunScript(special://skin/extras/stremio_dispatch.py,addons_ui.py,community_search)</onclick><texturefocus border="12">diffuse/bgpanel.png</texturefocus><texturenofocus border="12" colordiffuse="FF202020">diffuse/bgpanel.png</texturenofocus></control>
+    </control>
+
+    <control type="panel" id="50">
+      <left>100</left><top>275</top><width>1120</width><height>640</height>
+      <orientation>vertical</orientation><preloaditems>6</preloaditems><scrolltime>300</scrolltime>
+      <onup>20</onup><ondown>50</ondown><onright>60</onright><onleft>50</onleft>
+      <content>plugin://plugin.video.stremioelec/?action=community_catalog</content>
+      <itemlayout width="220" height="220">
+        <control type="group"><width>205</width><height>205</height>
+          <control type="image"><left>7</left><top>7</top><width>191</width><height>150</height><aspectratio>keep</aspectratio><texture background="true" fallback="DefaultAddon.png">$INFO[ListItem.Art(thumb)]</texture></control>
+          <control type="label"><left>8</left><top>160</top><width>190</width><height>34</height><font>Reg20</font><align>center</align><label>$INFO[ListItem.Label]</label><textcolor>white</textcolor></control>
+          <control type="label"><left>8</left><top>188</top><width>190</width><height>22</height><font>Reg16</font><align>center</align><label>$INFO[ListItem.Property(StremioInstalled)]</label><textcolor>grey</textcolor></control>
+        </control>
+      </itemlayout>
+      <focusedlayout width="220" height="220">
+        <control type="group"><width>205</width><height>205</height>
+          <control type="image"><width>205</width><height>205</height><texture border="12" colordiffuse="FFFFFFFF">diffuse/bgpanel.png</texture></control>
+          <control type="image"><left>7</left><top>7</top><width>191</width><height>150</height><aspectratio>keep</aspectratio><texture background="true" fallback="DefaultAddon.png">$INFO[ListItem.Art(thumb)]</texture></control>
+          <control type="label"><left>8</left><top>160</top><width>190</width><height>34</height><font>Reg20</font><align>center</align><label>$INFO[ListItem.Label]</label><textcolor>black</textcolor><scroll>true</scroll></control>
+          <control type="label"><left>8</left><top>188</top><width>190</width><height>22</height><font>Reg16</font><align>center</align><label>$INFO[ListItem.Property(StremioInstalled)]</label><textcolor>black</textcolor></control>
+        </control>
+      </focusedlayout>
+    </control>
+
+    <control type="group" id="60">
+      <left>1260</left><top>275</top><width>560</width><height>640</height>
+      <control type="image"><width>560</width><height>640</height><texture border="15" colordiffuse="FF171717">diffuse/bgpanel.png</texture></control>
+      <control type="image"><left>30</left><top>30</top><width>150</width><height>150</height><aspectratio>keep</aspectratio><texture background="true" fallback="DefaultAddon.png">$INFO[Container(50).ListItem.Art(thumb)]</texture></control>
+      <control type="label"><left>205</left><top>30</top><width>325</width><height>50</height><font>Bold30</font><label>$INFO[Container(50).ListItem.Label]</label><textcolor>white</textcolor><scroll>true</scroll></control>
+      <control type="label"><left>205</left><top>85</top><width>325</width><height>32</height><font>Reg20</font><label>$INFO[Container(50).ListItem.Property(StremioInstalled)]</label><textcolor>grey</textcolor></control>
+      <control type="label"><left>205</left><top>122</top><width>325</width><height>32</height><font>Reg20</font><label>Version $INFO[Container(50).ListItem.Property(StremioVersion)]</label><textcolor>grey</textcolor></control>
+      <control type="textbox"><left>30</left><top>205</top><width>500</width><height>210</height><font>Reg22</font><label>$INFO[Container(50).ListItem.Property(StremioDescription)]</label><textcolor>white</textcolor></control>
+      <control type="label"><left>30</left><top>445</top><width>500</width><height>35</height><font>Reg20</font><label>Types: $INFO[Container(50).ListItem.Property(StremioTypes)]</label><textcolor>grey</textcolor><scroll>true</scroll></control>
+      <control type="label"><left>30</left><top>490</top><width>500</width><height>35</height><font>Reg20</font><label>Resources: $INFO[Container(50).ListItem.Property(StremioResources)]</label><textcolor>grey</textcolor><scroll>true</scroll></control>
+      <control type="label"><left>30</left><top>555</top><width>500</width><height>45</height><font>Reg22</font><align>center</align><label>$INFO[Container(50).ListItem.Property(StremioActionLabel)]</label><textcolor>white</textcolor></control>
+    </control>
+
+    <control type="label"><left>100</left><top>945</top><width>1720</width><height>38</height><font>Reg20</font><label>$INFO[Window.Property(StremioCommunity.Status)]</label><textcolor>grey</textcolor></control>
+  </controls>
+</window>

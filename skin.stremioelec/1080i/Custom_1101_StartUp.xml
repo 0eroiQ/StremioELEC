@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<window id="1101">
+  <defaultcontrol always="true">101</defaultcontrol>
+  <controls>
+    <control type="image"><include>FullscreenDimensions</include><texture colordiffuse="ff000000">colors/color_white.png</texture></control>
+    <control type="label"><left>400</left><top>145</top><width>1120</width><height>100</height><font>Bold60</font><align>center</align><textcolor>ff9b7cff</textcolor><label>StremioELEC</label></control>
+    <control type="label"><left>450</left><top>330</top><width>1020</width><height>60</height><font>Bold40</font><align>center</align><label>Welcome to StremioELEC</label></control>
+    <control type="textbox"><left>470</left><top>425</top><width>980</width><height>260</height><font>Reg28</font><align>center</align><label>A Stremio-first TV experience with your account, addons, library, subtitles, artwork and playback in one interface.[CR][CR]Setup will not change your existing environment until you choose how StremioELEC should start.</label></control>
+    <control type="button" id="101"><left>510</left><top>790</top><width>420</width><height>72</height><font>Reg26</font><align>center</align><label>Start Setup</label><onright>102</onright><onclick>ReplaceWindow(1102)</onclick><texturefocus border="10" colordiffuse="white">bingie/border/default_button_focus.png</texturefocus><texturenofocus colordiffuse="ff202020">colors/color_white.png</texturenofocus></control>
+    <control type="button" id="102"><left>990</left><top>790</top><width>420</width><height>72</height><font>Reg26</font><align>center</align><label>Exit Setup</label><onleft>101</onleft><visible>System.HasAddon(service.stremioelec.portable)</visible><onclick>RunScript(special://home/addons/service.stremioelec.portable/control.py,restore)</onclick><texturefocus border="10" colordiffuse="white">bingie/border/default_button_focus.png</texturefocus><texturenofocus colordiffuse="ff202020">colors/color_white.png</texturenofocus></control>
+  </controls>
+</window>

@@ -1,0 +1,662 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- BINGIE -->
+<includes>		
+	 <variable name="Path_Param_Query">
+        <value condition="String.IsEqual(ListItem.DBType,movie) + !String.IsEmpty(ListItem.Property(imdb_id))">&amp;imdb_id=$INFO[ListItem.Property(imdb_id)]</value>
+        <value condition="String.IsEqual(ListItem.DBType,movie) + !String.IsEmpty(ListItem.IMDBNumber) + String.StartsWith(ListItem.IMDBNumber,tt)">&amp;imdb_id=$INFO[ListItem.IMDBNumber]</value>
+        <value condition="[String.IsEqual(ListItem.DBType,season) | String.IsEqual(ListItem.DBType,episode) | String.StartsWith(ListItem.Label,Season)] + !String.IsEmpty(ListItem.TvShowTitle)">&amp;query=$INFO[ListItem.TvShowTitle]$INFO[ListItem.Year,&amp;episode_year=,]</value>
+        <value condition="$EXP[Exp_IsPersonInfo] + !String.IsEmpty(ListItem.Property(tmdb_id))">&amp;tmdb_id=$INFO[ListItem.Property(tmdb_id)]</value>
+        <value condition="!String.IsEmpty(ListItem.Title)">&amp;query=$INFO[ListItem.Title]$INFO[ListItem.Year,&amp;year=,]</value>
+        <value>$INFO[ListItem.Label,&amp;query=,]</value>
+    </variable>
+	
+	<variable name="Path_Param_Type">
+        <value condition="$EXP[IsMovieDBType] | $EXP[IsSetDBType]">tmdb_type=movie</value>
+        <value condition="$EXP[IsTvShowDBType] | $EXP[IsSeasonDBType] | $EXP[IsEpisodeDBType]">tmdb_type=tv</value>
+        <value condition="$EXP[Exp_IsPersonInfo]">tmdb_type=person</value>
+    </variable>
+	
+	<variable name="Path_Param_Limit">
+        <value condition="Window.IsActive(1119)">&amp;length=1&amp;limit=3</value>
+    </variable>
+	
+	<variable name="Path_Param_EpisodeSpecific">
+        <value condition="String.IsEqual(ListItem.DBType,season)">$INFO[ListItem.Season,&amp;season=,]</value>
+        <value condition="String.IsEqual(ListItem.DBType,episode)">$INFO[ListItem.Season,&amp;season=,]$INFO[ListItem.Episode,&amp;episode=,]</value>
+    </variable>
+	
+	<variable name="Path_Cast">
+        <value condition="String.IsEqual(Window.Property(AdditionalInfo),cast) + !String.IsEmpty(ListItem.Property(StremioID))">plugin://plugin.video.stremioelec/?action=details_cast&amp;kind=$INFO[ListItem.Property(StremioType)]&amp;id=$INFO[ListItem.Property(StremioID)]</value>
+        <value condition="String.IsEqual(Window.Property(AdditionalInfo),cast) + String.IsEqual(ListItem.DBType,movie) + !String.IsEmpty(ListItem.IMDBNumber)">plugin://plugin.video.stremioelec/?action=details_cast&amp;kind=movie&amp;id=$INFO[ListItem.IMDBNumber]</value>
+        <value condition="String.IsEqual(Window.Property(AdditionalInfo),cast) + [String.IsEqual(ListItem.DBType,tvshow) | String.IsEqual(ListItem.DBType,season) | String.IsEqual(ListItem.DBType,episode)] + !String.IsEmpty(ListItem.UniqueID(imdb))">plugin://plugin.video.stremioelec/?action=details_cast&amp;kind=series&amp;id=$INFO[ListItem.UniqueID(imdb)]</value>
+        <value condition="String.IsEqual(Window.Property(AdditionalInfo),cast) + [String.IsEqual(ListItem.DBType,tvshow) | String.IsEqual(ListItem.DBType,season) | String.IsEqual(ListItem.DBType,episode)]">plugin://plugin.video.stremioelec/?action=details_cast&amp;kind=series&amp;query=$INFO[ListItem.TVShowTitle]</value>
+    </variable>
+	
+    <variable name="Path_Crew">
+        <value condition="String.IsEqual(Container(8999).ListItem.Label,$LOCALIZE[31089]) + !String.IsEmpty(ListItem.Property(StremioID))">plugin://plugin.video.stremioelec/?action=details_crew&amp;kind=$INFO[ListItem.Property(StremioType)]&amp;id=$INFO[ListItem.Property(StremioID)]</value>
+        <value condition="String.IsEqual(Container(8999).ListItem.Label,$LOCALIZE[31089]) + String.IsEqual(ListItem.DBType,movie) + !String.IsEmpty(ListItem.IMDBNumber)">plugin://plugin.video.stremioelec/?action=details_crew&amp;kind=movie&amp;id=$INFO[ListItem.IMDBNumber]</value>
+        <value condition="String.IsEqual(Container(8999).ListItem.Label,$LOCALIZE[31089]) + [String.IsEqual(ListItem.DBType,tvshow) | String.IsEqual(ListItem.DBType,season) | String.IsEqual(ListItem.DBType,episode)] + !String.IsEmpty(ListItem.UniqueID(imdb))">plugin://plugin.video.stremioelec/?action=details_crew&amp;kind=series&amp;id=$INFO[ListItem.UniqueID(imdb)]</value>
+    </variable>
+	
+	<variable name="Path_Videos">
+        <value condition="[Control.HasFocus(541) | String.IsEqual(Window.Property(AdditionalInfo),trailers)] + !String.IsEmpty(ListItem.Property(StremioID))">plugin://plugin.video.stremioelec/?action=details_trailers&amp;kind=$INFO[ListItem.Property(StremioType)]&amp;id=$INFO[ListItem.Property(StremioID)]</value>
+        <value condition="[Control.HasFocus(541) | String.IsEqual(Window.Property(AdditionalInfo),trailers)] + String.IsEqual(ListItem.DBType,movie) + !String.IsEmpty(ListItem.IMDBNumber)">plugin://plugin.video.stremioelec/?action=details_trailers&amp;kind=movie&amp;id=$INFO[ListItem.IMDBNumber]</value>
+        <value condition="[Control.HasFocus(541) | String.IsEqual(Window.Property(AdditionalInfo),trailers)] + [String.IsEqual(ListItem.DBType,tvshow) | String.IsEqual(ListItem.DBType,season) | String.IsEqual(ListItem.DBType,episode)] + !String.IsEmpty(ListItem.UniqueID(imdb))">plugin://plugin.video.stremioelec/?action=details_trailers&amp;kind=series&amp;id=$INFO[ListItem.UniqueID(imdb)]</value>
+    </variable>
+	
+	 <variable name="Path_FromGenre">
+        <value condition="String.IsEqual(Container(8999).ListItem.Label,$LOCALIZE[135]) + !String.IsEmpty(ListItem.Property(StremioGenre))">plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=$INFO[ListItem.Property(StremioType)]&amp;id=top&amp;genre=$INFO[ListItem.Property(StremioGenre)]</value>
+    </variable>
+	
+	<variable name="Path_FromDirector_Name">
+        <value condition="!String.IsEmpty(Container(17195).ListItem.Property(Director.1.name))">$INFO[Container(17195).ListItem.Property(Director.1.name)]</value>
+        <value condition="!String.IsEmpty(Container(17195).ListItem.Property(Director.2.name))">$INFO[Container(17195).ListItem.Property(Director.2.name)]</value>
+        <value condition="!String.IsEmpty(Container(17195).ListItem.Property(Director.3.name))">$INFO[Container(17195).ListItem.Property(Director.3.name)]</value>
+		<value condition="!String.IsEmpty(Container(17195).ListItem.Property(Director.4.name))">$INFO[Container(17195).ListItem.Property(Director.4.name)]</value>
+        <value condition="!String.IsEmpty(Container(17195).ListItem.Property(Director.5.name))">$INFO[Container(17195).ListItem.Property(Director.5.name)]</value>
+    </variable>
+	
+	<variable name="Path_FromDirector_TMDb">
+        <value condition="String.IsEqual(Container(8999).ListItem.Label,$LOCALIZE[20339]) + !String.IsEmpty(Container(17195).ListItem.Property(Director.1.TMDb_ID))">$INFO[Container(17195).ListItem.Property(Director.1.TMDb_ID),&amp;tmdb_id=,]</value>
+        <value condition="String.IsEqual(Container(8999).ListItem.Label,$LOCALIZE[20339]) + !String.IsEmpty(Container(17195).ListItem.Property(Director.2.TMDb_ID))">$INFO[Container(17195).ListItem.Property(Director.2.TMDb_ID),&amp;tmdb_id=,]</value>
+        <value condition="String.IsEqual(Container(8999).ListItem.Label,$LOCALIZE[20339]) + !String.IsEmpty(Container(17195).ListItem.Property(Director.3.TMDb_ID))">$INFO[Container(17195).ListItem.Property(Director.3.TMDb_ID),&amp;tmdb_id=,]</value>
+		<value condition="String.IsEqual(Container(8999).ListItem.Label,$LOCALIZE[20339]) + !String.IsEmpty(Container(17195).ListItem.Property(Director.4.TMDb_ID))">$INFO[Container(17195).ListItem.Property(Director.4.TMDb_ID),&amp;tmdb_id=,]</value>
+        <value condition="String.IsEqual(Container(8999).ListItem.Label,$LOCALIZE[20339]) + !String.IsEmpty(Container(17195).ListItem.Property(Director.5.TMDb_ID))">$INFO[Container(17195).ListItem.Property(Director.5.TMDb_ID),&amp;tmdb_id=,]</value>
+    </variable>
+	
+	<variable name="Path_FromDirector">
+        <value condition="String.IsEqual(Container(8999).ListItem.Label,$LOCALIZE[20339]) + !String.IsEmpty(ListItem.Property(StremioDirector))">plugin://plugin.video.stremioelec/?action=search_results&amp;query=$INFO[ListItem.Property(StremioDirector)]</value>
+    </variable>
+	
+	<variable name="Path_FromCreator_Name">
+        <value condition="String.IsEqual(Container(8999).ListItem.Label,$LOCALIZE[31530]) + !String.IsEmpty(Container(17195).ListItem.Property(Creator.1.name))">$INFO[Container(17195).ListItem.Property(Creator.1.name)]</value>
+		<value condition="String.IsEqual(Container(8999).ListItem.Label,$LOCALIZE[31530]) + !String.IsEmpty(Container(17195).ListItem.Property(Creator.2.name))">$INFO[Container(17195).ListItem.Property(Creator.2.name)]</value>
+		<value condition="String.IsEqual(Container(8999).ListItem.Label,$LOCALIZE[31530]) + !String.IsEmpty(Container(17195).ListItem.Property(Creator.3.name))">$INFO[Container(17195).ListItem.Property(Creator.3.name)]</value>
+    </variable>
+	
+	<variable name="Path_FromCreator_TMDb">
+        <value condition="!String.IsEmpty(Container(17195).ListItem.Property(Creator.1.TMDb_ID))">$INFO[Container(17195).ListItem.Property(Creator.1.TMDb_ID),&amp;tmdb_id=,]</value>
+        <value condition="!String.IsEmpty(Container(17195).ListItem.Property(Creator.2.TMDb_ID))">$INFO[Container(17195).ListItem.Property(Creator.2.TMDb_ID),&amp;tmdb_id=,]</value>
+        <value condition="!String.IsEmpty(Container(17195).ListItem.Property(Creator.3.TMDb_ID))">$INFO[Container(17195).ListItem.Property(Creator.3.TMDb_ID),&amp;tmdb_id=,]</value>
+    </variable>
+	
+	<variable name="Path_FromCreator">
+        <value condition="String.IsEqual(Container(8999).ListItem.Label,$LOCALIZE[31530]) + !String.IsEmpty(ListItem.Property(StremioWriter))">plugin://plugin.video.stremioelec/?action=search_results&amp;kind=series&amp;query=$INFO[ListItem.Property(StremioWriter)]</value>
+    </variable>
+	
+	<variable name="Path_Posters">
+        <value></value>
+    </variable>
+	
+	<variable name="Path_FromWriter_Screenplay">
+        <value condition="String.IsEqual(Container(8999).ListItem.Label,$LOCALIZE[31488]) + !String.IsEmpty(Container(17195).ListItem.Property(Writer.1.name)) + !String.IsEmpty(Container(17195).ListItem.Property(Writer.1.job)) + String.IsEqual(Container(17195).ListItem.Property(Writer.1.job),Screenplay)">$INFO[Container(17195).ListItem.Property(Writer.1.name)]</value>
+        <value condition="String.IsEqual(Container(8999).ListItem.Label,$LOCALIZE[31488]) + !String.IsEmpty(Container(17195).ListItem.Property(Writer.2.name)) + !String.IsEmpty(Container(17195).ListItem.Property(Writer.2.job)) + String.IsEqual(Container(17195).ListItem.Property(Writer.2.job),Screenplay)">$INFO[Container(17195).ListItem.Property(Writer.2.name)]</value>
+        <value condition="String.IsEqual(Container(8999).ListItem.Label,$LOCALIZE[31488]) + !String.IsEmpty(Container(17195).ListItem.Property(Writer.3.name)) + !String.IsEmpty(Container(17195).ListItem.Property(Writer.3.job)) + String.IsEqual(Container(17195).ListItem.Property(Writer.3.job),Screenplay)">$INFO[Container(17195).ListItem.Property(Writer.3.name)]</value>
+		<value condition="String.IsEqual(Container(8999).ListItem.Label,$LOCALIZE[31488]) + !String.IsEmpty(Container(17195).ListItem.Property(Writer.4.name)) + !String.IsEmpty(Container(17195).ListItem.Property(Writer.4.job)) + String.IsEqual(Container(17195).ListItem.Property(Writer.4.job),Screenplay)">$INFO[Container(17195).ListItem.Property(Writer.4.name)]</value>
+        <value condition="String.IsEqual(Container(8999).ListItem.Label,$LOCALIZE[31488]) + !String.IsEmpty(Container(17195).ListItem.Property(Writer.5.name)) + !String.IsEmpty(Container(17195).ListItem.Property(Writer.5.job)) + String.IsEqual(Container(17195).ListItem.Property(Writer.5.job),Screenplay)">$INFO[Container(17195).ListItem.Property(Writer.5.name)]</value>
+        <value condition="String.IsEqual(Container(8999).ListItem.Label,$LOCALIZE[31488]) + !String.IsEmpty(Container(17195).ListItem.Property(Writer.1.name))">$INFO[Container(17195).ListItem.Property(Writer.1.name)]</value>
+    </variable>
+	
+	<variable name="Path_FromWriter_TMDb">
+        <value condition="!String.IsEmpty(Container(17195).ListItem.Property(Writer.1.TMDb_ID)) + !String.IsEmpty(Container(17195).ListItem.Property(Writer.1.job)) + String.IsEqual(Container(17195).ListItem.Property(Writer.1.job),Screenplay)">$INFO[Container(17195).ListItem.Property(Writer.1.TMDb_ID),&amp;tmdb_id=,]</value>
+        <value condition="!String.IsEmpty(Container(17195).ListItem.Property(Writer.2.TMDb_ID)) + !String.IsEmpty(Container(17195).ListItem.Property(Writer.2.job)) + String.IsEqual(Container(17195).ListItem.Property(Writer.2.job),Screenplay)">$INFO[Container(17195).ListItem.Property(Writer.2.TMDb_ID),&amp;tmdb_id=,]</value>
+        <value condition="!String.IsEmpty(Container(17195).ListItem.Property(Writer.3.TMDb_ID)) + !String.IsEmpty(Container(17195).ListItem.Property(Writer.3.job)) + String.IsEqual(Container(17195).ListItem.Property(Writer.3.job),Screenplay)">$INFO[Container(17195).ListItem.Property(Writer.3.TMDb_ID),&amp;tmdb_id=,]</value>
+		<value condition="!String.IsEmpty(Container(17195).ListItem.Property(Writer.4.TMDb_ID)) + !String.IsEmpty(Container(17195).ListItem.Property(Writer.4.job)) + String.IsEqual(Container(17195).ListItem.Property(Writer.4.job),Screenplay)">$INFO[Container(17195).ListItem.Property(Writer.4.TMDb_ID),&amp;tmdb_id=,]</value>
+        <value condition="!String.IsEmpty(Container(17195).ListItem.Property(Writer.5.TMDb_ID)) + !String.IsEmpty(Container(17195).ListItem.Property(Writer.5.job)) + String.IsEqual(Container(17195).ListItem.Property(Writer.5.job),Screenplay)">$INFO[Container(17195).ListItem.Property(Writer.5.TMDb_ID),&amp;tmdb_id=,]</value>
+        <value condition="!String.IsEmpty(Container(17195).ListItem.Property(Writer.1.TMDb_ID))">$INFO[Container(17195).ListItem.Property(Writer.1.TMDb_ID),&amp;tmdb_id=,]</value>
+    </variable>
+	
+	<variable name="Path_FromWriter">
+        <value condition="String.IsEqual(Container(8999).ListItem.Label,$LOCALIZE[31488]) + !String.IsEmpty(ListItem.Property(StremioWriter))">plugin://plugin.video.stremioelec/?action=search_results&amp;query=$INFO[ListItem.Property(StremioWriter)]</value>
+    </variable>
+	
+    <variable name="Path_FromStudio">
+        <value></value>
+    </variable>
+	
+	<variable name="Path_FromYear">
+        <value condition="String.IsEqual(Container(8999).ListItem.Label,$LOCALIZE[345]) + !String.IsEmpty(ListItem.Property(StremioYear))">plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=$INFO[ListItem.Property(StremioType)]&amp;id=year&amp;genre=$INFO[ListItem.Property(StremioYear)]</value>
+    </variable>
+	
+	<variable name="Path_Similar">
+        <value condition="[Control.HasFocus(62) | String.IsEqual(Window.Property(AdditionalInfo),similar)] + !String.IsEmpty(ListItem.Property(StremioID))">plugin://plugin.video.stremioelec/?action=details_recommendations&amp;kind=$INFO[ListItem.Property(StremioType)]&amp;id=$INFO[ListItem.Property(StremioID)]</value>
+        <value condition="[Control.HasFocus(62) | String.IsEqual(Window.Property(AdditionalInfo),similar)] + String.IsEqual(ListItem.DBType,movie) + !String.IsEmpty(ListItem.IMDBNumber)">plugin://plugin.video.stremioelec/?action=details_recommendations&amp;kind=movie&amp;id=$INFO[ListItem.IMDBNumber]</value>
+        <value condition="[Control.HasFocus(62) | String.IsEqual(Window.Property(AdditionalInfo),similar)] + [String.IsEqual(ListItem.DBType,tvshow) | String.IsEqual(ListItem.DBType,season) | String.IsEqual(ListItem.DBType,episode)] + !String.IsEmpty(ListItem.UniqueID(imdb))">plugin://plugin.video.stremioelec/?action=details_recommendations&amp;kind=series&amp;id=$INFO[ListItem.UniqueID(imdb)]</value>
+    </variable>
+	
+	<variable name="Path_Reviews">
+        <value></value>
+    </variable>
+	
+	<variable name="Path_Collection">
+        <value></value>
+    </variable>
+	
+	<variable name="Path_Set">
+		<value condition="!String.IsEmpty(ListItem.Set)">$INFO[ListItem.Set]</value>
+        <value condition="!String.IsEmpty(Container(17195).ListItem.Set)">$INFO[Container(17195).ListItem.Set]</value>
+    </variable>
+	
+	<variable name="Path_MyList">
+        <value>$INFO[Window(Home).Property(StremioLibraryURL)]</value>
+    </variable>
+	
+	<variable name="Path_CastInMovies">
+        <value condition="String.IsEqual(Container(2999).ListItem.Label,$LOCALIZE[31519])">plugin://plugin.video.stremioelec/?action=search_results&amp;kind=movie&amp;query=$INFO[ListItem.Label]</value>
+    </variable>
+	
+    <variable name="Path_CastInShows">
+        <value condition="String.IsEqual(Container(2999).ListItem.Label,$LOCALIZE[31508])">plugin://plugin.video.stremioelec/?action=search_results&amp;kind=series&amp;query=$INFO[ListItem.Label]</value>
+    </variable>
+	
+    <variable name="Path_CrewInMovies">
+        <value condition="String.IsEqual(Container(2999).ListItem.Label,$LOCALIZE[31509])">plugin://plugin.video.stremioelec/?action=search_results&amp;kind=movie&amp;query=$INFO[ListItem.Label]</value>
+    </variable>
+	
+    <variable name="Path_CrewInShows">
+        <value condition="String.IsEqual(Container(2999).ListItem.Label,$LOCALIZE[31510])">plugin://plugin.video.stremioelec/?action=search_results&amp;kind=series&amp;query=$INFO[ListItem.Label]</value>
+    </variable>
+	
+	<variable name="Path_Wikipedia_Title">
+        <value condition="!String.IsEmpty(ListItem.TVShowTitle)">$INFO[ListItem.TVShowTitle]</value>
+        <value condition="!String.IsEmpty(ListItem.Title)">$INFO[ListItem.Title]</value>
+        <value>$INFO[ListItem.Label]</value>
+    </variable>
+
+    <variable name="Path_Wikipedia_Type">
+        <value condition="String.IsEqual(ListItem.DBType,tvshow)">tv</value>
+        <value condition="String.IsEqual(ListItem.DBType,season)">tv</value>
+        <value condition="String.IsEqual(ListItem.DBType,episode)">tv</value>
+        <value condition="String.IsEqual(ListItem.DBType,movie)">movie</value>
+    </variable>
+	
+	<variable name="Path_OSD_Cast">
+        <value condition="VideoPlayer.Content(movies) + !String.IsEmpty(VideoPlayer.IMDBNumber)">plugin://plugin.video.stremioelec/?action=details_cast&amp;kind=movie&amp;id=$INFO[VideoPlayer.IMDBNumber]</value>
+        <value condition="VideoPlayer.Content(episodes) + !String.IsEmpty(VideoPlayer.IMDBNumber)">plugin://plugin.video.stremioelec/?action=details_cast&amp;kind=series&amp;id=$INFO[VideoPlayer.IMDBNumber]</value>
+        <value condition="VideoPlayer.Content(episodes)">plugin://plugin.video.stremioelec/?action=details_cast&amp;kind=series&amp;query=$INFO[VideoPlayer.TVShowTitle]</value>
+    </variable>
+	
+	<variable name="Path_OSD_Crew">
+        <value condition="VideoPlayer.Content(movies) + !String.IsEmpty(VideoPlayer.IMDBNumber)">plugin://plugin.video.stremioelec/?action=details_crew&amp;kind=movie&amp;id=$INFO[VideoPlayer.IMDBNumber]</value>
+        <value condition="VideoPlayer.Content(episodes) + !String.IsEmpty(VideoPlayer.IMDBNumber)">plugin://plugin.video.stremioelec/?action=details_crew&amp;kind=series&amp;id=$INFO[VideoPlayer.IMDBNumber]</value>
+        <value condition="VideoPlayer.Content(episodes)">plugin://plugin.video.stremioelec/?action=details_crew&amp;kind=series&amp;query=$INFO[VideoPlayer.TVShowTitle]</value>
+    </variable>
+	
+	<variable name="ActionAdvantureMoviesWidget">
+        <value condition="!String.IsEmpty(Skin.String(ActionAdvantureMovies.path))">$INFO[Skin.String(ActionAdvantureMovies.path)]</value>
+        <value>$VAR[ActionAdvantureMovies]</value>
+    </variable>
+	
+	<variable name="ActionAdvantureMovies">
+		<value condition="[Library.HasContent(Movies) | Library.HasContent(TVShows)]">special://skin/extras/categories/actionadventure.xsp</value>
+        <value condition="!Library.HasContent(Movies) + !Library.HasContent(TVShows)">plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=movie&amp;id=top&amp;genre=Action</value>
+    </variable>
+	
+	<variable name="ActionAdvantureTVShowsWidget">
+        <value condition="!String.IsEmpty(Skin.String(ActionAdvantureTVShows.path))">$INFO[Skin.String(ActionAdvantureTVShows.path)]</value>
+        <value>$VAR[ActionAdvantureTVShows]</value>
+    </variable>
+	
+	<variable name="ActionAdvantureTVShows">
+		<value condition="[Library.HasContent(Movies) | Library.HasContent(TVShows)]">special://skin/extras/categories/tvactionadventure.xsp</value>
+        <value condition="!Library.HasContent(Movies) + !Library.HasContent(TVShows)">plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=series&amp;id=top&amp;genre=Action</value>
+    </variable>
+	
+	<variable name="DramaMoviesWidget">
+        <value condition="!String.IsEmpty(Skin.String(DramaMovies.path))">$INFO[Skin.String(DramaMovies.path)]</value>
+        <value>$VAR[DramaMovies]</value>
+    </variable>
+	
+	<variable name="DramaMovies">
+		<value condition="[Library.HasContent(Movies) | Library.HasContent(TVShows)]">special://skin/extras/categories/dramas.xsp</value>
+        <value condition="!Library.HasContent(Movies) + !Library.HasContent(TVShows)">plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=movie&amp;id=top&amp;genre=Drama</value>
+    </variable>
+	
+	<variable name="DramaTVShowsWidget">
+        <value condition="!String.IsEmpty(Skin.String(DramaTVShows.path))">$INFO[Skin.String(DramaTVShows.path)]</value>
+        <value>$VAR[DramaTVShows]</value>
+    </variable>
+	
+	<variable name="DramaTVShows">
+		<value condition="[Library.HasContent(Movies) | Library.HasContent(TVShows)]">special://skin/extras/categories/tvdramas.xsp</value>
+        <value condition="!Library.HasContent(Movies) + !Library.HasContent(TVShows)">plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=series&amp;id=top&amp;genre=Drama</value>
+    </variable>
+	
+	<variable name="ComedyMoviesWidget">
+        <value condition="!String.IsEmpty(Skin.String(ComedyMovies.path))">$INFO[Skin.String(ComedyMovies.path)]</value>
+        <value>$VAR[ComedyMovies]</value>
+    </variable>
+	
+	<variable name="ComedyMovies">
+		<value condition="[Library.HasContent(Movies) | Library.HasContent(TVShows)]">special://skin/extras/categories/comedies.xsp</value>
+        <value condition="!Library.HasContent(Movies) + !Library.HasContent(TVShows)">plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=movie&amp;id=top&amp;genre=Comedy</value>
+    </variable>
+	
+	<variable name="ComedyTVShowsWidget">
+        <value condition="!String.IsEmpty(Skin.String(ComedyTVShows.path))">$INFO[Skin.String(ComedyTVShows.path)]</value>
+        <value>$VAR[ComedyTVShows]</value>
+    </variable>
+	
+	<variable name="ComedyTVShows">
+		<value condition="[Library.HasContent(Movies) | Library.HasContent(TVShows)]">special://skin/extras/categories/tvcomedies.xsp</value>
+        <value condition="!Library.HasContent(Movies) + !Library.HasContent(TVShows)">plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=series&amp;id=top&amp;genre=Comedy</value>
+    </variable>
+	
+	<variable name="HorrorMoviesWidget">
+        <value condition="!String.IsEmpty(Skin.String(HorrorMovies.path))">$INFO[Skin.String(HorrorMovies.path)]</value>
+        <value>$VAR[HorrorMovies]</value>
+    </variable>
+	
+	<variable name="HorrorMovies">
+		<value condition="[Library.HasContent(Movies) | Library.HasContent(TVShows)]">special://skin/extras/categories/horror.xsp</value>
+        <value condition="!Library.HasContent(Movies) + !Library.HasContent(TVShows)">plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=movie&amp;id=top&amp;genre=Horror</value>
+    </variable>
+	
+	<variable name="DocumentaryMoviesWidget">
+        <value condition="!String.IsEmpty(Skin.String(DocumentaryMovies.path))">$INFO[Skin.String(DocumentaryMovies.path)]</value>
+        <value>$VAR[DocumentaryMovies]</value>
+    </variable>
+	
+	<variable name="DocumentaryMovies">
+		<value condition="[Library.HasContent(Movies) | Library.HasContent(TVShows)]">special://skin/extras/categories/documentaries.xsp</value>
+        <value condition="!Library.HasContent(Movies) + !Library.HasContent(TVShows)">plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=movie&amp;id=top&amp;genre=Documentary</value>
+    </variable>
+	
+	<variable name="DocumentaryTVShowsWidget">
+        <value condition="!String.IsEmpty(Skin.String(DocumentaryTVShows.path))">$INFO[Skin.String(DocumentaryTVShows.path)]</value>
+        <value>$VAR[DocumentaryTVShows]</value>
+    </variable>
+	
+	<variable name="DocumentaryTVShows">
+		<value condition="[Library.HasContent(Movies) | Library.HasContent(TVShows)]">special://skin/extras/categories/tvdocumentaries.xsp</value>
+        <value condition="!Library.HasContent(Movies) + !Library.HasContent(TVShows)">plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=series&amp;id=top&amp;genre=Documentary</value>
+    </variable>
+	
+	<variable name="CrimeMoviesWidget">
+        <value condition="!String.IsEmpty(Skin.String(CrimeMovies.path))">$INFO[Skin.String(CrimeMovies.path)]</value>
+        <value>$VAR[CrimeMovies]</value>
+    </variable>
+	
+	<variable name="CrimeMovies">
+		<value condition="[Library.HasContent(Movies) | Library.HasContent(TVShows)]">special://skin/extras/categories/crime.xsp</value>
+        <value condition="!Library.HasContent(Movies) + !Library.HasContent(TVShows)">plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=movie&amp;id=top&amp;genre=Crime</value>
+    </variable>
+	
+	<variable name="CrimeTVShowsWidget">
+        <value condition="!String.IsEmpty(Skin.String(CrimeTVShows.path))">$INFO[Skin.String(CrimeTVShows.path)]</value>
+        <value>$VAR[CrimeTVShows]</value>
+    </variable>
+	
+	<variable name="CrimeTVShows">
+		<value condition="[Library.HasContent(Movies) | Library.HasContent(TVShows)]">special://skin/extras/categories/tvcrime.xsp</value>
+        <value condition="!Library.HasContent(Movies) + !Library.HasContent(TVShows)">plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=series&amp;id=top&amp;genre=Crime</value>
+    </variable>
+	
+	<variable name="FantasyMoviesWidget">
+        <value condition="!String.IsEmpty(Skin.String(FantasyMovies.path))">$INFO[Skin.String(FantasyMovies.path)]</value>
+        <value>$VAR[FantasyMovies]</value>
+    </variable>
+	
+	<variable name="FantasyMovies">
+		<value condition="[Library.HasContent(Movies) | Library.HasContent(TVShows)]">special://skin/extras/categories/fantasy.xsp</value>
+        <value condition="!Library.HasContent(Movies) + !Library.HasContent(TVShows)">plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=movie&amp;id=top&amp;genre=Fantasy</value>
+    </variable>
+	
+	<variable name="SciFiFantasyTVShowsWidget">
+        <value condition="!String.IsEmpty(Skin.String(SciFiFantasyTVShows.path))">$INFO[Skin.String(SciFiFantasyTVShows.path)]</value>
+        <value>$VAR[SciFiFantasyTVShows]</value>
+    </variable>
+	
+	<variable name="SciFiFantasyTVShows">
+		<value condition="[Library.HasContent(Movies) | Library.HasContent(TVShows)]">special://skin/extras/categories/tvscififantasy.xsp</value>
+        <value condition="!Library.HasContent(Movies) + !Library.HasContent(TVShows)">plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=series&amp;id=top&amp;genre=Sci-Fi</value>
+    </variable>
+	
+	<variable name="MusicMoviesWidget">
+        <value condition="!String.IsEmpty(Skin.String(MusicMovies.path))">$INFO[Skin.String(MusicMovies.path)]</value>
+        <value>$VAR[MusicMovies]</value>
+    </variable>
+	
+	<variable name="MusicMovies">
+		<value condition="[Library.HasContent(Movies) | Library.HasContent(TVShows)]">special://skin/extras/categories/musicandmusical.xsp</value>
+        <value condition="!Library.HasContent(Movies) + !Library.HasContent(TVShows)">plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=movie&amp;id=top</value>
+    </variable>
+	
+	<variable name="RomanceMoviesWidget">
+        <value condition="!String.IsEmpty(Skin.String(RomanceMovies.path))">$INFO[Skin.String(RomanceMovies.path)]</value>
+        <value>$VAR[RomanceMovies]</value>
+    </variable>
+	
+	<variable name="RomanceMovies">
+		<value condition="[Library.HasContent(Movies) | Library.HasContent(TVShows)]">special://skin/extras/categories/romance.xsp</value>
+        <value condition="!Library.HasContent(Movies) + !Library.HasContent(TVShows)">plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=movie&amp;id=top&amp;genre=Romance</value>
+    </variable>
+	
+	<variable name="SciFiMoviesWidget">
+        <value condition="!String.IsEmpty(Skin.String(SciFiMovies.path))">$INFO[Skin.String(SciFiMovies.path)]</value>
+        <value>$VAR[SciFiMovies]</value>
+    </variable>
+	
+	<variable name="SciFiMovies">
+		<value condition="[Library.HasContent(Movies) | Library.HasContent(TVShows)]">special://skin/extras/categories/scifi.xsp</value>
+        <value condition="!Library.HasContent(Movies) + !Library.HasContent(TVShows)">plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=movie&amp;id=top&amp;genre=Sci-Fi</value>
+    </variable>
+	
+	<variable name="ThrillerMoviesWidget">
+        <value condition="!String.IsEmpty(Skin.String(ThrillerMovies.path))">$INFO[Skin.String(ThrillerMovies.path)]</value>
+        <value>$VAR[ThrillerMovies]</value>
+    </variable>
+	
+	<variable name="ThrillerMovies">
+		<value condition="[Library.HasContent(Movies) | Library.HasContent(TVShows)]">special://skin/extras/categories/thriller.xsp</value>
+        <value condition="!Library.HasContent(Movies) + !Library.HasContent(TVShows)">plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=movie&amp;id=top&amp;genre=Thriller</value>
+    </variable>
+	
+	<variable name="WesternMoviesWidget">
+        <value condition="!String.IsEmpty(Skin.String(WesternMovies.path))">$INFO[Skin.String(WesternMovies.path)]</value>
+        <value>$VAR[WesternMovies]</value>
+    </variable>
+	
+	<variable name="WesternMovies">
+		<value condition="[Library.HasContent(Movies) | Library.HasContent(TVShows)]">special://skin/extras/categories/westerns.xsp</value>
+        <value condition="!Library.HasContent(Movies) + !Library.HasContent(TVShows)">plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=movie&amp;id=top&amp;genre=Western</value>
+    </variable>
+	
+	<variable name="WesternTVShowsWidget">
+        <value condition="!String.IsEmpty(Skin.String(WesternTVShows.path))">$INFO[Skin.String(WesternTVShows.path)]</value>
+        <value>$VAR[WesternTVShows]</value>
+    </variable>
+	
+	<variable name="WesternTVShows">
+		<value condition="[Library.HasContent(Movies) | Library.HasContent(TVShows)]">special://skin/extras/categories/tvwesterns.xsp</value>
+        <value condition="!Library.HasContent(Movies) + !Library.HasContent(TVShows)">plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=series&amp;id=top&amp;genre=Western</value>
+    </variable>
+	
+	<variable name="AnimationMoviesWidget">
+        <value condition="!String.IsEmpty(Skin.String(AnimationMovies.path))">$INFO[Skin.String(AnimationMovies.path)]</value>
+        <value>$VAR[AnimationMovies]</value>
+    </variable>
+	
+	<variable name="AnimationMovies">
+		<value condition="[Library.HasContent(Movies) | Library.HasContent(TVShows)]">special://skin/extras/categories/animations.xsp</value>
+        <value condition="!Library.HasContent(Movies) + !Library.HasContent(TVShows)">plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=movie&amp;id=top&amp;genre=Animation</value>
+    </variable>
+	
+	<variable name="AnimationTVShowsWidget">
+        <value condition="!String.IsEmpty(Skin.String(AnimationTVShows.path))">$INFO[Skin.String(AnimationTVShows.path)]</value>
+        <value>$VAR[AnimationTVShows]</value>
+    </variable>
+	
+	<variable name="AnimationTVShows">
+		<value condition="[Library.HasContent(Movies) | Library.HasContent(TVShows)]">special://skin/extras/categories/tvanimations.xsp</value>
+        <value condition="!Library.HasContent(Movies) + !Library.HasContent(TVShows)">plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=series&amp;id=top&amp;genre=Animation</value>
+    </variable>
+	
+	<variable name="AnimeMoviesWidget">
+        <value condition="!String.IsEmpty(Skin.String(AnimeMovies.path))">$INFO[Skin.String(AnimeMovies.path)]</value>
+        <value>$VAR[AnimeMovies]</value>
+    </variable>
+	
+	<variable name="AnimeMovies">
+		<value condition="[Library.HasContent(Movies) | Library.HasContent(TVShows)]">special://skin/extras/categories/anime.xsp</value>
+        <value condition="!Library.HasContent(Movies) + !Library.HasContent(TVShows)">plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=movie&amp;id=top&amp;genre=Animation</value>
+    </variable>
+	
+	<variable name="FamilyMoviesWidget">
+        <value condition="!String.IsEmpty(Skin.String(FamilyMovies.path))">$INFO[Skin.String(FamilyMovies.path)]</value>
+        <value>$VAR[FamilyMovies]</value>
+    </variable>
+	
+	<variable name="FamilyMovies">
+		<value condition="[Library.HasContent(Movies) | Library.HasContent(TVShows)]">special://skin/extras/categories/kidsandfamily.xsp</value>
+        <value condition="!Library.HasContent(Movies) + !Library.HasContent(TVShows)">plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=movie&amp;id=top&amp;genre=Family</value>
+    </variable>
+	
+	<variable name="FamilyTVShowsWidget">
+        <value condition="!String.IsEmpty(Skin.String(FamilyTVShows.path))">$INFO[Skin.String(FamilyTVShows.path)]</value>
+        <value>$VAR[FamilyTVShows]</value>
+    </variable>
+	
+	<variable name="FamilyTVShows">
+		<value condition="[Library.HasContent(Movies) | Library.HasContent(TVShows)]">special://skin/extras/categories/tvkidsandfamily.xsp</value>
+        <value condition="!Library.HasContent(Movies) + !Library.HasContent(TVShows)">plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=series&amp;id=top&amp;genre=Family</value>
+    </variable>
+	
+	<variable name="HistoryWarMoviesWidget">
+        <value condition="!String.IsEmpty(Skin.String(HistoryWarMovies.path))">$INFO[Skin.String(HistoryWarMovies.path)]</value>
+        <value>$VAR[HistoryWarMovies]</value>
+    </variable>
+	
+	<variable name="HistoryWarMovies">
+		<value condition="[Library.HasContent(Movies) | Library.HasContent(TVShows)]">special://skin/extras/categories/historywar.xsp</value>
+        <value condition="!Library.HasContent(Movies) + !Library.HasContent(TVShows)">plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=movie&amp;id=top&amp;genre=History</value>
+    </variable>
+	
+	<variable name="WarPoliticsTVShowsWidget">
+        <value condition="!String.IsEmpty(Skin.String(WarPoliticsTVShows.path))">$INFO[Skin.String(WarPoliticsTVShows.path)]</value>
+        <value>$VAR[WarPoliticsTVShows]</value>
+    </variable>
+	
+	<variable name="WarPoliticsTVShows">
+		<value condition="[Library.HasContent(Movies) | Library.HasContent(TVShows)]">special://skin/extras/categories/tvwarpolitics.xsp</value>
+        <value condition="!Library.HasContent(Movies) + !Library.HasContent(TVShows)">plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=series&amp;id=top&amp;genre=War</value>
+    </variable>
+	
+	<variable name="MysteryMoviesWidget">
+        <value condition="!String.IsEmpty(Skin.String(MysteryMovies.path))">$INFO[Skin.String(MysteryMovies.path)]</value>
+        <value>$VAR[MysteryMovies]</value>
+    </variable>
+	
+	<variable name="MysteryMovies">
+		<value condition="[Library.HasContent(Movies) | Library.HasContent(TVShows)]">special://skin/extras/categories/mysteries.xsp</value>
+        <value condition="!Library.HasContent(Movies) + !Library.HasContent(TVShows)">plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=movie&amp;id=top&amp;genre=Mystery</value>
+    </variable>
+	
+	<variable name="MysteryTVShowsWidget">
+        <value condition="!String.IsEmpty(Skin.String(MysteryTVShows.path))">$INFO[Skin.String(MysteryTVShows.path)]</value>
+        <value>$VAR[MysteryTVShows]</value>
+    </variable>
+	
+	<variable name="MysteryTVShows">
+		<value condition="[Library.HasContent(Movies) | Library.HasContent(TVShows)]">special://skin/extras/categories/tvmysteries.xsp</value>
+        <value condition="!Library.HasContent(Movies) + !Library.HasContent(TVShows)">plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=series&amp;id=top&amp;genre=Mystery</value>
+    </variable>
+	
+	<variable name="DefSpotlightWidgetContent">
+		<value condition="Library.HasContent(Movies) | Library.HasContent(TVShows)">plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=movie&amp;id=imdbRating</value>
+        <value condition="!Library.HasContent(Movies) + !Library.HasContent(TVShows)">plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=movie&amp;id=imdbRating</value>
+    </variable>
+	
+	<variable name="DefSpotlightMovieHubContent">
+		<value condition="Library.HasContent(Movies) | Library.HasContent(TVShows)">special://skin/extras/widgetplaylists/randommovies.xsp</value>
+        <value condition="!Library.HasContent(Movies) + !Library.HasContent(TVShows)">plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=movie&amp;id=imdbRating</value>
+    </variable>
+	
+	<variable name="DefSpotlightTVShowHubContent">
+		<value condition="Library.HasContent(Movies) | Library.HasContent(TVShows)">special://skin/extras/widgetplaylists/randomtvshows.xsp</value>
+        <value condition="!Library.HasContent(Movies) + !Library.HasContent(TVShows)">plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=series&amp;id=imdbRating</value>
+    </variable>
+	
+	<variable name="DefSpotlightNewHubContent">
+		<value condition="Library.HasContent(Movies) | Library.HasContent(TVShows)">plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=movie&amp;id=year</value>
+        <value condition="!Library.HasContent(Movies) + !Library.HasContent(TVShows)">plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=movie&amp;id=year</value>
+    </variable>
+	
+	<variable name="DefWidgetContent">
+        <value condition="Skin.HasSetting(StremioHomeDefaults)">plugin://plugin.video.stremioelec/?action=continue</value>
+		<value condition="System.HasAddon(plugin.video.stremioelec) + Skin.HasSetting(StremioCatalogPilot)">plugin://plugin.video.stremioelec/?action=catalog&amp;kind=movie&amp;id=top</value>
+		<value condition="Library.HasContent(Movies) | Library.HasContent(TVShows)">plugin://plugin.video.stremioelec/?action=continue</value>
+        <value condition="!Library.HasContent(Movies) + !Library.HasContent(TVShows)">plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=movie&amp;id=top</value>
+    </variable>
+	
+	<variable name="DefWidgetName">
+        <value condition="Skin.HasSetting(StremioHomeDefaults)">Continue Watching</value>
+		<value condition="Library.HasContent(Movies) | Library.HasContent(TVShows)">[CAPITALIZE]$LOCALIZE[13362][/CAPITALIZE] $VAR[ForCurrentProfileNameLabel]</value>
+        <value condition="!Library.HasContent(Movies) + !Library.HasContent(TVShows)">$LOCALIZE[31337]</value>
+    </variable>
+	
+	<variable name="DefWidget1Content">
+        <value condition="Skin.HasSetting(StremioHomeDefaults)">plugin://plugin.video.stremioelec/?action=library</value>
+		<value condition="Library.HasContent(Movies) | Library.HasContent(TVShows)">plugin://plugin.video.stremioelec/?action=library</value>
+        <value condition="!Library.HasContent(Movies) + !Library.HasContent(TVShows)">plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=series&amp;id=top</value>
+    </variable>
+	
+	<variable name="DefWidget1Name">
+        <value condition="Skin.HasSetting(StremioHomeDefaults)">My Library</value>
+		<value condition="Library.HasContent(Movies) | Library.HasContent(TVShows)">[CAPITALIZE]$LOCALIZE[20382][/CAPITALIZE]</value>
+        <value condition="!Library.HasContent(Movies) + !Library.HasContent(TVShows)">$LOCALIZE[31328]</value>
+    </variable>
+	
+	<variable name="DefWidget2Content">
+        <value condition="Skin.HasSetting(StremioHomeDefaults)">plugin://plugin.video.stremioelec/?action=first_catalog</value>
+		<value condition="Library.HasContent(Movies) | Library.HasContent(TVShows)">special://skin/extras/widgetplaylists/bingeworthyshows.xsp</value>
+        <value condition="!Library.HasContent(Movies) + !Library.HasContent(TVShows)">plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=movie&amp;id=imdbRating</value>
+    </variable>
+	
+	<variable name="DefWidget2Name">
+        <value condition="Skin.HasSetting(StremioHomeDefaults)">Stremio catalog</value>
+		<value condition="Library.HasContent(Movies) | Library.HasContent(TVShows)">$LOCALIZE[31079]</value>
+        <value condition="!Library.HasContent(Movies) + !Library.HasContent(TVShows)">$LOCALIZE[31326]</value>
+    </variable>
+	
+	<variable name="DefWidget3Content">
+		<value condition="Library.HasContent(Movies) | Library.HasContent(TVShows)">plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=series&amp;id=imdbRating</value>
+        <value condition="!Library.HasContent(Movies) + !Library.HasContent(TVShows)">plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=series&amp;id=imdbRating</value>
+    </variable>
+	
+	<variable name="DefWidget3Name">
+		<value condition="Library.HasContent(Movies) | Library.HasContent(TVShows)">$LOCALIZE[515]</value>
+        <value condition="!Library.HasContent(Movies) + !Library.HasContent(TVShows)">$LOCALIZE[31319]</value>
+    </variable>
+	
+	<variable name="DefWidget4Content">
+		<value condition="Library.HasContent(Movies) | Library.HasContent(TVShows)">special://skin/extras/widgetplaylists/criticallyacclaimedmovies.xsp</value>
+		<value condition="!Library.HasContent(Movies) + !Library.HasContent(TVShows)">plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=movie&amp;id=imdbRating</value>
+    </variable>
+	
+	<variable name="DefWidget4Name">
+		<value condition="Library.HasContent(Movies) | Library.HasContent(TVShows)">$LOCALIZE[31532]</value>
+		<value condition="!Library.HasContent(Movies) + !Library.HasContent(TVShows)">$LOCALIZE[31277]</value>
+    </variable>
+	
+	<variable name="DefWidget5Content">
+		<value condition="Library.HasContent(Movies) | Library.HasContent(TVShows)">plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=movie&amp;id=imdbRating</value>
+		<value condition="!Library.HasContent(Movies) + !Library.HasContent(TVShows)">plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=series&amp;id=imdbRating</value>
+	</variable>
+	
+	<variable name="DefWidget5Name">
+		<value condition="Library.HasContent(Movies) | Library.HasContent(TVShows)">Recommended</value>
+		<value condition="!Library.HasContent(Movies) + !Library.HasContent(TVShows)">$LOCALIZE[31443]</value>
+    </variable>
+	
+	<variable name="DefMovieHubContent">
+		<value condition="Library.HasContent(Movies) | Library.HasContent(TVShows)">special://skin/extras/widgetplaylists/inprogressmovies.xsp</value>
+		<value condition="!Library.HasContent(Movies) + !Library.HasContent(TVShows)">plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=movie&amp;id=top</value>
+	</variable>
+	
+	<variable name="DefMovieHubName">
+		<value condition="Library.HasContent(Movies) | Library.HasContent(TVShows)">[CAPITALIZE]$LOCALIZE[13362][/CAPITALIZE] $VAR[ForCurrentProfileNameLabel]</value>
+		<value condition="!Library.HasContent(Movies) + !Library.HasContent(TVShows)">$LOCALIZE[31337]</value>
+    </variable>
+	
+	<variable name="DefMovieHub1Content">
+		<value condition="Library.HasContent(Movies) | Library.HasContent(TVShows)">special://skin/extras/widgetplaylists/recentlyaddedmovies.xsp</value>
+		<value condition="!Library.HasContent(Movies) + !Library.HasContent(TVShows)">plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=movie&amp;id=top</value>
+	</variable>
+	
+	<variable name="DefMovieHub1Name">
+		<value condition="Library.HasContent(Movies) | Library.HasContent(TVShows)">[CAPITALIZE]$LOCALIZE[20382][/CAPITALIZE]</value>
+		<value condition="!Library.HasContent(Movies) + !Library.HasContent(TVShows)">$LOCALIZE[31326]</value>
+    </variable>
+	
+	<variable name="DefMovieHub2Content">
+		<value condition="Library.HasContent(Movies) | Library.HasContent(TVShows)">special://skin/extras/widgetplaylists/criticallyacclaimedmovies.xsp</value>
+		<value condition="!Library.HasContent(Movies) + !Library.HasContent(TVShows)">plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=movie&amp;id=imdbRating</value>
+	</variable>
+	
+	<variable name="DefMovieHub2Name">
+		<value condition="Library.HasContent(Movies) | Library.HasContent(TVShows)">$LOCALIZE[31532]</value>
+		<value condition="!Library.HasContent(Movies) + !Library.HasContent(TVShows)">$LOCALIZE[31277]</value>
+    </variable>
+	
+	<variable name="DefTVShowHubContent">
+		<value condition="Library.HasContent(Movies) | Library.HasContent(TVShows)">plugin://plugin.video.stremioelec/?action=continue</value>
+		<value condition="!Library.HasContent(Movies) + !Library.HasContent(TVShows)">plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=series&amp;id=top</value>
+	</variable>
+	
+	<variable name="DefTVShowHubName">
+		<value condition="Library.HasContent(Movies) | Library.HasContent(TVShows)">[CAPITALIZE]$LOCALIZE[13362][/CAPITALIZE] $VAR[ForCurrentProfileNameLabel]</value>
+		<value condition="!Library.HasContent(Movies) + !Library.HasContent(TVShows)">$LOCALIZE[31328]</value>
+    </variable>
+	
+	<variable name="DefTVShowHub1Content">
+		<value condition="Library.HasContent(Movies) | Library.HasContent(TVShows)">special://skin/extras/widgetplaylists/recentlyaddedtvshows.xsp</value>
+		<value condition="!Library.HasContent(Movies) + !Library.HasContent(TVShows)">plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=series&amp;id=top</value>
+	</variable>
+	
+	<variable name="DefTVShowHub1Name">
+		<value condition="Library.HasContent(Movies) | Library.HasContent(TVShows)">[CAPITALIZE]$LOCALIZE[20382][/CAPITALIZE]</value>
+		<value condition="!Library.HasContent(Movies) + !Library.HasContent(TVShows)">$LOCALIZE[31319]</value>
+    </variable>
+	
+	<variable name="DefTVShowHub2Content">
+		<value condition="Library.HasContent(Movies) | Library.HasContent(TVShows)">special://skin/extras/widgetplaylists/bingeworthyshows.xsp</value>
+		<value condition="!Library.HasContent(Movies) + !Library.HasContent(TVShows)">plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=series&amp;id=imdbRating</value>
+	</variable>
+	
+	<variable name="DefTVShowHub2Name">
+		<value condition="Library.HasContent(Movies) | Library.HasContent(TVShows)">$LOCALIZE[31079]</value>
+		<value condition="!Library.HasContent(Movies) + !Library.HasContent(TVShows)">$LOCALIZE[31443]</value>
+    </variable>
+	
+	<variable name="DefNewHubContent">
+		<value condition="Library.HasContent(Movies) | Library.HasContent(TVShows)">plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=movie&amp;id=year</value>
+		<value condition="!Library.HasContent(Movies) + !Library.HasContent(TVShows)">plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=movie&amp;id=year</value>
+	</variable>
+	
+	<variable name="DefNewHubName">
+		<value condition="Library.HasContent(Movies) | Library.HasContent(TVShows)">[CAPITALIZE]$LOCALIZE[20382][/CAPITALIZE]</value>
+		<value condition="!Library.HasContent(Movies) + !Library.HasContent(TVShows)">$LOCALIZE[31334]</value>
+    </variable>
+	
+	<variable name="DefNewHub1Content">
+		<value condition="Library.HasContent(Movies) | Library.HasContent(TVShows)">plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=series&amp;id=top</value>
+		<value condition="!Library.HasContent(Movies) + !Library.HasContent(TVShows)">plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=series&amp;id=year</value>
+	</variable>
+	
+	<variable name="DefNewHub1Name">
+		<value condition="Library.HasContent(Movies) | Library.HasContent(TVShows)">$LOCALIZE[31563]</value>
+		<value condition="!Library.HasContent(Movies) + !Library.HasContent(TVShows)">$LOCALIZE[31196]</value>
+    </variable>
+	
+	<variable name="DefNewHub2Content">
+		<value condition="!Library.HasContent(Movies) + !Library.HasContent(TVShows)">plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=movie&amp;id=year</value>
+	</variable>
+	
+	<variable name="DefNewHub2Name">
+		<value condition="!Library.HasContent(Movies) + !Library.HasContent(TVShows)">$LOCALIZE[31332]</value>
+    </variable>
+	
+	<variable name="DefNewHub3Content">
+		<value condition="!Library.HasContent(Movies) + !Library.HasContent(TVShows)">plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=series&amp;id=year</value>
+	</variable>
+	
+	<variable name="DefNewHub3Name">
+		<value condition="!Library.HasContent(Movies) + !Library.HasContent(TVShows)">$LOCALIZE[31256]</value>
+    </variable>
+	
+	<variable name="DefMusicHub3Name">
+		<value>[CAPITALIZE]$LOCALIZE[359][/CAPITALIZE]</value>
+    </variable>
+	
+	<variable name="DefSomethingHubContent">
+		<value condition="Library.HasContent(Movies) | Library.HasContent(TVShows)">plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=movie&amp;id=top</value>
+		<value condition="!Library.HasContent(Movies) + !Library.HasContent(TVShows)">plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=movie&amp;id=top</value>
+	</variable>
+	
+	<variable name="DefSomethingHubName">
+		<value condition="Library.HasContent(Movies) | Library.HasContent(TVShows)">$LOCALIZE[31219]</value>
+		<value condition="!Library.HasContent(Movies) + !Library.HasContent(TVShows)">$LOCALIZE[31219]</value>
+    </variable>
+	
+</includes>

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- StremioELEC owns the user-facing Settings experience. -->
+<window>
+  <onload>ReplaceWindow(1198)</onload>
+  <controls />
+</window>

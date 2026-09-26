@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<includes>
+  <!-- Compatibility include names are skin-internal now; no Skin Shortcuts addon is used. -->
+  <include name="skinshortcuts-mainmenu">
+    <item><label>Search</label><icon>shortcuts/search.png</icon><property name="path">StremioELEC.Search</property><onclick>RunScript(special://skin/extras/stremio_dispatch.py,search_ui.py)</onclick></item>
+    <item><label>Home</label><icon>shortcuts/home.png</icon><property name="path">ActivateWindow(home,return)</property><onclick>ActivateWindow(home,return)</onclick></item>
+    <item><label>Discover</label><icon>shortcuts/new.png</icon><property name="path">StremioELEC.Discover</property><onclick>ActivateWindow(Videos,plugin://plugin.video.stremioelec/?action=provider,return)</onclick></item>
+    <item><label>Library</label><icon>shortcuts/mylist.png</icon><property name="path">StremioELEC.Library</property><onclick>ActivateWindow(Videos,plugin://plugin.video.stremioelec/?action=library&amp;hub=1,return)</onclick></item>
+    <item><label>Addons</label><icon>DefaultAddon.png</icon><property name="path">ActivateWindow(1196)</property><onclick>ActivateWindow(1196)</onclick></item>
+    <item><label>Settings</label><icon>settings.png</icon><property name="path">ActivateWindow(1198)</property><onclick>ActivateWindow(1198)</onclick></item>
+  </include>
+
+  <include name="skinshortcuts-group-powermenu">
+    <item><label>Settings</label><property name="path">ActivateWindow(1198)</property><onclick>ActivateWindow(1198)</onclick></item>
+    <item><label>Restart StremioELEC</label><property name="path">RestartApp</property><onclick>RestartApp</onclick></item>
+  </include>
+
+  <!-- Names retained only as internal layout aliases used by the inherited XML. -->
+  <include name="skinshortcuts-template-Widgets"><include>StremioHomeWidgets</include></include>
+  <include name="skinshortcuts-template-tvshowhub"><include>StremioHomeWidgets</include></include>
+  <include name="skinshortcuts-template-moviehub"><include>StremioHomeWidgets</include></include>
+  <include name="skinshortcuts-template-newhub"><include>StremioHomeWidgets</include></include>
+  <include name="skinshortcuts-template-customhub"><include>StremioHomeWidgets</include></include>
+  <include name="skinshortcuts-template-mylisthub"><include>StremioHomeWidgets</include></include>
+  <include name="skinshortcuts-template-musichub"><include>StremioHomeWidgets</include></include>
+  <include name="skinshortcuts-template-somethinghub"><include>StremioHomeWidgets</include></include>
+  <include name="skinshortcuts-template-search" />
+  <include name="skinshortcuts-template-tmdbsearch" />
+
+  <!-- Native StremioELEC widget row: the Kodi skin is only the renderer. -->
+  <include name="StremioWidgetRow">
+    <param name="widgetid" />
+    <param name="widgetName" />
+    <param name="widgetPath" />
+    <definition>
+      <include content="widget_header_multi">
+        <param name="widgetid" value="$PARAM[widgetid]" />
+        <param name="widgetName" value="$PARAM[widgetName]" />
+      </include>
+      <include content="widget_base" condition="String.IsEqual(Skin.String(widgetstyle),poster)">
+        <param name="contentStyle" value="normal" /><param name="container" value="fixedlist" />
+        <param name="position" value="horizontal" /><param name="width" value="100%" /><param name="height" value="341" />
+        <param name="widgetid" value="$PARAM[widgetid]" /><param name="widgetTags" value="WidgetTagOverlayDisable" />
+        <param name="widgetTarget" value="videos" /><param name="widgetPath" value="$PARAM[widgetPath]" />
+        <param name="widgetStyle" value="widget_layout_poster" /><param name="widgetSortBy" value="none" />
+        <param name="widgetSortOrder" value="ascending" /><param name="widgetLimit" value="20" />
+      </include>
+      <include content="widget_base" condition="String.IsEqual(Skin.String(widgetstyle),landscape)">
+        <param name="contentStyle" value="normal" /><param name="container" value="fixedlist" />
+        <param name="position" value="horizontal" /><param name="width" value="100%" /><param name="height" value="341" />
+        <param name="widgetid" value="$PARAM[widgetid]" /><param name="widgetTags" value="WidgetTagOverlayDisable" />
+        <param name="widgetTarget" value="videos" /><param name="widgetPath" value="$PARAM[widgetPath]" />
+        <param name="widgetStyle" value="widget_layout_landscape" /><param name="widgetSortBy" value="none" />
+        <param name="widgetSortOrder" value="ascending" /><param name="widgetLimit" value="20" />
+      </include>
+      <include content="widget_base" condition="String.IsEqual(Skin.String(widgetstyle),square)">
+        <param name="contentStyle" value="normal" /><param name="container" value="fixedlist" />
+        <param name="position" value="horizontal" /><param name="width" value="100%" /><param name="height" value="341" />
+        <param name="widgetid" value="$PARAM[widgetid]" /><param name="widgetTags" value="WidgetTagOverlayDisable" />
+        <param name="widgetTarget" value="videos" /><param name="widgetPath" value="$PARAM[widgetPath]" />
+        <param name="widgetStyle" value="widget_layout_square" /><param name="widgetSortBy" value="none" />
+        <param name="widgetSortOrder" value="ascending" /><param name="widgetLimit" value="20" />
+      </include>
+    </definition>
+  </include>
+
+  <include name="StremioHomeWidgets">
+    <include content="StremioWidgetRow" condition="!Skin.HasSetting(StremioHideHomeRow0)"><param name="widgetid" value="3101" /><param name="widgetName" value="Continue Watching" /><param name="widgetPath" value="plugin://plugin.video.stremioelec/?action=continue" /></include>
+    <include content="StremioWidgetRow" condition="!Skin.HasSetting(StremioHideHomeRow1)"><param name="widgetid" value="3102" /><param name="widgetName" value="My Library" /><param name="widgetPath" value="plugin://plugin.video.stremioelec/?action=library" /></include>
+    <include content="StremioWidgetRow" condition="!Skin.HasSetting(StremioHideHomeRow2)"><param name="widgetid" value="3103" /><param name="widgetName" value="Popular Movies" /><param name="widgetPath" value="plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=movie&amp;id=top" /></include>
+    <include content="StremioWidgetRow" condition="!Skin.HasSetting(StremioHideHomeRow3)"><param name="widgetid" value="3104" /><param name="widgetName" value="Popular Series" /><param name="widgetPath" value="plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=series&amp;id=top" /></include>
+    <include content="StremioWidgetRow" condition="!Skin.HasSetting(StremioHideHomeRow4)"><param name="widgetid" value="3105" /><param name="widgetName" value="New Movies" /><param name="widgetPath" value="plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=movie&amp;id=year" /></include>
+    <include content="StremioWidgetRow" condition="!Skin.HasSetting(StremioHideHomeRow5)"><param name="widgetid" value="3106" /><param name="widgetName" value="New Series" /><param name="widgetPath" value="plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=series&amp;id=year" /></include>
+    <include content="StremioWidgetRow" condition="!Skin.HasSetting(StremioHideHomeRow6)"><param name="widgetid" value="3107" /><param name="widgetName" value="Featured Movies" /><param name="widgetPath" value="plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=movie&amp;id=imdbRating" /></include>
+    <include content="StremioWidgetRow" condition="!Skin.HasSetting(StremioHideHomeRow7)"><param name="widgetid" value="3108" /><param name="widgetName" value="Featured Series" /><param name="widgetPath" value="plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=series&amp;id=imdbRating" /></include>
+    <include content="StremioWidgetRow" condition="!Skin.HasSetting(StremioHideHomeRow8)"><param name="widgetid" value="3109" /><param name="widgetName" value="Action Movies" /><param name="widgetPath" value="plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=movie&amp;id=top&amp;genre=Action" /></include>
+    <include content="StremioWidgetRow" condition="!Skin.HasSetting(StremioHideHomeRow9)"><param name="widgetid" value="3110" /><param name="widgetName" value="Comedy Series" /><param name="widgetPath" value="plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=series&amp;id=top&amp;genre=Comedy" /></include>
+  </include>
+
+  <variable name="StremioStreamsFiltersContent"><value>$INFO[Window(Home).Property(StremioStreams.FilterPath)]</value></variable>
+  <variable name="StremioStreamsItemsContent"><value>$INFO[Window(Home).Property(StremioStreams.ItemsPath)]</value></variable>
+
+  <variable name="DefSpotlightWidgetContent"><value>plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=movie&amp;id=imdbRating</value></variable>
+  <variable name="DefSpotlightMovieHubContent"><value>plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=movie&amp;id=imdbRating</value></variable>
+  <variable name="DefSpotlightTVShowHubContent"><value>plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=series&amp;id=imdbRating</value></variable>
+  <variable name="DefSpotlightNewHubContent"><value>plugin://plugin.video.stremioelec/?action=home_catalog&amp;kind=movie&amp;id=year</value></variable>
+</includes>
