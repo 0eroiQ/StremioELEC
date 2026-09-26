@@ -95,10 +95,22 @@ jobs:
           echo "a3c2b80201b89e68616f4ad30bc66aee4927c3ce50e33929ca819d5c43538898  sources/gmp/gmp-6.3.0.tar.xz" | sha256sum -c -
           printf \'%s\\n\' \'https://gmplib.org/download/gmp/gmp-6.3.0.tar.xz\' > sources/gmp/gmp-6.3.0.tar.xz.url
           printf \'%s\\n\' \'a3c2b80201b89e68616f4ad30bc66aee4927c3ce50e33929ca819d5c43538898\' > sources/gmp/gmp-6.3.0.tar.xz.sha256
+      - name: Cache LibreELEC sources and build state
+        uses: actions/cache@v4
+        with:
+          path: |
+            sources
+            build.LibreELEC-Generic.x86_64-13.0-devel/.ccache
+          key: stremioelec-native-${{ runner.os }}-${{ hashFiles('packages/**/package.mk', 'distributions/StremioELEC/**') }}
+          restore-keys: |
+            stremioelec-native-${{ runner.os }}-
       - name: Build Generic x86_64 StremioELEC test image
         shell: bash
+        env:
+          THREADCOUNT: "2"
         run: |
           set -euo pipefail
+          export MAKEFLAGS="-j2"
           PROJECT=Generic ARCH=x86_64 DEVICE=Generic DISTRIBUTION=StremioELEC make image
       - name: Collect images
         shell: bash
