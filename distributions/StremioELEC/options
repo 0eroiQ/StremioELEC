@@ -1,0 +1,108 @@
+### DISTRO INFORMATION ###
+
+DISTRONAME="StremioELEC"
+DESCRIPTION="StremioELEC is a TV-first media operating system built on LibreELEC and Kodi, with a Stremio-focused interface and core integration."
+
+# Reuse LibreELEC source infrastructure while StremioELEC packages live in this repository.
+DISTRO_MIRROR="https://sources.libreelec.tv/mirror"
+DISTRO_SRC="https://sources.libreelec.tv/$DISTRO_VERSION"
+DISTRO_HOME_URL="https://github.com/0eroiQ/StremioELEC"
+
+GREETING0="##############################################"
+GREETING1="#                StremioELEC                 #"
+GREETING2="#        github.com/0eroiQ/StremioELEC       #"
+GREETING3="##############################################"
+GREETING4=""
+
+ROOT_PASSWORD="libreelec"
+DISTRO_BOOTLABEL="STREMIOELEC"
+DISTRO_DISKLABEL="STORAGE"
+VFD_MESSAGE="  STREMIOELEC"
+
+### BUILDSYSTEM SETTINGS ###
+LTO_SUPPORT="yes"
+GOLD_SUPPORT="yes"
+MOLD_SUPPORT="no"
+DEFAULT_LINKER="gold"
+HARDENING_SUPPORT="no"
+GET_HANDLER_SUPPORT="archive"
+LOCAL_CCACHE_SUPPORT="yes"
+
+### OS CONFIGURATION ###
+GLIBC_LOCALES="yes"
+if [ "${TARGET_ARCH}" = "arm" ]; then
+  ARM_MEM_SUPPORT="yes"
+else
+  ARM_MEM_SUPPORT="no"
+fi
+ADDITIONAL_DRIVERS=""
+SYSTEM_SIZE=512
+SYSTEM_PART_START=8192
+STORAGE_SIZE=32
+SWAP_SUPPORT="yes"
+SWAP_ENABLED_DEFAULT="no"
+SWAPFILESIZE="128"
+DEBUG_TTY="/dev/tty3"
+LOCAL_LOGIN="no"
+SSH_ENABLED_DEFAULT="no"
+
+### KODI SETTINGS ###
+MEDIACENTER="kodi"
+# Keep Estuary available as a recovery skin until the StremioELEC Main/Nimbus package passes boot testing.
+SKINS="Estuary"
+SKIN_DEFAULT="Estuary"
+KODI_EXTRA_FONTS="yes"
+PULSEAUDIO_SUPPORT="yes"
+PIPEWIRE_SUPPORT="no"
+ESPEAK_SUPPORT="yes"
+KODI_BLURAY_SUPPORT="yes"
+BLURAY_BDPLUS_SUPPORT="yes"
+BLURAY_AACS_SUPPORT="yes"
+KODI_DVDCSS_SUPPORT="yes"
+BLUETOOTH_SUPPORT="yes"
+KODI_WEBSERVER_SUPPORT="yes"
+AVAHI_DAEMON="yes"
+KODI_UPNP_SUPPORT="yes"
+KODI_MYSQL_SUPPORT="mariadb"
+KODI_OPTICAL_SUPPORT="yes"
+KODI_AIRPLAY_SUPPORT="yes"
+KODI_AIRTUNES_SUPPORT="yes"
+KODI_NFS_SUPPORT="yes"
+KODI_SAMBA_SUPPORT="yes"
+KODI_ALSA_SUPPORT="yes"
+KODI_PULSEAUDIO_SUPPORT="yes"
+KODI_PIPEWIRE_SUPPORT="no"
+
+### KODI ADDONS ###
+ADDON_SERVER_URL="https://addons.libreelec.tv"
+ADDON_PROJECT="${DEVICE:-$PROJECT}"
+DISTRO_PKG_SETTINGS="LibreELEC-settings"
+DISTRO_PKG_SETTINGS_ID="service.libreelec.settings"
+
+### ADDITIONAL PROGRAMS / FUNCTIONS ###
+TESTING="no"
+DEBUG_GROUPS="kodi+=kodi+,!mesa"
+DEBUG_GROUP_YES="kodi+"
+NFS_SUPPORT="yes"
+SAMBA_SUPPORT="yes"
+SAMBA_SERVER="yes"
+SFTP_SERVER="yes"
+OPENVPN_SUPPORT="yes"
+WIREGUARD_SUPPORT="yes"
+UDEVIL="yes"
+INITRAMFS_PARTED_SUPPORT="no"
+NANO_EDITOR="yes"
+CRON_SUPPORT="yes"
+INSTALLER_SUPPORT="yes"
+REMOTE_SUPPORT="yes"
+IR_REMOTE_KEYMAPS="rc6_mce xbox_360 xbox_one"
+JOYSTICK_SUPPORT="yes"
+CEC_SUPPORT="yes"
+CEC_FRAMEWORK_SUPPORT="no"
+OEM_SUPPORT="no"
+ALSA_SUPPORT="yes"
+ADDITIONAL_PACKAGES=""
+DRIVER_ADDONS_SUPPORT="no"
+DRIVER_ADDONS="crazycat digital_devices dvb-latest"
+BUILD_REUSABLE=""
+USE_REUSABLE="no"
