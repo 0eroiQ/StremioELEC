@@ -25,6 +25,24 @@ makeinstall_target() {
           <description>StremioELEC Core bridge</description>\
           <visible>false</visible>\
           <onclick>ActivateWindow(Videos,plugin://plugin.video.stremioelec/,return)</onclick>\
+        </control>\
+        <control type="button" id="9401">\
+          <description>StremioELEC Movies bridge</description>\
+          <label>Movies</label>\
+          <visible>false</visible>\
+          <onclick>ActivateWindow(Videos,plugin://plugin.video.stremioelec/,return)</onclick>\
+        </control>\
+        <control type="button" id="9402">\
+          <description>StremioELEC Series bridge</description>\
+          <label>Series</label>\
+          <visible>false</visible>\
+          <onclick>ActivateWindow(Videos,plugin://plugin.video.stremioelec/,return)</onclick>\
+        </control>\
+        <control type="button" id="9403">\
+          <description>StremioELEC Continue Watching bridge</description>\
+          <label>Continue Watching</label>\
+          <visible>false</visible>\
+          <onclick>ActivateWindow(Videos,plugin://plugin.video.stremioelec/,return)</onclick>\
         </control>' "${HOME_XML}"
   fi
 }
